@@ -4,7 +4,7 @@
 // constructor
 int    HDE::bindingSocket::connect_to_network(int sock, struct sockaddr_in address)
 {
-    return (bind(sock, (struct sockaddr*)&address, sizeof(address));
+    return (bind(sock, (struct sockaddr*)&address, sizeof(address)));
 }
 
 // definition of connect_to_network virtual function
