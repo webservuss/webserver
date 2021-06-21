@@ -3,7 +3,7 @@
 
 
 
-HDE::ListentingSocket::ListentingSocket(int domain , int service,
+HDE::listentingSocket::listentingSocket(int domain , int service,
 int protocol, int port, u_long interface,  int bklg) : 
 bindingSocket(domain , service,  protocol, port,  interface)
 {
@@ -12,7 +12,7 @@ bindingSocket(domain , service,  protocol, port,  interface)
     test_connection(listening);
 }
 
-void HDE::ListentingSocket::start_listening()
+void HDE::listentingSocket::start_listening()
 {
     listening = listen(get_connection(), backlog);
 }

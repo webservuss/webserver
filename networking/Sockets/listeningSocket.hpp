@@ -8,12 +8,12 @@
 
 namespace HDE {
 
-class ListentingSocket:public bindingSocket{
+class listentingSocket:public bindingSocket{
     private:
         int backlog;
         int listening;
     public:
-        ListentingSocket(int domain , int service, int protocol, int port, 
+        listentingSocket(int domain , int service, int protocol, int port, 
         u_long interface,  int bklg);
     void start_listening();
 
