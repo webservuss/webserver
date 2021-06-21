@@ -16,9 +16,9 @@ namespace HDE
             private:
                 char buffer[30000] = {0};
                 int new_socket;
-                virtual void accepter()= 0;
-                virtual void handeler()= 0;
-                virtual void responder()= 0;
+                void accepter();
+                 void handeler();
+                void responder();
             public:
                 TestServer();
                 void launch();

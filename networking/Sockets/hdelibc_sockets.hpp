@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "SimpleSocket.hpp"
+#include "simpleSocket.hpp"
 #include "bindingSocket.hpp"
 #include "listeningSocket.hpp"
 #include "bindingSocket.hpp"

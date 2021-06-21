@@ -20,7 +20,7 @@ class SimpleServer{
     public:
     SimpleServer(int domain, int service, int protocol, int port, u_long interface, int bklg);
     virtual void launch()= 0;
-    listeningSocket * get_socket();
+    listentingSocket * get_socket();
 };
 
 }
