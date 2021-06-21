@@ -7,3 +7,8 @@ HDE::SimpleServer::SimpleServer(int domain, int service, int protocol, int port,
     socket = new listentingSocket(domain, service, protocol, port, interface, bklg);
     //delete socket;
 }
+
+HDE::listeningSocket * HDE::SimpleServer::get_socket()
+{
+    return socket;
+}
