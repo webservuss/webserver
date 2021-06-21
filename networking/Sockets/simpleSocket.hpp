@@ -14,18 +14,18 @@ namespace HDE {
             // constructor
             simpleSocket(int domain, int service, int protocol, int port, u_long interface);
             // virtual function to connect to a network
-            virtual int         connect_to_network(int sock, struct sockaddr_in address) = 0;
+            virtual void         connect_to_network(int sock, struct sockaddr_in address) = 0;
             // function to test sockets and connections
             void                test_connection(int item_to_test);
             // getter functions
             int                 get_sock();
-            int                 get_connection();
+            //int                 get_connection();
             struct sockaddr_in  get_address();
             // setter function
-            void                set_connection(int con);
+            //void                set_connection(int con);
         private:
             int                 sock;
-            int                 connection;
+           //int                 connection;
             struct sockaddr_in  address;
     };
 }

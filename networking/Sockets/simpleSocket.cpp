@@ -32,10 +32,10 @@ int         HDE::simpleSocket::get_sock()
     return (sock);
 }
 
-int            HDE::simpleSocket::get_connection()
-{
-    return (connection);
-}
+// int            HDE::simpleSocket::get_connection()
+// {
+//     return (connection);
+// }
 
 struct sockaddr_in HDE::simpleSocket::get_address()
 {
@@ -44,9 +44,9 @@ struct sockaddr_in HDE::simpleSocket::get_address()
 
 // setter function
 
-void    HDE::simpleSocket::set_connection(int con)
-{
-    connection = con;
-    return;
-}
+// void    HDE::simpleSocket::set_connection(int con)
+// {
+//     connection = con;
+//     return;
+// }
 
