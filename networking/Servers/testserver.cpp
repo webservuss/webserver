@@ -34,11 +34,11 @@ void HDE::TestServer::launch()
 {
     while(true)
     {
-        std::cout "...................WAITING////" << std::endl;
+        std::cout << "...................WAITING////" << std::endl;
         accepter();
         handeler();
         responder();
-        std::cout "...................DONE////" << std::endl;
+        std::cout << "...................DONE////" << std::endl;
 
 
     }
