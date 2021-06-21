@@ -7,7 +7,6 @@
 #include "simpleSocket.hpp"
 #include "bindingSocket.hpp"
 #include "listeningSocket.hpp"
-#include "bindingSocket.hpp"
 #include "connectingSocket.hpp"
 
 #endif 

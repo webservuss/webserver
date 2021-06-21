@@ -4,6 +4,6 @@
 #include <stdio.h>
 
 
-#include "Networking/hdelibc_networking"
+#include "networking/hdelibc_networking.hpp"
 
 #endif

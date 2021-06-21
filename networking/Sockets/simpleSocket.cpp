@@ -1,4 +1,3 @@
-
 #include "simpleSocket.hpp"
 
 // defult connstructor
@@ -49,4 +48,3 @@ struct sockaddr_in HDE::simpleSocket::get_address()
 //     connection = con;
 //     return;
 // }
-
