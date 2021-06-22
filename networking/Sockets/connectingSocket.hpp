@@ -8,6 +8,8 @@
 namespace HDE {
 
 class connectingSocket : public simpleSocket {
+    private:
+        int connected;
     public:
         // constructor
         connectingSocket(int domain, int service, int protocol, int port, u_long interface);

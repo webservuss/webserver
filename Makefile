@@ -13,9 +13,12 @@ INCLUDES =	*.hpp
 all:		$(NAME)
 
 $(NAME):	$(OFILES) $(INCLUDES)
-	g++ -o $(NAME) $(OFILES) $(FLAGS)
+	g++ -o $(NAME) $(SRCS) $(FLAGS)
 
 %.o: %.c $(INCLUDE)
 	gcc $(FLAGS) -c $< -o $@
+
+clean:
+	rm -rf $(NAME)
 
 .PHONY: all clean fclean re
