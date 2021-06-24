@@ -2,16 +2,18 @@
 #define configServer_hpp
 
 #include <stdio.h>
+#include <fstream>
 
 #include "../hdelibc_networking.hpp"
+#include "SimpleServer.hpp"
 
 namespace HDE{
     
-class configServer_hpp{
+class configServer{
     public:
         //complian form
         // configServer_hpp();
-        configServer_hpp(std::string config_file_path);
+        configServer(ifstream configfileStream);
 
         //setters
         void		set_server_name(std::string srv_name);

@@ -1,5 +1,11 @@
 #include "SimpleServer.hpp"
 
+HDE::configServer_hpp::configServer_hpp(ifstream configfileStream)
+{
+    
+}
+
+
 //  setters
 void		HDE::configServer_hpp::set_server_name(std::string srv_name)
 {
@@ -63,7 +69,7 @@ int				HDE::configServer_hpp::set_auto_index()
 }
 std::string 	HDE::configServer_hpp::set_root()
 {
-    return root;
+    return _root;
 }
 
 std::string 	HDE::configServer_hpp::set_index()
