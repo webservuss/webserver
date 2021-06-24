@@ -1,14 +1,14 @@
 #include "stdio.h"
 #include "testserver.hpp"
-
+#include "configServer.hpp"
 
 int main()
 {
     // HDE::TestServer t;
-    ifstream    configfileStream;
-    std::string configfilePath;
+    std::ifstream    configfileStream;
+    std::string     configfilePath;
 
-    configfilePath = "../configs/example.conf"
+    configfilePath = "../configs/example.conf";
     configfileStream.open(configfilePath);
     if (!configfileStream)
     {

@@ -1,6 +1,15 @@
 NAME =		test
 
-SRCS =		networking/Servers/test.cpp networking/Servers/testserver.cpp networking/Servers/SimpleServer.cpp networking/Sockets/bindingSocket.cpp networking/Sockets/listeningSocket.cpp networking/Sockets/hdelibc_sockets.cpp networking/Sockets/simpleSocket.cpp networking/hdelibc_networking.cpp  hdelibc.cpp 
+SRCS =		networking/Servers/test.cpp \
+			networking/Servers/testserver.cpp \
+			networking/Servers/SimpleServer.cpp \
+			networking/Sockets/bindingSocket.cpp \
+			networking/Sockets/listeningSocket.cpp \
+			networking/Sockets/hdelibc_sockets.cpp \
+			networking/Sockets/simpleSocket.cpp \
+			networking/hdelibc_networking.cpp  \
+			hdelibc.cpp \
+			networking/Servers/configServer.cpp
 #  networking/Sockets/main.cpp
 # networking/Sockets/connectingSocket.cpp 
 OFILES =	$(SRCS:.c=.o)

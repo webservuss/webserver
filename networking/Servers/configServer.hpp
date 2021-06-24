@@ -3,17 +3,21 @@
 
 #include <stdio.h>
 #include <fstream>
+#include <string>
+#include <iostream>
 
 #include "../hdelibc_networking.hpp"
 #include "SimpleServer.hpp"
 
-namespace HDE{
+namespace HDE {
     
-class configServer{
+class configServer {
     public:
         //complian form
-        // configServer_hpp();
-        configServer(ifstream configfileStream);
+        configServer() {}
+        configServer(std::ifstream configfileStream);
+        configServer (const configServer& x);
+        configServer& operator=(const configServer& x);
 
         //setters
         void		set_server_name(std::string srv_name);
@@ -24,13 +28,13 @@ class configServer{
         void 		set_root(std::string rt);
         void 		set_index(std::string ndx);
         //getters
-        std::string		set_server_name();
-        int				set_port();
-        std::string		set_host();
-        std::string		set_error_page();
-        int				set_auto_index();
-        std::string 	set_root();
-        std::string 	set_index();
+        std::string		get_server_name();
+        int				get_port();
+        std::string		get_host();
+        std::string		get_error_page();
+        int				get_auto_index();
+        std::string 	get_root();
+        std::string 	get_index();
 
     private:
         std::string _server_name;
@@ -40,7 +44,7 @@ class configServer{
         int         _auto_index;
         std::string _root;
         std::string _index;
-        configServer_hpp();
+        // configServer();
 };
 
 }

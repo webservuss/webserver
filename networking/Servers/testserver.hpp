@@ -17,7 +17,7 @@ namespace HDE
                 char buffer[30000] = {0};
                 int new_socket;
                 void accepter();
-                 void handeler();
+                void handeler();
                 void responder();
             public:
                 TestServer();
