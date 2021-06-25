@@ -20,6 +20,7 @@ void HDE::TestServer::accepter()
 void HDE::TestServer::handeler()
 {
     std::cout << buffer << std::endl;
+
 }
 
 void HDE::TestServer::responder()

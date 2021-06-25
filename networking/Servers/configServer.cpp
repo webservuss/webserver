@@ -13,9 +13,9 @@ HDE::configServer::configServer(std::ifstream &configfileStream)
             i++;
         std::string firstWord = line.substr(i, line.size());
         std::cout << "line after trim is: [" << firstWord << "]" << std::endl;
-
+        
     }
-    // //close file
+    // //   close file
     return ;
 }
 
