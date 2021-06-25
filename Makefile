@@ -14,7 +14,7 @@ SRCS =		networking/Servers/test.cpp \
 # networking/Sockets/connectingSocket.cpp 
 OFILES =	$(SRCS:.c=.o)
 
-FLAGS = 
+FLAGS = -std=c++98
 # -Wall -Werror -Wextra
 
 INCLUDES =	*.hpp

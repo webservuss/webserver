@@ -1,4 +1,8 @@
 #include "configServer.hpp"
+#include <unistd.h>
+#include <stdio.h>
+
+#include "SimpleServer.hpp"
 
 HDE::configServer::configServer(std::ifstream &configfileStream)
 {
@@ -8,14 +12,20 @@ HDE::configServer::configServer(std::ifstream &configfileStream)
     while (std::getline(configfileStream, line))
     {
         std::cout << "line before trim:   [" << line  << "]" << std::endl;
-        int i = 0;
-        while (line[i] == ' ')
-            i++;
-        std::string firstWord = line.substr(i, line.size());
-        std::cout << "line after trim is: [" << firstWord << "]" << std::endl;
-        
+        std::size_t found = line.find("root");
+        if (found < INT_MAX)
+        {
+            while (line[found] != ' ')
+                found++;
+            std::string nxt;
+            int sizey = line.length();
+            std::cout << "sizey is" << sizey << " found is " << found << std::endl;
+            nxt = line.substr(found, sizey - found);
+            std::cout << "last bit is [" << nxt << "]" << std::endl;
+            // return ;
+        }
     }
-    // //   close file
+    // // close file
     return ;
 }
 
