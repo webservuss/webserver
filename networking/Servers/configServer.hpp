@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include "../hdelibc_networking.hpp"
 #include "SimpleServer.hpp"
@@ -15,7 +16,7 @@ class configServer {
     public:
         //complian form
         configServer() {}
-        configServer(std::ifstream configfileStream);
+        configServer(std::ifstream & configfileStream);
         configServer (const configServer& x);
         configServer& operator=(const configServer& x);
 

@@ -1,18 +1,24 @@
 #include "configServer.hpp"
 
-HDE::configServer::configServer(std::ifstream configfileStream)
+HDE::configServer::configServer(std::ifstream &configfileStream)
 {
     std::string line;
-    
-    if (!configfileStream.is_open())
-        return;
+    // std::vector<std::string> config_variables = {"server_name", "listen", "host", "error_page", "autoindex", "root", "index"};
+
     while (std::getline(configfileStream, line))
     {
-        std::cout << "line is: " << std::endl;
+        std::cout << "line before trim:   [" << line  << "]" << std::endl;
+        int i = 0;
+        while (line[i] == ' ')
+            i++;
+        std::string firstWord = line.substr(i, line.size());
+        std::cout << "line after trim is: [" << firstWord << "]" << std::endl;
+
     }
-    //close file
+    // //close file
     return ;
 }
+
 
 HDE::configServer& HDE::configServer::operator=(const HDE::configServer& x)
 {

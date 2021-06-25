@@ -6,9 +6,9 @@ int main()
 {
     // HDE::TestServer t;
     std::ifstream    configfileStream;
-    std::string     configfilePath;
+    std::string      configfilePath;
 
-    configfilePath = "../configs/example.conf";
+    configfilePath = "configs/example.conf";
     configfileStream.open(configfilePath);
     if (!configfileStream)
     {
@@ -16,5 +16,6 @@ int main()
         return (-1);
     }
     HDE::configServer configServ(configfileStream);
+    configfileStream.close();
     return (0);
 }
