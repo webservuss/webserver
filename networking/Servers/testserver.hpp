@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "SimpleServer.hpp"
+#include "../Colors.hpp"
 
 
 namespace HDE

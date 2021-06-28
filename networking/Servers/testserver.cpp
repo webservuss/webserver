@@ -1,4 +1,5 @@
 #include "testserver.hpp"
+#include "../Request/request.hpp"
 #include <unistd.h>
 
 
@@ -19,7 +20,12 @@ void HDE::TestServer::accepter()
 
 void HDE::TestServer::handeler()
 {
+    
+    std::cout << GREEN <<"***************BEGINNING***************"<< RESET<< std::endl;
     std::cout << buffer << std::endl;
+    /*  store buffer in request class*/
+    HDE::request r(buffer);
+    std::cout << GREEN << "***************END BUFFER***************"<< RESET <<std::endl;
 }
 
 void HDE::TestServer::responder()
