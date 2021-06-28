@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <iostream>
+#include <fcntl.h>
 
 namespace HDE {
 
@@ -17,6 +18,8 @@ namespace HDE {
             virtual void         connect_to_network(int sock, struct sockaddr_in address) = 0;
             // function to test sockets and connections
             void                test_connection(int item_to_test);
+            // set non-blocking
+            void                set_non_blocking(int sock);
             // getter functions
             int                 get_sock();
             //int                 get_connection();

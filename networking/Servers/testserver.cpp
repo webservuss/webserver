@@ -1,8 +1,5 @@
 #include "testserver.hpp"
-#include <unistd.h>
-#include <sys/socket.h>
-#include <fstream>
-#include <string>
+
 HDE:: TestServer::TestServer(): SimpleServer(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, 10)
 {
     launch();

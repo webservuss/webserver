@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <fstream>
+#include <string>
 
 #include "SimpleServer.hpp"
 

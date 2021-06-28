@@ -9,7 +9,8 @@ SRCS =		networking/Servers/test.cpp \
 			networking/Sockets/simpleSocket.cpp \
 			networking/hdelibc_networking.cpp  \
 			hdelibc.cpp \
-			networking/Servers/configServer.cpp
+			networking/Servers/configServer.cpp \
+			networking/Servers/selectServer.cpp
 #  networking/Sockets/main.cpp
 # networking/Sockets/connectingSocket.cpp 
 OFILES =	$(SRCS:.c=.o)
