@@ -19,7 +19,8 @@ namespace HDE
             private:
                 char buffer[30000] = {0};
                 struct timeval  timeout;
-                int             connectlist[100]; // dont want 100 want it to be backlog get_socket()->get_backlog()
+                int             connection;
+                int             connectlist[5]; // dont want 100 want it to be backlog get_socket()->get_backlog()
                 int             highsock;
                 fd_set          socks;
                 int             new_socket;
