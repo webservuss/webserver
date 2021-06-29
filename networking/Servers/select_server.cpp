@@ -1,6 +1,6 @@
-#include "selectServer.hpp"
+#include "select_server.hpp"
 
-HDE:: selectServer::selectServer(): SimpleServer(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, 5)
+HTTP:: select_server::select_server(): simple_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, 5)
 {
     launch();
 }
@@ -12,7 +12,7 @@ HDE:: selectServer::selectServer(): SimpleServer(AF_INET, SOCK_STREAM, 0, 80, IN
 /* FD_SET() adds the file descriptor "sock" to the fd_set, so that select() will 
     return if a connection comes in on that socket (which means you have to do accept(), etc. */
 /* Loops through all the possible connections and adds those sockets to the fd_set */
-void HDE::selectServer::accepter()
+void HTTP::select_server::accepter()
 {
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
@@ -28,7 +28,7 @@ void HDE::selectServer::accepter()
 	}
 }
 
-void HDE::selectServer::setnonblocking(int sock)
+void HTTP::select_server::setnonblocking(int sock)
 {
 	int opts;
 
@@ -47,7 +47,7 @@ void HDE::selectServer::setnonblocking(int sock)
 
 /* We have a new connection coming in!  We'll
 try to find a spot for it in connectlist. */
-void   HDE::selectServer::handle_new_connection()
+void   HTTP::select_server::handle_new_connection()
 {
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
@@ -75,7 +75,7 @@ void   HDE::selectServer::handle_new_connection()
 	/* Now check connectlist for available data */
 	/* Run through our sockets and check to see if anything
 		happened with them, if so 'service' them. */
-void    HDE::selectServer::handeler()
+void    HTTP::select_server::handeler()
 {
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
@@ -87,7 +87,7 @@ void    HDE::selectServer::handeler()
 	}
 }
 
-void    HDE::selectServer::responder(int listnum)
+void    HTTP::select_server::responder(int listnum)
 {
     int valread;
     int sock = get_socket()->get_sock();
@@ -134,7 +134,7 @@ void    HDE::selectServer::responder(int listnum)
 			woke up. i.e. If file descriptor 4 was originally in
 			the fd_set, and then it became readable, the fd_set
 			contains file descriptor 4 in it. */
-void    HDE::selectServer::launch()
+void    HTTP::select_server::launch()
 {
     int readsocks;
     int sock = get_socket()->get_sock();

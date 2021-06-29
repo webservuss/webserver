@@ -1,23 +1,9 @@
 #include "stdio.h"
-#include "testserver.hpp"
-#include "selectServer.hpp"
-#include "configServer.hpp"
+#include "select_server.hpp"
 
 int main()
 {
-    // HDE::TestServer t;
-    HDE::selectServer t;
-    // std::ifstream    configfileStream;
-    // std::string      configfilePath;
+    HTTP::select_server t;
 
-    // configfilePath = "configs/example.conf";
-    // configfileStream.open(configfilePath);
-    // if (!configfileStream)
-    // {
-    //     std::cout<< "unable to open " << configfilePath << std::endl;
-    //     return (-1);
-    // }
-    // HDE::configServer configServ(configfileStream);
-    // configfileStream.close();
     return (0);
 }

@@ -1,5 +1,5 @@
-#ifndef configServer_hpp
-#define configServer_hpp
+#ifndef config_server_hpp
+#define config_server_hpp
 
 #include <stdio.h>
 #include <fstream>
@@ -7,18 +7,18 @@
 #include <iostream>
 #include <vector>
 
-#include "../hdelibc_networking.hpp"
-#include "SimpleServer.hpp"
+#include "../../http.hpp"
+#include "simple_server.hpp"
 
-namespace HDE {
+namespace HTTP {
     
-class configServer {
+class config_server {
     public:
         //complian form
-        configServer() {}
-        configServer(std::ifstream & configfileStream);
-        configServer (const configServer& x);
-        configServer& operator=(const configServer& x);
+        config_server() {}
+        config_server(std::ifstream & configfileStream);
+        config_server (const config_server& x);
+        config_server& operator=(const config_server& x);
 
         //setters
         void		set_server_name(std::string srv_name);
@@ -45,7 +45,7 @@ class configServer {
         int         _auto_index;
         std::string _root;
         std::string _index;
-        // configServer();
+        // config_server();
 };
 
 }

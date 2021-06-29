@@ -1,8 +1,8 @@
-#include "simpleSocket.hpp"
+#include "simple_socket.hpp"
 
 // defult connstructor
 
-HDE::simpleSocket::simpleSocket(int domain, int service, int protocol, int port, u_long interface)
+HTTP::simple_socket::simple_socket(int domain, int service, int protocol, int port, u_long interface)
 {
     int reuse_addr = 1;
     //define address structure
@@ -20,7 +20,7 @@ HDE::simpleSocket::simpleSocket(int domain, int service, int protocol, int port,
 }
 
 //test connection virtual function
-void    HDE::simpleSocket::test_connection(int item_to_test)
+void    HTTP::simple_socket::test_connection(int item_to_test)
 {
     // confirm that the socket or connection has been properly established
     if (item_to_test < 0)
@@ -34,7 +34,7 @@ void    HDE::simpleSocket::test_connection(int item_to_test)
 /* IF you want to set a specific flag and leave the other flags as-is, 
 then you must F_GETFL the old flags, | the new flag in, and then F_SETFL the result. 
 This must be done as two separate system calls; */
-void    HDE::simpleSocket::set_non_blocking(int sock)
+void    HTTP::simple_socket::set_non_blocking(int sock)
 {
     int opts;
 
@@ -52,25 +52,12 @@ void    HDE::simpleSocket::set_non_blocking(int sock)
 }
 
 //getter functions
-int     HDE::simpleSocket::get_sock()
+int     HTTP::simple_socket::get_sock()
 {
     return (sock);
 }
 
-// int            HDE::simpleSocket::get_connection()
-// {
-//     return (connection);
-// }
-
-struct sockaddr_in HDE::simpleSocket::get_address()
+struct sockaddr_in HTTP::simple_socket::get_address()
 {
     return (address);
 }
-
-// setter function
-
-// void    HDE::simpleSocket::set_connection(int con)
-// {
-//     connection = con;
-//     return;
-// }

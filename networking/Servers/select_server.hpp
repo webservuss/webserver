@@ -1,5 +1,5 @@
-#ifndef selectServer_hpp
-#define selectServer_hpp
+#ifndef select_server_hpp
+#define select_server_hpp
 
 #include <stdio.h>
 #include <unistd.h>
@@ -7,13 +7,13 @@
 #include <fstream>
 #include <string>
 
-#include "SimpleServer.hpp"
+#include "simple_server.hpp"
 
 
-namespace HDE
+namespace HTTP
 {
     
-        class selectServer: public SimpleServer
+        class select_server: public simple_server
         {
 
             private:
@@ -25,7 +25,7 @@ namespace HDE
                 fd_set          socks;
                 int             new_socket;
             public:
-                selectServer();
+                select_server();
                 void    setnonblocking(int sock); // should use one from other class
                 void    accepter();
                 void    handle_new_connection();

@@ -1,19 +1,19 @@
-#ifndef listeningSocket_hpp
-#define listeningSocket_hpp
+#ifndef listening_socket_hpp
+#define listening_socket_hpp
 
 // this class implements a call to the connect() function of sockets as a definition to the connect_to_network virtual function
 
 #include "stdio.h"
-#include "bindingSocket.hpp"
+#include "binding_socket.hpp"
 
-namespace HDE {
+namespace HTTP {
 
-class listentingSocket:public bindingSocket{
+class listening_socket: public binding_socket{
     private:
         int backlog;
         int listening;
     public:
-        listentingSocket(int domain , int service, int protocol, int port, 
+        listening_socket(int domain , int service, int protocol, int port, 
         u_long interface,  int bklg);
         void    start_listening();
         int     get_listening();

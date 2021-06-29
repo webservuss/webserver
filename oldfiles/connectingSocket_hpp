@@ -4,10 +4,10 @@
 // this class implements a call to the connect() function of sockets as a definition to the connect_to_network virtual function
 
 #include "stdio.h"
-#include "simpleSocket.hpp"
-namespace HDE {
+#include "simple_socket.hpp"
+namespace HTTP {
 
-class connectingSocket : public simpleSocket {
+class connectingSocket : public simple_socket {
     private:
         int connected;
     public:

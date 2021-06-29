@@ -1,5 +1,5 @@
-#ifndef simpleSocket_hpp
-#define simpleSocket_hpp
+#ifndef simple_socket_hpp
+#define simple_socket_hpp
 
 #include <stdio.h>
 #include <sys/socket.h>
@@ -7,13 +7,13 @@
 #include <iostream>
 #include <fcntl.h>
 
-namespace HDE {
+namespace HTTP {
 
-    class simpleSocket
+    class simple_socket
     {
         public:
             // constructor
-            simpleSocket(int domain, int service, int protocol, int port, u_long interface);
+            simple_socket(int domain, int service, int protocol, int port, u_long interface);
             // virtual function to connect to a network
             virtual void         connect_to_network(int sock, struct sockaddr_in address) = 0;
             // function to test sockets and connections
@@ -22,13 +22,9 @@ namespace HDE {
             void                set_non_blocking(int sock);
             // getter functions
             int                 get_sock();
-            //int                 get_connection();
             struct sockaddr_in  get_address();
-            // setter function
-            //void                set_connection(int con);
         private:
             int                 sock;
-           //int                 connection;
             struct sockaddr_in  address;
     };
 }

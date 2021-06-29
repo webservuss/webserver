@@ -1,5 +1,5 @@
-#ifndef TestServer_hpp
-#define TestServer_hpp
+#ifndef test_server_hpp
+#define test_server_hpp
 
 #include <stdio.h>
 #include <unistd.h>
@@ -7,13 +7,13 @@
 #include <fstream>
 #include <string>
 
-#include "SimpleServer.hpp"
+#include "simple_server.hpp"
 
 
-namespace HDE
+namespace HTTP
 {
     
-        class TestServer: public SimpleServer
+        class test_server: public simple_server
         {
 
             private:
@@ -23,7 +23,7 @@ namespace HDE
                 void handeler();
                 void responder();
             public:
-                TestServer();
+                test_server();
                 void launch();
         };
         

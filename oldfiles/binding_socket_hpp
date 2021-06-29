@@ -1,0 +1,19 @@
+#ifndef binding_socket_hpp
+#define binding_socket_hpp
+
+#include "stdio.h"
+#include "simple_socket.hpp"
+namespace HTTP {
+
+class binding_socket : public simple_socket {
+    private:
+         int          binding;
+         void         connect_to_network(int sock, struct sockaddr_in address);
+    public:
+        // constructor
+        binding_socket(int domain, int service, int protocol, int port, u_long interface);
+        int get_binding();
+};
+}
+
+#endif
