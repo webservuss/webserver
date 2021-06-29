@@ -111,12 +111,14 @@ void    HDE::selectServer::responder(int listnum)
 	    } 
     else {
         buffer[valread] = '\0';  
-    //     	const void *hi = "hi";
-	// int message_len = 2;
-	// send(connectlist[listnum], hi, message_len, 0 );
-        send(connectlist[listnum] , buffer , strlen(buffer) , 0 );  
-		std::cout << "\nResponded: " << buffer << std::endl;
-		std::cout << "\nSlot" << listnum << "FD IS: " << "connectlist[listnum]" << connectlist[listnum] << std::endl;
+            write(connectlist[listnum], "HTTP/1.1 200 OK\n", 16);
+            write(connectlist[listnum], "Content-length: 50\n", 19);
+            write(connectlist[listnum], "Content-Type: text/html\n\n", 25);
+            write(connectlist[listnum], "<html><body><H1> YAY SOMETHING Found</H1></body></html>", 50); 
+
+        // send(connectlist[listnum] , buffer , strlen(buffer) , 0 );  
+		// std::cout << "\nResponded: " << buffer << std::endl;
+		// std::cout << "\nSlot" << listnum << "FD IS: " << "connectlist[listnum]" << connectlist[listnum] << std::endl;
         // close(connectlist[listnum]);
 	}
 }
@@ -152,14 +154,12 @@ void    HDE::selectServer::launch()
 {
     int readsocks;
     int sock = get_socket()->get_sock();
-    fd_set temp;
+    fd_set temp_fds;
 
-    temp = socks;
     highsock = sock;
 	memset((char *) &connectlist, 0, sizeof(connectlist));
     while(true)
     {
-        temp = socks;
         std::cout << "...................WAITING////" << std::endl;
  		accepter();
 		timeout.tv_sec = 5;
@@ -177,7 +177,6 @@ void    HDE::selectServer::launch()
         else
 			handeler();
         std::cout << "...................DONE////" << std::endl;
-        socks = temp;
     }
     /* Last step: Close all the sockets */
      for (int i=0;i < highsock;i++) {
