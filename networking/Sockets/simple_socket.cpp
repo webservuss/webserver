@@ -34,7 +34,7 @@ void    HTTP::simple_socket::test_connection(int item_to_test)
 /* IF you want to set a specific flag and leave the other flags as-is, 
 then you must F_GETFL the old flags, | the new flag in, and then F_SETFL the result. 
 This must be done as two separate system calls; */
-void    HTTP::simple_socket::set_non_blocking(int sock)
+void                HTTP::simple_socket::set_non_blocking(int sock)
 {
     int opts;
 
@@ -52,12 +52,12 @@ void    HTTP::simple_socket::set_non_blocking(int sock)
 }
 
 //getter functions
-int     HTTP::simple_socket::get_sock()
+int                 HTTP::simple_socket::get_sock()
 {
     return (sock);
 }
 
-struct sockaddr_in HTTP::simple_socket::get_address()
+struct sockaddr_in  HTTP::simple_socket::get_address()
 {
     return (address);
 }

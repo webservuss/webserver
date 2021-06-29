@@ -11,11 +11,14 @@ namespace HTTP {
 
     class simple_socket
     {
+        private:
+            int                 sock;
+            struct sockaddr_in  address;
         public:
             // constructor
             simple_socket(int domain, int service, int protocol, int port, u_long interface);
             // virtual function to connect to a network
-            virtual void         connect_to_network(int sock, struct sockaddr_in address) = 0;
+            virtual void        connect_to_network(int sock, struct sockaddr_in address) = 0;
             // function to test sockets and connections
             void                test_connection(int item_to_test);
             // set non-blocking
@@ -23,9 +26,6 @@ namespace HTTP {
             // getter functions
             int                 get_sock();
             struct sockaddr_in  get_address();
-        private:
-            int                 sock;
-            struct sockaddr_in  address;
     };
 }
 

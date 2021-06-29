@@ -26,11 +26,11 @@ namespace HTTP
                 int             new_socket;
             public:
                 select_server();
-                void    setnonblocking(int sock); // should use one from other class
-                void    accepter();
-                void    handeler();
-				void	responder();
-                void    launch();
+                void    		setnonblocking(int sock); // should use one from other class
+                void    		accepter();
+                void    		handeler();
+				void			responder();
+                void    		launch();
         };
         
     
