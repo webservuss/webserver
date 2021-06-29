@@ -49,7 +49,6 @@ void HDE::selectServer::setnonblocking(int sock)
 try to find a spot for it in connectlist. */
 void   HDE::selectServer::handle_new_connection()
 {
-    std::cout << "in handle new connection " << std::endl;
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
     struct sockaddr_in  address = get_socket()->get_address();
@@ -73,34 +72,23 @@ void   HDE::selectServer::handle_new_connection()
 	}
 }
 
+	/* Now check connectlist for available data */
+	/* Run through our sockets and check to see if anything
+		happened with them, if so 'service' them. */
 void    HDE::selectServer::handeler()
 {
-    std::cout << "in handler " << std::endl;
-
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
     if (FD_ISSET(sock,&socks))
 		handle_new_connection();
-    std::cout << "out handle connection handler " << std::endl;
-	/* Now check connectlist for available data */
-	/* Run through our sockets and check to see if anything
-		happened with them, if so 'service' them. */
 	for (int listnum = 0; listnum < bklg; listnum++) {
-        std::cout << "looping\n";
-	// for (int listnum = 0; listnum < highsock; listnum++) {
 		if (FD_ISSET(connectlist[listnum],&socks))
-		{	
-            std::cout << "listnumb" << listnum << std::endl;
             responder(listnum);
-        }
 	}
-    std::cout << "out handler " << std::endl;
 }
 
 void    HDE::selectServer::responder(int listnum)
 {
-    std::cout << "in responder " << std::endl;
-
     int valread;
     int sock = get_socket()->get_sock();
     if ((valread = recv(connectlist[listnum], buffer, 3000, 0)) < 0) {
@@ -111,15 +99,11 @@ void    HDE::selectServer::responder(int listnum)
 	    } 
     else {
         buffer[valread] = '\0';  
-            write(connectlist[listnum], "HTTP/1.1 200 OK\n", 16);
-            write(connectlist[listnum], "Content-length: 50\n", 19);
-            write(connectlist[listnum], "Content-Type: text/html\n\n", 25);
-            write(connectlist[listnum], "<html><body><H1> YAY SOMETHING Found</H1></body></html>", 50); 
-
-        // send(connectlist[listnum] , buffer , strlen(buffer) , 0 );  
-		// std::cout << "\nResponded: " << buffer << std::endl;
-		// std::cout << "\nSlot" << listnum << "FD IS: " << "connectlist[listnum]" << connectlist[listnum] << std::endl;
-        // close(connectlist[listnum]);
+		send(connectlist[listnum] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
+		send(connectlist[listnum] , "Content-length: 50\n" , 19 , 0 );  
+		send(connectlist[listnum] , "Content-Type: text/html\n\n" , 25 , 0 );  
+		send(connectlist[listnum] , "<html><body><H1> YAY SOMETHING Found</H1></body></html>" , 50 , 0 );  
+		std::cout << "\nResponded buffer is: " << buffer << std::endl;
 	}
 }
 
@@ -166,22 +150,15 @@ void    HDE::selectServer::launch()
 		timeout.tv_usec = 0;
 		readsocks = select(highsock+1, &socks, (fd_set *) 0, (fd_set *) 0, &timeout);
 		if (readsocks < 0) {
-        std::cout << "error select " << std::endl;
-			perror("select");
+        	std::cout << "error select " << std::endl;
 			exit(EXIT_FAILURE);
 		}
 		if (readsocks == 0) { /* Nothing  to read, just show alive */
 			std::cout << ".";
-			fflush(stdout);
+			// fflush(stdout);
 		} 
         else
 			handeler();
         std::cout << "...................DONE////" << std::endl;
     }
-    /* Last step: Close all the sockets */
-     for (int i=0;i < highsock;i++) {
-         if (connectlist[i] > 0) {
-             close(connectlist[i]);
-         }
-     }
 }
