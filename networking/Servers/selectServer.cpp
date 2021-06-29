@@ -5,24 +5,20 @@ HDE:: selectServer::selectServer(): SimpleServer(AF_INET, SOCK_STREAM, 0, 80, IN
     launch();
 }
 	
-/* First put together fd_set for select(), which will
-   consist of the sock veriable in case a new connection
-   is coming in, plus all the sockets we have already
-   accepted. */
-/* FD_ZERO() clears out the fd_set called socks, so that
-	it doesn't contain any file descriptors. */
-/* FD_SET() adds the file descriptor "sock" to the fd_set,
-	so that select() will return if a connection comes in
-	on that socket (which means you have to do accept(), etc. */
-/* Loops through all the possible connections and adds
-	those sockets to the fd_set */
+/* First put together fd_set for select(), which will consist of the sock 
+    veriable in case a new connection is coming in, plus all the sockets 
+    we have already accepted. */
+/* FD_ZERO() clears out the fd_set called socks, so that it doesn't contain any file descriptors. */
+/* FD_SET() adds the file descriptor "sock" to the fd_set, so that select() will 
+    return if a connection comes in on that socket (which means you have to do accept(), etc. */
+/* Loops through all the possible connections and adds those sockets to the fd_set */
 void HDE::selectServer::accepter()
 {
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
-    highsock = sock;
 	FD_ZERO(&socks);
 	FD_SET(sock,&socks);
+    highsock = sock;
 	for (int listnum = 0; listnum < bklg; listnum++) {
 		if (connectlist[listnum] != 0) {
 			FD_SET(connectlist[listnum],&socks);
@@ -53,6 +49,7 @@ void HDE::selectServer::setnonblocking(int sock)
 try to find a spot for it in connectlist. */
 void   HDE::selectServer::handle_new_connection()
 {
+    std::cout << "in handle new connection " << std::endl;
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
     struct sockaddr_in  address = get_socket()->get_address();
@@ -66,46 +63,61 @@ void   HDE::selectServer::handle_new_connection()
 	setnonblocking(connection);
 	for (int listnum = 0; (listnum < bklg) && (connection != -1); listnum ++)
 		if (connectlist[listnum] == 0) {
-			printf("\nConnection accepted:   FD=%d; Slot=%d\n", connection,listnum);
+			std::cout << "\nConnection accepted:   FD=" << connection << "Slot" << listnum << std::endl;
 			connectlist[listnum] = connection;
 			connection = -1;
 		}
 	if (connection != -1) { /* No room left in the queue! */
-		printf("\nNo room left for new client.\n");
+        std::cout << "\nNo room left for new client.\n";
 		close(connection);
 	}
 }
 
 void    HDE::selectServer::handeler()
 {
+    std::cout << "in handler " << std::endl;
+
     int sock = get_socket()->get_sock();
     int bklg = get_socket()->get_backlog();
     if (FD_ISSET(sock,&socks))
 		handle_new_connection();
+    std::cout << "out handle connection handler " << std::endl;
 	/* Now check connectlist for available data */
 	/* Run through our sockets and check to see if anything
 		happened with them, if so 'service' them. */
 	for (int listnum = 0; listnum < bklg; listnum++) {
+        std::cout << "looping\n";
 	// for (int listnum = 0; listnum < highsock; listnum++) {
 		if (FD_ISSET(connectlist[listnum],&socks))
-			responder(listnum);
+		{	
+            std::cout << "listnumb" << listnum << std::endl;
+            responder(listnum);
+        }
 	}
+    std::cout << "out handler " << std::endl;
 }
 
 void    HDE::selectServer::responder(int listnum)
 {
+    std::cout << "in responder " << std::endl;
+
     int valread;
     int sock = get_socket()->get_sock();
-    if ((valread = read(connectlist[listnum], buffer, 3000)) < 0) {
+    if ((valread = recv(connectlist[listnum], buffer, 3000, 0)) < 0) {
 	    /* Connection closed, close this end and free up entry in connectlist */
-	    printf("\nConnection lost: FD=%d;  Slot=%d\n", connectlist[listnum],listnum);
+	    std::cout << "\nConnection lost: FD=" << connectlist[listnum] << " Slot" << listnum << std::endl;
 	    close(connectlist[listnum]);
 		connectlist[listnum] = 0;
 	    } 
     else {
         buffer[valread] = '\0';  
+    //     	const void *hi = "hi";
+	// int message_len = 2;
+	// send(connectlist[listnum], hi, message_len, 0 );
         send(connectlist[listnum] , buffer , strlen(buffer) , 0 );  
 		std::cout << "\nResponded: " << buffer << std::endl;
+		std::cout << "\nSlot" << listnum << "FD IS: " << "connectlist[listnum]" << connectlist[listnum] << std::endl;
+        // close(connectlist[listnum]);
 	}
 }
 
@@ -140,25 +152,37 @@ void    HDE::selectServer::launch()
 {
     int readsocks;
     int sock = get_socket()->get_sock();
+    fd_set temp;
 
+    temp = socks;
     highsock = sock;
 	memset((char *) &connectlist, 0, sizeof(connectlist));
     while(true)
     {
+        temp = socks;
         std::cout << "...................WAITING////" << std::endl;
  		accepter();
 		timeout.tv_sec = 5;
 		timeout.tv_usec = 0;
 		readsocks = select(highsock+1, &socks, (fd_set *) 0, (fd_set *) 0, &timeout);
 		if (readsocks < 0) {
+        std::cout << "error select " << std::endl;
 			perror("select");
 			exit(EXIT_FAILURE);
 		}
 		if (readsocks == 0) { /* Nothing  to read, just show alive */
-			printf(".");
+			std::cout << ".";
 			fflush(stdout);
-		} else
+		} 
+        else
 			handeler();
         std::cout << "...................DONE////" << std::endl;
+        socks = temp;
     }
+    /* Last step: Close all the sockets */
+     for (int i=0;i < highsock;i++) {
+         if (connectlist[i] > 0) {
+             close(connectlist[i]);
+         }
+     }
 }
