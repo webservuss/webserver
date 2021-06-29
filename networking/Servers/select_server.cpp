@@ -45,67 +45,72 @@ void HTTP::select_server::setnonblocking(int sock)
 	return;
 }
 
-/* We have a new connection coming in!  We'll
-try to find a spot for it in connectlist. */
-void   HTTP::select_server::handle_new_connection()
-{
-    int sock = get_socket()->get_sock();
-    int bklg = get_socket()->get_backlog();
-    struct sockaddr_in  address = get_socket()->get_address();
-    int addrlen = sizeof(address);
 
-	connection = accept(sock, (struct sockaddr *)&address, (socklen_t * )&addrlen);
-	if (connection < 0) {
-		perror("accept");
-		exit(EXIT_FAILURE);
-	}
-	setnonblocking(connection);
-	for (int listnum = 0; (listnum < bklg) && (connection != -1); listnum ++)
-		if (connectlist[listnum] == 0) {
+	/* Now check connectlist for available data */
+	/* We have a new connection coming in!  We'll try to find a spot for it in connectlist. */
+void    HTTP::select_server::handeler()
+{
+    int					sock = get_socket()->get_sock();
+    int					bklg = get_socket()->get_backlog();
+    struct sockaddr_in  address = get_socket()->get_address();
+    int 				addrlen = sizeof(address);
+
+    if (FD_ISSET(sock,&socks))
+	{
+		connection = accept(sock, (struct sockaddr *)&address, (socklen_t * )&addrlen);
+		if (connection < 0) 
+		{
+			std::cout << "error in accept" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		setnonblocking(connection);
+		for (int listnum = 0; (listnum < bklg) && (connection != -1); listnum ++)
+		// DOES THIS EVEN INCREASE LISTNUM
+		if (connectlist[listnum] == 0) 
+		{
 			std::cout << "\nConnection accepted:   FD=" << connection << "Slot" << listnum << std::endl;
 			connectlist[listnum] = connection;
 			connection = -1;
 		}
-	if (connection != -1) { /* No room left in the queue! */
-        std::cout << "\nNo room left for new client.\n";
-		close(connection);
+		if (connection != -1) 
+		{ /* No room left in the queue! */
+        	std::cout << "\nNo room left for new client.\n";
+			close(connection);
+		}
 	}
 }
 
-	/* Now check connectlist for available data */
-	/* Run through our sockets and check to see if anything
-		happened with them, if so 'service' them. */
-void    HTTP::select_server::handeler()
-{
-    int sock = get_socket()->get_sock();
-    int bklg = get_socket()->get_backlog();
-    if (FD_ISSET(sock,&socks))
-		handle_new_connection();
-	for (int listnum = 0; listnum < bklg; listnum++) {
-		if (FD_ISSET(connectlist[listnum],&socks))
-            responder(listnum);
-	}
-}
-
-void    HTTP::select_server::responder(int listnum)
+/* Run through our sockets and check to see if anything
+	happened with them, if so 'service' them. */
+void    HTTP::select_server::responder()
 {
     int valread;
     int sock = get_socket()->get_sock();
-    if ((valread = recv(connectlist[listnum], buffer, 3000, 0)) < 0) {
-	    /* Connection closed, close this end and free up entry in connectlist */
-	    std::cout << "\nConnection lost: FD=" << connectlist[listnum] << " Slot" << listnum << std::endl;
-	    close(connectlist[listnum]);
-		connectlist[listnum] = 0;
-	    } 
-    else {
-        buffer[valread] = '\0';  
-		send(connectlist[listnum] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
-		send(connectlist[listnum] , "Content-length: 50\n" , 19 , 0 );  
-		send(connectlist[listnum] , "Content-Type: text/html\n\n" , 25 , 0 );  
-		send(connectlist[listnum] , "<html><body><H1> YAY SOMETHING Found</H1></body></html>" , 50 , 0 );  
-		std::cout << "\nResponded buffer is: " << buffer << std::endl;
+    int bklg = get_socket()->get_backlog();
+
+	for (int listnum = 0; listnum < bklg; listnum++) {
+		if (FD_ISSET(connectlist[listnum],&socks))
+        {
+			if ((valread = recv(connectlist[listnum], buffer, 3000, 0)) < 0) 
+			{
+	    		/* Connection closed, close this end and free up entry in connectlist */
+	    		std::cout << "\nConnection lost: FD=" << connectlist[listnum] << " Slot" << listnum << std::endl;
+				close(connectlist[listnum]);
+				connectlist[listnum] = 0;
+			} 
+    		else 
+			{
+        		buffer[valread] = '\0';  
+				send(connectlist[listnum] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
+				send(connectlist[listnum] , "Content-length: 50\n" , 19 , 0 );  
+				send(connectlist[listnum] , "Content-Type: text/html\n\n" , 25 , 0 );  
+				send(connectlist[listnum] , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
+				std::cout << "\nResponded buffer is: " << buffer << std::endl;
+			}
+		}
 	}
 }
+
 
 
 		/* The first argument to select is the highest file
@@ -142,6 +147,7 @@ void    HTTP::select_server::launch()
 
     highsock = sock;
 	memset((char *) &connectlist, 0, sizeof(connectlist));
+	memset((char *) &buffer, 0, sizeof(buffer));
     while(true)
     {
         std::cout << "...................WAITING////" << std::endl;
@@ -158,7 +164,10 @@ void    HTTP::select_server::launch()
 			// fflush(stdout);
 		} 
         else
+		{
 			handeler();
-        std::cout << "...................DONE////" << std::endl;
+			responder();
+		}
+		std::cout << "...................DONE////" << std::endl;
     }
 }
