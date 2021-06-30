@@ -31,8 +31,7 @@ class simple_server{
 		virtual void 	launch()= 0;
     	/* getter */
 		listen_n_bind * get_socket();
-};
-
+	};
 }
 
 #endif

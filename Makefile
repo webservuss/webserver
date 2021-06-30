@@ -19,10 +19,15 @@ all:		$(NAME)
 $(NAME):	$(OFILES) $(INCLUDES)
 	g++ -o $(NAME) $(SRCS) $(FLAGS)
 
-%.o: %.c $(INCLUDE)
+%.o: %.cpp $(INCLUDE)
 	gcc $(FLAGS) -c $< -o $@
 
 clean:
+
 	rm -rf $(NAME)
+
+fclean: clean
+
+re: fclean all
 
 .PHONY: all clean fclean re
