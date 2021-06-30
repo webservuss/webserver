@@ -7,7 +7,7 @@ SRCS =		networking/servers/test.cpp \
 			networking/sockets/listen_n_bind.cpp \
 			http_funct.cpp
 
-OFILES =	$(SRCS:.c=.o)
+OFILES =	$(SRCS:.cpp=.o)
 
 FLAGS = -std=c++98
 # -Wall -Werror -Wextra
@@ -23,10 +23,10 @@ $(NAME):	$(OFILES) $(INCLUDES)
 	gcc $(FLAGS) -c $< -o $@
 
 clean:
-
-	rm -rf $(NAME)
+	/bin/rm -f $(OFILES)
 
 fclean: clean
+	rm -rf $(NAME)
 
 re: fclean all
 
