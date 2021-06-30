@@ -1,6 +1,7 @@
 #include "select_server.hpp"
 
-HTTP:: select_server::select_server(): simple_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, 5)
+/* constructor calls simple_server and launches */
+HTTP:: select_server::select_server(): simple_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG)
 {
     launch();
 }
@@ -27,24 +28,6 @@ void HTTP::select_server::accepter()
 	}
 }
 
-void HTTP::select_server::setnonblocking(int sock)
-{
-	int opts;
-
-	opts = fcntl(sock,F_GETFL);
-	if (opts < 0) {
-		perror("fcntl(F_GETFL)");
-		exit(EXIT_FAILURE);
-	}
-	opts = (opts | O_NONBLOCK);
-	if (fcntl(sock,F_SETFL,opts) < 0) {
-		perror("fcntl(F_SETFL)");
-		exit(EXIT_FAILURE);
-	}
-	return;
-}
-
-
 	/* Now check connectlist for available data */
 	/* We have a new connection coming in!  We'll try to find a spot for it in connectlist. */
 void    HTTP::select_server::handeler()
@@ -62,7 +45,7 @@ void    HTTP::select_server::handeler()
 			std::cout << "error in accept" << std::endl;
 			exit(EXIT_FAILURE);
 		}
-		setnonblocking(connection);
+		set_non_blocking(connection);
 		for (int listnum = 0; (listnum < BACKLOG) && (connection != -1); listnum ++)
 		// DOES THIS EVEN INCREASE LISTNUM
 		if (connectlist[listnum] == 0) 

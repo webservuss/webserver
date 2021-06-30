@@ -28,27 +28,6 @@ void    HTTP::simple_socket::test_connection(int item_to_test)
     }
 }
 
-/* set non-blocking:
-to set a specific flag and leave the other flags as-is, 
-then you must F_GETFL the old flags, | the new flag in, and then F_SETFL the result
- as two separate system calls; */
-void                HTTP::simple_socket::set_non_blocking(int sock)
-{
-    int opts;
-
-	opts = fcntl(sock,F_GETFL);
-	if (opts < 0) {
-		perror("fcntl(F_GETFL)");
-		exit(EXIT_FAILURE);
-	}
-	opts = (opts | O_NONBLOCK);
-	if (fcntl(sock,F_SETFL,opts) < 0) {
-		perror("fcntl(F_SETFL)");
-		exit(EXIT_FAILURE);
-	}
-	return;
-}
-
 /* getter functions */
 int                 HTTP::simple_socket::get_sock()
 {
@@ -59,3 +38,24 @@ struct sockaddr_in  HTTP::simple_socket::get_address()
 {
     return (address);
 }
+
+
+// /* set non-blocking: to set a specific flag and leave the other flags as-is, 
+// then you must F_GETFL the old flags, | the new flag in, and then F_SETFL the result
+//  as two separate system calls; */
+// void                HTTP::set_non_blocking(int sock)
+// {
+//     int opts;
+
+// 	opts = fcntl(sock,F_GETFL);
+// 	if (opts < 0) {
+// 		perror("fcntl(F_GETFL)");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	opts = (opts | O_NONBLOCK);
+// 	if (fcntl(sock,F_SETFL,opts) < 0) {
+// 		perror("fcntl(F_SETFL)");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	return;
+// }

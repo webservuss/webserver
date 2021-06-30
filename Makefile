@@ -1,11 +1,11 @@
 NAME =		test
 
-SRCS =		networking/Servers/test.cpp \
-			networking/Servers/simple_server.cpp \
-			networking/Sockets/simple_socket.cpp \
-			networking/Servers/select_server.cpp \
-			networking/Sockets/listen_n_bind.cpp
-
+SRCS =		networking/servers/test.cpp \
+			networking/servers/simple_server.cpp \
+			networking/sockets/simple_socket.cpp \
+			networking/servers/select_server.cpp \
+			networking/sockets/listen_n_bind.cpp \
+			http_funct.cpp
 
 OFILES =	$(SRCS:.c=.o)
 

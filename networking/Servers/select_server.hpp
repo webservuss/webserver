@@ -9,28 +9,30 @@
 
 #include "simple_server.hpp"
 #include "../../http.hpp"
+#include "../../http_funct.hpp"
 
+#define BACKLOG 10
 
 namespace HTTP
 {
-    
-        class select_server: public simple_server
+        class select_server : public simple_server
         {
-
             private:
+                /* variable to recv() data */
                 char            buffer[30000];
-                int             connectlist[BACKLOG]; // dont want 100 want it to be backlog get_socket()->get_backlog()
+                /* variables needed for select()*/
                 int             highsock;
                 fd_set          socks;
+                int             connectlist[BACKLOG];
             public:
+                /* constructor */
                 select_server();
-                void    		setnonblocking(int sock); // should use one from other class
+                /* implement the virtual void functions from simple_server
+                to accept, handle respond and launch */
                 void    		accepter();
                 void    		handeler();
 				void			responder();
                 void    		launch();
         };
-        
-    
 }
 #endif
