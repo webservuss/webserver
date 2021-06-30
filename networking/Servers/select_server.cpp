@@ -6,16 +6,23 @@ HTTP:: select_server::select_server(): simple_server(AF_INET, SOCK_STREAM, 0, 80
     launch();
 }
 	
-/* First put together fd_set for select(), which will consist of the sock 
-    veriable in case a new connection is coming in, plus all the sockets 
-    we have already accepted. */
+/* fd_set for select(), consist of the sock veriable in case a new, plus all already accepted sockets  */
 /* FD_ZERO() clears out the fd_set called socks, so that it doesn't contain any file descriptors. */
-/* FD_SET() adds the file descriptor "sock" to the fd_set, so that select() will 
-    return if a connection comes in on that socket (which means you have to do accept(), etc. */
+/* FD_SET() adds the FD "sock" to the fd_set */
 /* Loops through all the possible connections and adds those sockets to the fd_set */
-void HTTP::select_server::accepter()
+/* select() 1st argument is the highest FD plus 1 */
+/* 2nd argument is  address of the fd_set that contains sockets we're waiting to be readable (including the listening socket). */
+/* 3rd argument is an fd_set that you want to know if you can write on -- we doesn't use it, so it passes 0 NULL. */
+/* 4th argument is sockets you're waiting for out-of-band data for, which usually, you're not. */
+/* 5th argument is a time-out of how long select() should block */
+/* select() returns the number of sockets that had things going on with them -- i.e. they're readable. */
+/* Once select() returns, the original fd_set has been modified so it now reflects the state of why select() woke up */
+int HTTP::select_server::selecter()
 {
-    int sock = get_socket()->get_sock();
+	int 			readsocks;
+    struct timeval  timeout;
+    int 			sock = get_socket()->get_sock();
+	
 	FD_ZERO(&socks);
 	FD_SET(sock,&socks);
     highsock = sock;
@@ -26,11 +33,15 @@ void HTTP::select_server::accepter()
 				highsock = connectlist[listnum];
 		}
 	}
+	timeout.tv_sec = 5;
+	timeout.tv_usec = 0;
+	readsocks = select(highsock+1, &socks, (fd_set *) 0, (fd_set *) 0, &timeout);
+	return (readsocks);
 }
 
-	/* Now check connectlist for available data */
-	/* We have a new connection coming in!  We'll try to find a spot for it in connectlist. */
-void    HTTP::select_server::handeler()
+/* Now check connectlist for available data */
+/* We have a new connection coming in!  We'll try to find a spot for it in connectlist. */
+void    HTTP::select_server::accepter()
 {
 	int					connection;
     int					sock = get_socket()->get_sock();
@@ -47,41 +58,40 @@ void    HTTP::select_server::handeler()
 		}
 		set_non_blocking(connection);
 		for (int listnum = 0; (listnum < BACKLOG) && (connection != -1); listnum ++)
-		// DOES THIS EVEN INCREASE LISTNUM
 		if (connectlist[listnum] == 0) 
 		{
 			std::cout << "\nConnection accepted:   FD=" << connection << "Slot" << listnum << std::endl;
 			connectlist[listnum] = connection;
 			connection = -1;
 		}
-		if (connection != -1) 
-		{ /* No room left in the queue! */
-        	std::cout << "\nNo room left for new client.\n";
+		if (connection != -1)
+		{
+        	std::cout << "\nNo room left in queue for new client.\n";
 			close(connection);
 		}
 	}
 }
 
-/* Run through our sockets and check to see if anything
-	happened with them, if so 'service' them. */
-void    HTTP::select_server::responder()
+/* Run through our sockets and check to see if anything happened with them, if so 'service' them. */
+/* if recv fails connection closed, close this end and free up entry in connectlist */
+/* else send correct to browser */
+void    HTTP::select_server::handeler()
 {
     int valread;
     int sock = get_socket()->get_sock();
 
-	for (int listnum = 0; listnum < BACKLOG; listnum++) {
+	for (int listnum = 0; listnum < BACKLOG; listnum++)
+	{
 		if (FD_ISSET(connectlist[listnum],&socks))
         {
 			if ((valread = recv(connectlist[listnum], buffer, 3000, 0)) < 0) 
 			{
-	    		/* Connection closed, close this end and free up entry in connectlist */
 	    		std::cout << "\nConnection lost: FD=" << connectlist[listnum] << " Slot" << listnum << std::endl;
 				close(connectlist[listnum]);
 				connectlist[listnum] = 0;
 			} 
     		else 
 			{
-        		buffer[valread] = '\0';  
 				send(connectlist[listnum] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
 				send(connectlist[listnum] , "Content-length: 50\n" , 19 , 0 );  
 				send(connectlist[listnum] , "Content-Type: text/html\n\n" , 25 , 0 );  
@@ -92,63 +102,29 @@ void    HTTP::select_server::responder()
 	}
 }
 
-
-
-		/* The first argument to select is the highest file
-			descriptor value plus 1. In most cases, you can
-			just pass FD_SETSIZE and you'll be fine. */
-			
-		/* The second argument to select() is the address of
-			the fd_set that contains sockets we're waiting
-			to be readable (including the listening socket). */
-			
-		/* The third parameter is an fd_set that you want to
-			know if you can write on -- this example doesn't
-			use it, so it passes 0, or NULL. The fourth parameter
-			is sockets you're waiting for out-of-band data for,
-			which usually, you're not. */
-		
-		/* The last parameter to select() is a time-out of how
-			long select() should block. If you want to wait forever
-			until something happens on a socket, you'll probably
-			want to pass NULL. */
-            		/* select() returns the number of sockets that had
-			things going on with them -- i.e. they're readable. */
-			
-		/* Once select() returns, the original fd_set has been
-			modified so it now reflects the state of why select()
-			woke up. i.e. If file descriptor 4 was originally in
-			the fd_set, and then it became readable, the fd_set
-			contains file descriptor 4 in it. */
+/* launch in an endless loop */
 void    HTTP::select_server::launch()
 {
     int 			readsocks;
-    struct timeval  timeout;
     fd_set 			temp_fds;
-    int 			sock = get_socket()->get_sock();
 
-    highsock = sock;
 	memset((char *) &connectlist, 0, sizeof(connectlist));
 	memset((char *) &buffer, 0, sizeof(buffer));
     while(true)
     {
         std::cout << "...................WAITING////" << std::endl;
- 		accepter();
-		timeout.tv_sec = 5;
-		timeout.tv_usec = 0;
-		readsocks = select(highsock+1, &socks, (fd_set *) 0, (fd_set *) 0, &timeout);
-		if (readsocks < 0) {
+ 		readsocks = selecter();
+		if (readsocks < 0)
+		{
         	std::cout << "error select " << std::endl;
 			exit(EXIT_FAILURE);
 		}
-		if (readsocks == 0) { /* Nothing  to read, just show alive */
+		if (readsocks == 0) /* Nothing  to read, just show alive */
 			std::cout << ".";
-			// fflush(stdout);
-		} 
         else
 		{
+			accepter();
 			handeler();
-			responder();
 		}
 		std::cout << "...................DONE////" << std::endl;
     }

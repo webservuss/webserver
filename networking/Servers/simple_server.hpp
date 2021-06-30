@@ -16,7 +16,6 @@ class simple_server{
 		accept, handle and respond */
     	virtual void 	accepter()= 0;
     	virtual void 	handeler()= 0;
-    	virtual void 	responder()= 0;
     public:
 		/* constructor */
     	simple_server(int domain, int service, int protocol, int port, u_long interface, 

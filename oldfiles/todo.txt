@@ -1,3 +1,2 @@
 1. all complian form
-2. comments on functions
-3. get rid of warnings
+3. Go through subject and see what i have done so far

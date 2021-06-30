@@ -6,6 +6,7 @@
     enable rebinding while a previous connection is still in TIME_WAIT state, allow re-use of local address
     and set non blocking */
 HTTP::simple_socket::simple_socket(int domain, int service, int protocol, int port, u_long interface)
+    : domain(domain), service(service), protocol(protocol), port(port), interface(interface)
 {
     int reuse_addr = 1;
     memset(&address,0,sizeof(address));
@@ -29,33 +30,60 @@ void    HTTP::simple_socket::test_connection(int item_to_test)
 }
 
 /* getter functions */
-int                 HTTP::simple_socket::get_sock()
+int                 HTTP::simple_socket::get_sock()         const
 {
     return (sock);
 }
 
-struct sockaddr_in  HTTP::simple_socket::get_address()
+struct sockaddr_in  HTTP::simple_socket::get_address()      const
 {
     return (address);
 }
 
+int                 HTTP::simple_socket::get_domain()       const
+{
+    return (domain);
+}
 
-// /* set non-blocking: to set a specific flag and leave the other flags as-is, 
-// then you must F_GETFL the old flags, | the new flag in, and then F_SETFL the result
-//  as two separate system calls; */
-// void                HTTP::set_non_blocking(int sock)
-// {
-//     int opts;
+int                 HTTP::simple_socket::get_service()      const
+{
+    return (service);
+}
 
-// 	opts = fcntl(sock,F_GETFL);
-// 	if (opts < 0) {
-// 		perror("fcntl(F_GETFL)");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	opts = (opts | O_NONBLOCK);
-// 	if (fcntl(sock,F_SETFL,opts) < 0) {
-// 		perror("fcntl(F_SETFL)");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	return;
-// }
+int                 HTTP::simple_socket::get_protocol()     const
+{
+    return (protocol);
+}
+
+int                 HTTP::simple_socket::get_port()          const
+{
+    return (port);
+}
+
+u_long              HTTP::simple_socket::get_interface()    const
+{
+    return (interface);
+}
+
+/* complian form */
+/* empty constructor */
+// HTTP::simple_socket::simple_socket() : sock(0) {memset(&address, 0, sizeof(struct sockaddr_in));}
+
+/*copy constructor */
+HTTP::simple_socket::simple_socket(const simple_socket& x)
+{
+    sock = x.sock;
+    address = x.address;
+}
+
+/*assignment operator */
+HTTP::simple_socket& HTTP::simple_socket::operator=(const simple_socket& x)
+{
+    // if (sock != x.sock || address != x.address)
+    sock = x.sock;
+    address = x.address;
+    return *this;
+}
+
+/*destructor */
+HTTP::simple_socket::~simple_socket() {}

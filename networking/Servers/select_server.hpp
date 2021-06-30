@@ -27,11 +27,12 @@ namespace HTTP
             public:
                 /* constructor */
                 select_server();
+                /* */
+                int             selecter();
                 /* implement the virtual void functions from simple_server
                 to accept, handle respond and launch */
                 void    		accepter();
                 void    		handeler();
-				void			responder();
                 void    		launch();
         };
 }

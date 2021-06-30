@@ -16,15 +16,24 @@ namespace HTTP
         	void    connect_to_network(int sock, struct sockaddr_in address);
         	/* call listen */
         	void    start_listening();
+			/* empty constructor for complian form */
+            listen_n_bind();
 
    		public:
         	/* constructor */
         	listen_n_bind(int domain, int service, int protocol, int port, 
 			u_long interface, int bklg);
+            /*copy constructor */
+            listen_n_bind(const listen_n_bind& x);
+            /*assignment operator */
+            listen_n_bind& operator=(const listen_n_bind& x);
+            /*destructor */
+            ~listen_n_bind();
+
         	/* getters */
-        	int     get_listening();
-        	int     get_backlog();
-        	int     get_binding();
+        	int     get_listening() const;
+        	int     get_backlog() 	const;
+        	int     get_binding() 	const;
 	};
 }
 #endif
