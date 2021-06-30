@@ -129,3 +129,32 @@ void    HTTP::select_server::launch()
 		std::cout << "...................DONE////" << std::endl;
     }
 }
+
+
+// /* complian form */
+// /*copy constructor */
+// HTTP::select_server::select_server(const select_server& x)
+//     : simple_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG)
+
+// {
+//     buffer = x.buffer;
+//     highsock = x.highsock;
+//     socks = x.socks;
+//     connectlist = x.connectlist;
+// }
+
+// /*assignment operator */
+// HTTP::select_server& HTTP::select_server::operator=(const select_server& x)
+// {
+//     if (buffer != x.buffer || highsock != x.highsock ||socks != x.socks || connectlist != x.connectlist)
+//     {
+//     	buffer = x.buffer;
+//     	highsock = x.highsock;
+//     	socks = x.socks;
+//     	connectlist = x.connectlist;
+//     }
+//     return *this;
+// }
+
+// /*destructor */
+// HTTP::select_server::~select_server() {}

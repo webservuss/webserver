@@ -3,7 +3,6 @@
 
 #include "stdio.h"
 #include "simple_socket.hpp"
-// #include "../../http.hpp"
 
 namespace HTTP 
 {
