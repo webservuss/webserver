@@ -11,6 +11,14 @@ std::vector<std::string> utils::split_http(const std::string &str, const std::st
     std::cout << "str**** " << str << std::endl;
     std::cout << "strsize " << str.size() << std::endl;
     std::cout << "split_c " << split_c << "c" << std::endl;
+    //end = str.size();
+    // while(str[start] != end){
+    //     while(str[res] != " ")
+    // }
+
+    /* FIRST PART  */
+    end = str.find(" ");
+    std::cout << "print the lengt of end ----" <<end << std::endl;
     /* npos is a static member constant value with the greatest 
     possible value for an element of type size_t */
     // while(end != str.npos)
@@ -20,8 +28,8 @@ std::vector<std::string> utils::split_http(const std::string &str, const std::st
     //     find_first_not_of searches seraches the string for the first character that does 
     //     not match any of the characters specified in the argument */
     //     std::cout << "print the lengt of end" <<end << std::endl;
-        start = str.find_first_not_of(split_c, end);
-        end = str.find_first_not_of(split_c ,start);
+        //start = str.find_first_not_of(split_c, end);
+        //end = str.find_first_not_of(split_c ,start);
         std::cout << "print the lengt of start" <<start << std::endl;
         std::cout << "print the lengt of end" <<end << std::endl;
     //     /* so basicly checking if not empty */
@@ -32,7 +40,9 @@ std::vector<std::string> utils::split_http(const std::string &str, const std::st
         // make a loop to fill the vector 
         if(end != std::string::npos || start != std::string::npos)
         {
-            std::cout << "in pushback" << << std::endl;
+            std::cout << "in pushback"  << std::endl;
+            res = str.substr(start, end - start);
+            std::cout << "res" << res << std::endl;
             array.push_back(str.substr(start, end - start));
         }
     //}

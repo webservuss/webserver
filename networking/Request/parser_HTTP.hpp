@@ -7,6 +7,7 @@
 #include "split.hpp"
 #include "../Colors.hpp"
 #include "makeMap.hpp"
+#include "utils_countspace.hpp"
 
 #include <stdio.h>
 #include <string>
@@ -35,16 +36,31 @@ namespace HDE{
         DELETE
     };
 
+    
     class parser_HTTP
     {
         parser_HTTP(){}
         private:
-        static const std::string                    permisChar;
+            std::string _key;
+            std::string _value;
+            static const std::string                    permisChar;
+            
 
 
         public:
-        static const std::map<std::string, method>  mapMethod;
-        parser_HTTP(std::string dataparser);
+            parser_HTTP(std::string dataparser);
+            void split_line(std::string line);
+            static const std::map<std::string, method>  mapMethod;
+            std::map<std::string, std::string> mapHeader;
+            
+        
+        //setters
+        
+        void		set_key(std::string key);
+        void		set_value(std::string value);
+
+        //getters
+        std::string	 get_key();
 
     };
 
