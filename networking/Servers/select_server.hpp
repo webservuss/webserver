@@ -8,6 +8,7 @@
 #include <string>
 
 #include "simple_server.hpp"
+#include "../../http.hpp"
 
 
 namespace HTTP
@@ -18,12 +19,9 @@ namespace HTTP
 
             private:
                 char            buffer[30000];
-                struct timeval  timeout;
-                int             connection;
-                int             connectlist[5]; // dont want 100 want it to be backlog get_socket()->get_backlog()
+                int             connectlist[BACKLOG]; // dont want 100 want it to be backlog get_socket()->get_backlog()
                 int             highsock;
                 fd_set          socks;
-                int             new_socket;
             public:
                 select_server();
                 void    		setnonblocking(int sock); // should use one from other class

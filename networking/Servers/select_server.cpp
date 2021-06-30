@@ -15,11 +15,10 @@ HTTP:: select_server::select_server(): simple_server(AF_INET, SOCK_STREAM, 0, 80
 void HTTP::select_server::accepter()
 {
     int sock = get_socket()->get_sock();
-    int bklg = get_socket()->get_backlog();
 	FD_ZERO(&socks);
 	FD_SET(sock,&socks);
     highsock = sock;
-	for (int listnum = 0; listnum < bklg; listnum++) {
+	for (int listnum = 0; listnum < BACKLOG; listnum++) {
 		if (connectlist[listnum] != 0) {
 			FD_SET(connectlist[listnum],&socks);
 			if (connectlist[listnum] > highsock)
@@ -50,8 +49,8 @@ void HTTP::select_server::setnonblocking(int sock)
 	/* We have a new connection coming in!  We'll try to find a spot for it in connectlist. */
 void    HTTP::select_server::handeler()
 {
+	int					connection;
     int					sock = get_socket()->get_sock();
-    int					bklg = get_socket()->get_backlog();
     struct sockaddr_in  address = get_socket()->get_address();
     int 				addrlen = sizeof(address);
 
@@ -64,7 +63,7 @@ void    HTTP::select_server::handeler()
 			exit(EXIT_FAILURE);
 		}
 		setnonblocking(connection);
-		for (int listnum = 0; (listnum < bklg) && (connection != -1); listnum ++)
+		for (int listnum = 0; (listnum < BACKLOG) && (connection != -1); listnum ++)
 		// DOES THIS EVEN INCREASE LISTNUM
 		if (connectlist[listnum] == 0) 
 		{
@@ -86,9 +85,8 @@ void    HTTP::select_server::responder()
 {
     int valread;
     int sock = get_socket()->get_sock();
-    int bklg = get_socket()->get_backlog();
 
-	for (int listnum = 0; listnum < bklg; listnum++) {
+	for (int listnum = 0; listnum < BACKLOG; listnum++) {
 		if (FD_ISSET(connectlist[listnum],&socks))
         {
 			if ((valread = recv(connectlist[listnum], buffer, 3000, 0)) < 0) 
@@ -141,9 +139,10 @@ void    HTTP::select_server::responder()
 			contains file descriptor 4 in it. */
 void    HTTP::select_server::launch()
 {
-    int readsocks;
-    int sock = get_socket()->get_sock();
-    fd_set temp_fds;
+    int 			readsocks;
+    struct timeval  timeout;
+    fd_set 			temp_fds;
+    int 			sock = get_socket()->get_sock();
 
     highsock = sock;
 	memset((char *) &connectlist, 0, sizeof(connectlist));

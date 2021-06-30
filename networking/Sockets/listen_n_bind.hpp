@@ -11,11 +11,15 @@ class listen_n_bind : public simple_socket {
         int     binding;
         int     backlog;
         int     listening;
-    public:
-        // constructor
-        listen_n_bind(int domain, int service, int protocol, int port, u_long interface, int bklg);
+        /* call bind */
         void    connect_to_network(int sock, struct sockaddr_in address);
-        void    start_listening(); // ,aybe make this private
+        /* call listen */
+        void    start_listening();
+
+    public:
+        /* constructor */
+        listen_n_bind(int domain, int service, int protocol, int port, u_long interface, int bklg);
+        /* getters */
         int     get_listening();
         int     get_backlog();
         int     get_binding();

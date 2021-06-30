@@ -14,16 +14,17 @@ namespace HTTP {
         private:
             int                 sock;
             struct sockaddr_in  address;
+
         public:
-            // constructor
+            /* constructor */
             simple_socket(int domain, int service, int protocol, int port, u_long interface);
-            // virtual function to connect to a network
+            /* virtual function to connect to a network */
             virtual void        connect_to_network(int sock, struct sockaddr_in address) = 0;
-            // function to test sockets and connections
+            /* test sockets and connections */
             void                test_connection(int item_to_test);
-            // set non-blocking
+            /* test non-blocking */
             void                set_non_blocking(int sock);
-            // getter functions
+            /* getter functions */
             int                 get_sock();
             struct sockaddr_in  get_address();
     };
