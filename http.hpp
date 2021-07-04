@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-#include "networking/sockets/simple_socket.hpp"
-#include "networking/sockets/listen_n_bind.hpp"
+#include "networking/Sockets/simple_socket.hpp"
+#include "networking/Sockets/listen_n_bind.hpp"
 
 
 #endif
