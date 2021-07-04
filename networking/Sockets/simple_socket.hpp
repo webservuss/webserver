@@ -12,15 +12,13 @@ namespace HTTP {
     class simple_socket
     {
         private:
-            int                 sock;
-            struct sockaddr_in  address;
-            int                 domain;
-            int                 service;
-            int                 protocol;
-            int                 port;
-            u_long              interface;
-            /* empty constructor for complian form */
-            // simple_socket();
+            int                 _sock;
+            struct sockaddr_in  _address;
+            int                 _domain;
+            int                 _service;
+            int                 _protocol;
+            int                 _port;
+            u_long              _interface;
         public:
             /* constructors */
             simple_socket(int domain, int service, int protocol, int port, u_long interface);

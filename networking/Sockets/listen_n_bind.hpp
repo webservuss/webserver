@@ -8,15 +8,13 @@ namespace HTTP
 {
     class listen_n_bind : public simple_socket {
         private:
-            int     binding;
-        	int     backlog;
-	        int     listening;
+            int     _binding;
+        	int     _backlog;
+	        int     _listening;
     	    /* call bind */
         	void    connect_to_network(int sock, struct sockaddr_in address);
         	/* call listen */
         	void    start_listening();
-			/* empty constructor for complian form */
-            listen_n_bind();
 
    		public:
         	/* constructor */
@@ -33,6 +31,7 @@ namespace HTTP
         	int     get_listening() const;
         	int     get_backlog() 	const;
         	int     get_binding() 	const;
+
 	};
 }
 #endif
