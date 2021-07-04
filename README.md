@@ -67,5 +67,3 @@ and type the following in browser (recommended to use with chrome)
 ```
 127.0.0.1
 ```
-
-and for a specific function e.g. strlen
