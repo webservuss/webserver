@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <fcntl.h>
+#include "all_libs.hpp"
 
 namespace HTTP
 {
