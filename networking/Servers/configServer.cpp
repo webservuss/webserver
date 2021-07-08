@@ -1,5 +1,32 @@
 #include "SimpleServer.hpp"
 
+
+HDE::ConfigServer::config_server(std::ifstream &configfileStream)
+{
+    std::string line;
+    // std::vector<std::string> config_variables = {"server_name", "listen", "host", "error_page", "autoindex", "root", "index"};
+
+    while (std::getline(configfileStream, line))
+    {
+        
+        std::cout << "line before trim:   [" << line  << "]" << std::endl;
+        std::size_t found = line.find("root");
+        if (found < INT_MAX)e
+        {
+            while (line[found] != ' ')
+                found++;
+            std::string nxt;
+            int sizey = line.length();
+            std::cout << "sizey is" << sizey << " found is " << found << std::endl;
+            nxt = line.substr(found, sizey - found);
+            std::cout << "last bit is [" << nxt << "]" << std::endl;
+            // return ;
+        }
+    }
+    // // close file
+    return ;
+}
+
 //  setters
 void		HDE::configServer_hpp::set_server_name(std::string srv_name)
 {

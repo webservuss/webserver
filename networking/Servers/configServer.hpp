@@ -7,11 +7,11 @@
 
 namespace HDE{
     
-class configServer_hpp{
+class configServer{
     public:
         //complian form
         // configServer_hpp();
-        configServer_hpp(std::string config_file_path);
+        configServer(std::string config_file_path);
 
         //setters
         void		set_server_name(std::string srv_name);
