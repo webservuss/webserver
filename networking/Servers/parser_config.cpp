@@ -1,56 +1,88 @@
-#ifndef parser_config_hpp
-#define parser_config_hpp
+#include "parser_config.hpp"
+#include "colors.hpp"
 
-#include <stdio.h>
-
-#include "../hdelibc_networking.hpp"
-#include "../hdelibc_networking.hpp"
-#include "../Servers/SimpleServer.hpp"
-#include "split.hpp"
-#include "../Colors.hpp"
-#include "makeMap.hpp"
-#include "utils_countspace.hpp"
-
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <cstring>
-#include <iterator>
-#include <sstream>
-#include <sstream>
-#include <vector>
 #include <iostream>
 #include <map>
-#include <string>
-#include <map>
+#include <fstream>
 
-namespace HDE{
 
-class parser_config
+using namespace HDE;
+
+
+const std::string parser_config::permisChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!#$&'()*+,/:;=?@[]";
+
+
+HDE::parser_config::parser_config(std::ifstream& file)
 {
+    std::cout<< RED<< "###########WE ARE IN PARSER CONFIG##########" << RESET << std::endl;
+    std::string data;
+    std::string line;
+    std::ifstream config;
 
-    parser_config(){}
-        private:
-            std::string _key;
-            std::string _value;
-            static const std::string                    permisChar;
+    
+    if(config)
+        std::cout<< RED<< "file is full" << RESET << std::endl;
+    config.open("example.txt", std::ifstream::in);
+    while(config.is_open()){
+        std::cout<< RED<< "yes" << RESET << std::endl;
+    if (!config) {
+        std::cout << "Unable to open file config.txt";
+        //exit(1);   // call system to stop
+    }
 
-        public:
-            parser_config(std::string dataparser);
-            void split_line(std::string line);
-            static const std::map<std::string, method>  mapMethod;
-            std::map<std::string, std::string> mapHeader;
-         
-        void		set_server_name(std::string srv_name);
-        void		set_port(int prt);
-        void		set_host(std::string hst);
-        void		set_error_page(std::string err_pg);
-        void		set_auto_index(int ato_ndx);
-        void 		set_root(std::string rt);
-        void 		set_index(std::string ndx);
+    if(file)
+    {
+        std::cout<< RED<< "file is full" << RESET << std::endl;
+    }
 
-};
+    while(getline(file, line))
+    {
+         std::cout<< RED<< "GET LINES" << RESET << std::endl;
+        std::cout << line << '\n';
+    }
+    
+ 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//}
+
+
+
+
+
+
+
+
+
+    // while(std::getline(request_data, data))
+    // {
+    //     line = data.substr(0, data.find('\r'));
+    //     if(line.size() != 0)
+    //         split_line(line);
+        
+    //     mapConfig.insert(std::pair<std::string, std::string>( _key, _value) );
+    // }
+    // std::map<std::string, std::string>::iterator it = mapConfig.begin();
+    // std::cout << RED <<  "*******************    MAP HEADER CONTAINTS   *******************\n";
+    // for (it=mapConfig.begin(); it!=mapConfig.end(); ++it)
+    // std::cout << GREEN << it->first  << BLUE << " => " << GREEN << it->second << RESET << '\n';
 }
 
-#endif
+void HDE::parser_config::parser_config_open(){
+
+    std::cout<< RED<< "#LALA#" << RESET << std::endl;
+
+}

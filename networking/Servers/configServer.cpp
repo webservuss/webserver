@@ -1,7 +1,7 @@
 #include "SimpleServer.hpp"
 
 
-HDE::ConfigServer::config_server(std::ifstream &configfileStream)
+HDE::configServer::config_server(std::ifstream &configfileStream)
 {
     std::string line;
     // std::vector<std::string> config_variables = {"server_name", "listen", "host", "error_page", "autoindex", "root", "index"};

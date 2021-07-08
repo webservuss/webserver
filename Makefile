@@ -5,8 +5,8 @@ networking/Servers/SimpleServer.cpp networking/Sockets/bindingSocket.cpp \
 networking/Sockets/listeningSocket.cpp networking/Sockets/hdelibc_sockets.cpp \
 networking/Sockets/simpleSocket.cpp networking/hdelibc_networking.cpp  hdelibc.cpp\
 networking/Request/request.cpp \
-networking/Request/parser_HTTP.cpp networking/Request/utils_HTTP.cpp \
-networking/Request/split.cpp
+networking/Request/parser_HTTP.cpp networking/Request/utils_HTTP.cpp networking/Servers/parser_config.cpp\
+networking/Request/split.cpp 
 
 
 
