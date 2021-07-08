@@ -16,23 +16,23 @@ HDE::request::request(std::string myrequest)
 
     
 
-    std::cout << "here"<<std::endl;
-    std::cout <<" string "<< myrequest<< std::endl;
-    while(std::getline(request_str, str))
-    {
-         std::cout <<" line is: "<< str<< std::endl;
-    }
+    //std::cout << "here"<<std::endl;
+    //std::cout <<" string "<< myrequest<< std::endl;
+    //while(std::getline(request_str, str))
+    //{
+        // std::cout <<" line is: "<< str<< std::endl;
+    //}
     /* setting your vecotr to string */
-    std::vector<std::string> requestVec;
+    //std::vector<std::string> requestVec;
 
-    requestVec.push_back(str);
-    std::cout << "VECTOR" << std::endl;
+    //requestVec.push_back(str);
+    //std::cout << "VECTOR" << std::endl;
    // std::cout << requestVec.size << std::endl;
 
-    for(unsigned int i = 0; i < requestVec.size(); i++){
-        std::cout << requestVec[i] << " " << std::endl;
+    //for(unsigned int i = 0; i < requestVec.size(); i++){
+       // std::cout << requestVec[i] << " " << std::endl;
 
-    }
+    //}
     
 
 }

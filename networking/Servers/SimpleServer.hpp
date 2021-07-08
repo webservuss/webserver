@@ -5,6 +5,9 @@
 
 
 #include "../hdelibc_networking.hpp"
+#include "colors.hpp"
+
+
 
 namespace HDE{
     

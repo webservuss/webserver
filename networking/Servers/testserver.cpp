@@ -1,5 +1,6 @@
 #include "testserver.hpp"
 #include "../Request/request.hpp"
+#include "../Request/parser_HTTP.hpp"
 #include <unistd.h>
 
 
@@ -25,6 +26,7 @@ void HDE::TestServer::handeler()
     std::cout << buffer << std::endl;
     /*  store buffer in request class*/
     HDE::request r(buffer);
+    HDE::parser_HTTP h(buffer);
     std::cout << GREEN << "***************END BUFFER***************"<< RESET <<std::endl;
 }
 
