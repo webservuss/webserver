@@ -45,21 +45,28 @@ class parser_config
             int         _auto_index;
             std::string _root;
             std::string _index;
+            std::string _server;
+            std::string _key;
+            std::string _value;
 
         public:
             parser_config(std::ifstream& file);
             void parser_config_open();
+            void split_config(std::string line);
             void split_line(std::string line);
             static const std::map<std::string, namec>  mapMethod;
             std::map<std::string, std::string> mapconfig;
          
-        void		set_server_name(std::string srv_name);
+        void		set_server_name(std::string server, std::string server_name);
         void		set_port(int prt);
         void		set_host(std::string hst);
         void		set_error_page(std::string err_pg);
         void		set_auto_index(int ato_ndx);
         void 		set_root(std::string rt);
         void 		set_index(std::string ndx);
+        void        set_key(std::string key, std::string value);
+        void        set_value(std::string value);
+
 
 };
 

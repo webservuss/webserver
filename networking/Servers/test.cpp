@@ -25,9 +25,12 @@
 int main()
 {
     std::cout<< RED<< "MAIN" << RESET << std::endl;
-    std::
-    std::ifstream file("example.txt");
-    file.open("example.txt", std::ifstream::in);
+    std::ifstream file;
+    // std::ifstream file("example.txt");
+    std::string path;
+    path = "configs/example.txt";
+    // file.open(path , std::ifstream::in);
+    file.open(path);
     if(file.is_open()){
         std::cout<< RED<< "###########CONFIG OPEN##########" << RESET << std::endl;
         HDE::parser_config t (file);
