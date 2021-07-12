@@ -1,25 +1,5 @@
+#include "parser_config.hpp"
 #include "select_server.hpp"
-#include <stdio.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <cstring>
-#include <iterator>
-#include <sstream>
-#include <sstream>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <string>
-#include <map>
-#include <iostream>
-#include <map>
-#include <fstream>
-#include "parser_config.hpp"
-#include "parser_config.hpp"
-
-
 
 int main()
 {

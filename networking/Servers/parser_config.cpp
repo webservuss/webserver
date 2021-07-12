@@ -1,22 +1,5 @@
 #include "parser_config.hpp"
 
-#include <iostream>
-#include <map>
-#include <fstream>
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <cstring>
-#include <iterator>
-#include <sstream>
-#include <sstream>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <string>
-#include <map>
-
-
 using namespace HDE;
 
 

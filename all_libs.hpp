@@ -12,4 +12,11 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <iostream>
+#include <iterator>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <netinet/in.h>
+#include <fcntl.h>
 #endif //WEB_6JULI_ALL_LIBS_HPP

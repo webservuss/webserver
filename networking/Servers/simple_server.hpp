@@ -1,8 +1,6 @@
 #ifndef simple_server_hpp
 #define simple_server_hpp
 
-#include <stdio.h>
-
 #include "../../http.hpp"
 
 namespace HTTP{

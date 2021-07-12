@@ -1,27 +1,12 @@
 #ifndef parser_config_hpp
 #define parser_config_hpp
 
-#include <stdio.h>
-
 #include "../../http.hpp"
 #include "./simple_server.hpp"
-//#include "split.hpp"
 #include "../utils/colors.hpp"
+//#include "split.hpp"
 //#include "makeMap.hpp"
 //#include "utils_countspace.hpp"
-
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <cstring>
-#include <iterator>
-#include <sstream>
-#include <sstream>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <string>
-#include <map>
 
 namespace HDE{
 
