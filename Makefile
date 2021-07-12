@@ -5,7 +5,15 @@ SRCS =		networking/Servers/test.cpp \
 			networking/Sockets/simple_socket.cpp \
 			networking/Servers/select_server.cpp \
 			networking/Sockets/listen_n_bind.cpp \
-			networking/utils/http_funct.cpp
+			networking/utils/http_funct.cpp \
+networking/Request/parser_HTTP.cpp networking/Request/utils_HTTP.cpp networking/Servers/parser_config.cpp\
+networking/Request/split.cpp  \
+networking/Request/request.cpp
+# SRCS =		networking/Servers/test.cpp networking/Servers/testserver.cpp \
+# networking/Servers/SimpleServer.cpp networking/Sockets/bindingSocket.cpp \
+# networking/Sockets/listeningSocket.cpp networking/Sockets/hdelibc_sockets.cpp \
+# networking/Sockets/simpleSocket.cpp networking/hdelibc_networking.cpp  hdelibc.cpp\ \
+
 
 OFILES =	$(SRCS:.cpp=.o)
 
