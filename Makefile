@@ -5,7 +5,7 @@ SRCS =		networking/Servers/test.cpp \
 			networking/Sockets/simple_socket.cpp \
 			networking/Servers/select_server.cpp \
 			networking/Sockets/listen_n_bind.cpp \
-			http_funct.cpp
+			networking/utils/http_funct.cpp
 
 OFILES =	$(SRCS:.cpp=.o)
 

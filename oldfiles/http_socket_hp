@@ -1,9 +1,0 @@
-#ifndef http_socket_hpp
-#define http_socket_hpp
-
-#include <stdio.h>
-
-#include "simple_socket.hpp"
-#include "listen_n_bind.hpp"
-
-#endif 

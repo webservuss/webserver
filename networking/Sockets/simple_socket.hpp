@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <iostream>
 #include <fcntl.h>
-#include "../../http_funct.hpp"
+#include "../utils/http_funct.hpp"
 
 namespace HTTP {
     class simple_socket
