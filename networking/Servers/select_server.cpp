@@ -1,6 +1,7 @@
 #include "select_server.hpp"
 
 /* constructor calls simple_server and launches */
+// HTTP::simple_server::simple_server(int domain, int service, int protocol, int port, u_long interface, int bklg)
 HTTP:: select_server::select_server(): simple_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG)
 {
     launch();

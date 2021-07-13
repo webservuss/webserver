@@ -1,7 +1,6 @@
 #ifndef listen_n_bind_hpp
 #define listen_n_bind_hpp
 
-#include "stdio.h"
 #include "simple_socket.hpp"
 
 namespace HTTP 

@@ -1,15 +1,9 @@
 #ifndef select_server_hpp
 #define select_server_hpp
 
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <fstream>
-#include <string>
-
 #include "simple_server.hpp"
 #include "../../http.hpp"
-#include "../../http_funct.hpp"
+#include "../utils/http_funct.hpp"
 
 #define BACKLOG 10
 
