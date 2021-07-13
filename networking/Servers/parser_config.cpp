@@ -116,6 +116,56 @@ void 		HDE::parser_config::set_index(std::string indx)
     _index = indx;
 }
 
+const std::string &parser_config::getPermisChar()
+{
+	return permisChar;
+}
+
+const std::string &parser_config::getServerName() const
+{
+	return _server_name;
+}
+
+int parser_config::getPort() const
+{
+	return _port;
+}
+
+const std::string &parser_config::getHost() const
+{
+	return _host;
+}
+
+const std::string &parser_config::getErrorPage() const
+{
+	return _error_page;
+}
+
+int parser_config::getAutoIndex() const
+{
+	return _auto_index;
+}
+
+const std::string &parser_config::getRoot() const
+{
+	return _root;
+}
+
+const std::string &parser_config::getIndex() const
+{
+	return _index;
+}
+
+const std::string &parser_config::getKey() const
+{
+	return _key;
+}
+
+const std::string &parser_config::getValue() const
+{
+	return _value;
+}
+
 
 
 
