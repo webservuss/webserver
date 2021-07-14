@@ -48,6 +48,15 @@ void parse_conf::set_values_server(std::string s)
 		_value = s.substr(s.find(' ') + 1, s.size());
 }
 
+void dbe(std::string &s)
+{
+	std::cout << s << std::endl;
+}
+void db(std::string &s)
+{
+	std::cout << s;
+}
+
 void parse_conf::set_values_location(std::string s)
 {
 	// TODO
@@ -62,12 +71,22 @@ void parse_conf::set_values_location(std::string s)
 	std::string line;
 	// conf must have empty line at end?
 	int i =0;
+	bool is_acc = false;
 	while(std::getline(file, line, '\t'))
 	{
 		line = line.substr(0, line.find('\n'));
-		line = line.substr(0, line.find(';'));
 		if (line.empty())
 			continue;
+		if (line[line.length() - 1] == ';') {
+			line = line.substr(0, line.find(';'));
+		}
+		else if (line[line.length() - 1] == '{') {
+			is_acc = true;
+		}
+		else if (line[line.length() - 1] == '}') {
+			is_acc = false;
+		}
+
 		std::cout << line << std::endl;
 		// prob. needs a better name than key
 		std::string key = line.substr(0, line.find(" "));

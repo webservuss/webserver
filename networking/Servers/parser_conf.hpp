@@ -27,8 +27,11 @@ private:
 		std::string _address;
 		std::string _method;
 		std::string _root;
+
+		int _client_body_size;
 	};
 	std::vector<location> _location;
+
 	void set_values_server(std::string s);
 	void set_values_location(std::string s);
 public:
