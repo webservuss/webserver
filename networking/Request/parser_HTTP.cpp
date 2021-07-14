@@ -10,11 +10,7 @@ using namespace HDE;
 
 const std::string parser_HTTP::permisChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!#$&'()*+,/:;=?@[]";
 
-const std::map<std::string, method> parser_HTTP::mapMethod = 
-UTILS::makeMap<std::string, method>
-("GET", GET)
-("POST", POST)
-("DELETE", DELETE);
+
 
 HDE::parser_HTTP::parser_HTTP(std::string dataparser)
 {

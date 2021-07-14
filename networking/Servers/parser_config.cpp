@@ -13,6 +13,9 @@ HDE::parser_config::parser_config(std::ifstream &file)
     int i= 0;
     int j=0;
 
+    int f;
+
+
   
     if(file)
         std::cout<< RED<< "file is open lets read" << RESET << std::endl;
@@ -20,6 +23,8 @@ HDE::parser_config::parser_config(std::ifstream &file)
     //server part
     while(std::getline(file,line) && i != 8)
     {
+
+        f = line.find("location");
        // we split the lines 
         if(line.find("{") || line.find("}"))
             i++;
@@ -28,7 +33,7 @@ HDE::parser_config::parser_config(std::ifstream &file)
         if(line.size()!= 0)
             split_config(line);
         j++;
-
+        std::cout << f << "size "<< std::endl;
        mapconfig.insert(std::pair<std::string, std::string>( _key, _value) );
         
     }
