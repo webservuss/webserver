@@ -27,6 +27,8 @@ private:
 		std::string _address;
 		std::string _method;
 		std::string _root;
+		std::string _cgi;
+		std::string _autoindex;
 
 		int _client_body_size;
 	};

@@ -30,13 +30,7 @@ namespace HDE{
  */
 
 
-    enum method{
-        GET,
-        POST,
-        DELETE
-    };
 
-    
     class parser_HTTP
     {
         parser_HTTP(){}
