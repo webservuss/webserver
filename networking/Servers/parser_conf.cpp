@@ -65,8 +65,7 @@ void parse_conf::set_values_location(std::string s, int i)
 	if (key == "method")
 		_location[i-1]._method = s.substr(s.find(' ') + 1, s.size());
 	if (key == "location") {
-		s = s.substr(s.find(' '), s.find(' ') );
-		std::cout<< "*********s" << s <<std::endl;
+		s = s.substr(s.find(' ') + 1, s.find('{') - s.find(' ')-2);
 		_location[i-1]._address = s;
 	}
 	if (key == "cgi")
