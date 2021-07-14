@@ -61,14 +61,24 @@ void db(std::string &s)
 
 void parse_conf::set_values_location(std::string s, int i)
 {
+    int size;
 	std::string key = s.substr(0, s.find(' '));
 	if (key == "method")
 		_location[i-1]._method = s.substr(s.find(' ') + 1, s.size());
+
+
 	if (key == "location") {
-		s = s.substr(s.find(' '), s.find(' ') );
-		std::cout<< "*********s" << s <<std::endl;
+		s = s.substr(s.find(' '),  s.size());
+		std::cout<< "*********s" << s << "*******"<< std::endl;
+		size = s.find ('{' );
+        s = s.substr(0 ,  size);
 		_location[i-1]._address = s;
 	}
+
+
+
+
+
 	if (key == "cgi")
 		_location[i-1]._cgi = s.substr(s.find(' ') + 1, s.size());
 	if (key == "root")
