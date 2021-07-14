@@ -22,7 +22,29 @@ class parser_config
     parser_config(){}
         private:
             static const std::string                    permisChar;
-            std::string _server_name;
+public:
+	static const std::string &getPermisChar();
+
+	const std::string &getServerName() const;
+
+	int getPort() const;
+
+	const std::string &getHost() const;
+
+	const std::string &getErrorPage() const;
+
+	int getAutoIndex() const;
+
+	const std::string &getRoot() const;
+
+	const std::string &getIndex() const;
+
+	const std::string &getKey() const;
+
+	const std::string &getValue() const;
+
+private:
+	std::string _server_name;
             int         _port;
             std::string _host;
             std::string _error_page;

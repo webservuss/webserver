@@ -9,6 +9,7 @@ SRCS =		networking/Servers/test.cpp \
 			networking/Request/parser_HTTP.cpp \
 			networking/Request/utils_HTTP.cpp \
 			networking/Servers/parser_config.cpp \
+			networking/Servers/parser_conf.cpp \
 			networking/Request/split.cpp  \
 			networking/Request/request.cpp
 
