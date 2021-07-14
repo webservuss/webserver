@@ -10,8 +10,6 @@ using namespace HDE;
 
 const std::string parser_HTTP::permisChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!#$&'()*+,/:;=?@[]";
 
-
-
 HDE::parser_HTTP::parser_HTTP(std::string dataparser)
 {
     std::string data;

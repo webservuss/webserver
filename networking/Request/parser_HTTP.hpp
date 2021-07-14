@@ -44,7 +44,7 @@ namespace HDE{
         public:
             parser_HTTP(std::string dataparser);
             void split_line(std::string line);
-//            static const std::map<std::string, method>  mapMethod;
+            //static const std::map<std::string, method>  mapMethod;
             std::map<std::string, std::string> mapHeader;
             
         
