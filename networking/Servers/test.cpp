@@ -36,10 +36,16 @@ int main()
 //		std::cout << "l[0]: " << ex._location[0]._root << std::endl;
 //		std::cout << "l[1]: " << ex._location[1]._client_body_size << std::endl;
 		std::vector<t_location> example = ex.get_location();
+		std::map<std::string, t_location> map_locations = ex.get_location_map();
 
-		std::cout << "l[0]: " << example[0]._address << std::endl;
-		std::cout << "l[1]: " << example[1]._address << std::endl;
-		std::cout << "l[2]: " << example[2]._address << std::endl;
+		std::cout << "l[0]: |" << example[0]._address << "|" << std::endl;
+		std::cout << "l[1]: |" << example[1]._address << "|" << std::endl;
+		std::cout << "l[2]: |" << example[2]._address << "|" << std::endl;
+
+		std::cout << "loc_map[\"/\"]._method: " << map_locations["/ {"]._method << std::endl;
+		std::cout << "loc_map[*.error_image.png {]._method: " << map_locations["*.error_image.png {"]._method << std::endl;
+		std::cout << "loc_map[*.ico {]._method: " << map_locations["*.ico {"]._method << std::endl;
+
 	}
     else
         std::cout << RED << " ERROR no configfile" << RESET << std::endl;
