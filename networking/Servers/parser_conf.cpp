@@ -4,6 +4,8 @@
 
 #include "parser_conf.hpp"
 
+int g_amount = 0;
+
 static int ft_stoi(std::string s)
 {
 	int i;
@@ -57,9 +59,38 @@ void db(std::string &s)
 	std::cout << s;
 }
 
-void parse_conf::set_values_location(std::string s)
+void parse_conf::set_values_location(std::string s, int i)
 {
-	// TODO
+	std::string key = s.substr(0, s.find(' '));
+	if (key == "method")
+		_location[i-1]._method = s.substr(s.find(' ') + 1, s.size());
+	if (key == "location") {
+		s = s.substr(s.find(' '), s.find(' ') );
+		std::cout<< "*********s" << s <<std::endl;
+		_location[i-1]._address = s;
+	}
+	if (key == "cgi")
+		_location[i-1]._cgi = s.substr(s.find(' ') + 1, s.size());
+	if (key == "root")
+		_location[i-1]._root = s.substr(s.find(' ') + 1, s.size());
+	if (key == "autoindex")
+		_location[i-1]._autoindex= s.substr(s.find(' ') + 1, s.size());
+	if (key == "client_body_size")
+		_location[i-1]._client_body_size = ft_stoi(s.substr(s.find(' ') + 1, s.size()));
+	//std::cout << "l[0]: " << _location[0]._method << std::endl;
+
+}
+
+int	count_locations(std::ifstream &file)
+{
+	std::string line;
+	while(std::getline(file, line, '\t')) {
+		std::string key = line.substr(0, line.find(" "));
+		if (key == "location")
+			g_amount++;
+	}
+	return g_amount;
+
 }
 
 	parse_conf::parse_conf(std::ifstream &file)
@@ -72,16 +103,22 @@ void parse_conf::set_values_location(std::string s)
 	// conf must have empty line at end?
 	int i =0;
 	bool is_acc = false;
+	//int amount_loc = count_locations(file);
+	//std::cout << "amount_loc: " << amount_loc << std::endl;
+	int vector_size = 0;
 	while(std::getline(file, line, '\t'))
 	{
+		std::string key = line.substr(0, line.find(" "));
 		line = line.substr(0, line.find('\n'));
 		if (line.empty())
 			continue;
 		if (line[line.length() - 1] == ';') {
 			line = line.substr(0, line.find(';'));
 		}
-		else if (line[line.length() - 1] == '{') {
+		else if (key == "location" && line[line.length() - 1] == '{') {
 			is_acc = true;
+			vector_size++;
+			_location.resize(vector_size);
 		}
 		else if (line[line.length() - 1] == '}') {
 			is_acc = false;
@@ -89,14 +126,11 @@ void parse_conf::set_values_location(std::string s)
 
 		std::cout << line << std::endl;
 		// prob. needs a better name than key
-		std::string key = line.substr(0, line.find(" "));
-		if (key != "location")
+		if (!is_acc)
 			set_values_server(line);
-		if (key == "location")
-		{
-			// TODO
-			set_values_location(line);
-		}
+		if (is_acc)
+			set_values_location(line, vector_size);
+
 
 		//if(line.find(s) != std::string::npos) {
 		//	_s = line.substr(line.find(' ') + 1, line.size());
@@ -156,4 +190,9 @@ const std::string &parse_conf::get_value() const
 const std::vector<std::string> &parse_conf::get_error_page() const
 {
 	return _error_page;
+}
+
+const std::vector<t_location> &parse_conf::get_location() const
+{
+	return _location;
 }

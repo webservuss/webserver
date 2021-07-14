@@ -6,12 +6,23 @@
 #define __PARSER_CONF_HPP__
 
 #include "../../all_libs.hpp"
+
+typedef struct s_location {
+	std::string _address;
+	std::string _method;
+	std::string _root;
+	std::string _cgi;
+	std::string _autoindex;
+
+	int _client_body_size;
+}				t_location;
 #include "../../http.hpp"
 
 
 class parse_conf
 {
 private:
+	std::vector<t_location> _location;
 	std::string _server_name;
 	int         _port;
 	std::string _host;
@@ -23,19 +34,9 @@ private:
 	std::string _value;
 
 	//TODO: better datastructure? Map? 2d Vector of strings?
-	struct location {
-		std::string _address;
-		std::string _method;
-		std::string _root;
-		std::string _cgi;
-		std::string _autoindex;
-
-		int _client_body_size;
-	};
-	std::vector<location> _location;
 
 	void set_values_server(std::string s);
-	void set_values_location(std::string s);
+	void set_values_location(std::string s, int i);
 public:
 	parse_conf(std::ifstream &file);
 	std::vector<std::string> split(const std::string &s, char delim);
@@ -51,7 +52,8 @@ public:
 	const std::string &get_key() const;
 	const std::string &get_value() const;
 
-
+	// TODO get's total vector.
+	const std::vector<t_location> &get_location() const;
 };
 
 #endif //__PARSER_CONF_HPP__

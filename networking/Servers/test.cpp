@@ -30,7 +30,16 @@ int main()
 		std::cout << "k  " << ex.get_key() <<std::endl;
 		std::cout << "v  " << ex.get_value() <<std::endl;
 		std::cout << BLUE << "----------" << RESET << std::endl;
+//		std::cout << "l[0]: " << ex._location[0]._method << std::endl;
+//		std::cout << "l[1]: " << ex._location[1]._method << std::endl;
+//		std::cout << "l[2]: " << ex._location[2]._method << std::endl;
+//		std::cout << "l[0]: " << ex._location[0]._root << std::endl;
+//		std::cout << "l[1]: " << ex._location[1]._client_body_size << std::endl;
+		std::vector<t_location> example = ex.get_location();
 
+		std::cout << "l[0]: " << example[0]._address << std::endl;
+		std::cout << "l[1]: " << example[1]._address << std::endl;
+		std::cout << "l[2]: " << example[2]._address << std::endl;
 	}
     else
         std::cout << RED << " ERROR no configfile" << RESET << std::endl;
