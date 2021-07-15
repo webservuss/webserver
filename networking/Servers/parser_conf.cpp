@@ -34,7 +34,6 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 	// we should think of a better name then key
 	std::string key = s.substr(0, s.find(' '));
 	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
-	//location._method= value;
 	if (key == "method")
 		location._method= value;
 	if (key == "root")
@@ -55,9 +54,7 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 	}
 	std::string line;
 	// conf must have empty line at end?
-	int i =0;
 	bool is_acc = false;
-	int vector_size = 0;
 	std::string map_key;
 	while(std::getline(file, line, '\t'))
 	{
@@ -131,12 +128,7 @@ const std::vector<std::string> &parse_conf::get_error_page() const
 	return _error_page;
 }
 
-const std::vector<t_location> &parse_conf::get_location() const
-{
-	return _location;
-}
-
-const std::map<std::string, t_location> &parse_conf::get_location_map() const
+const std::map<std::string, t_location> &parse_conf::get_location() const
 {
 	return _location_map;
 }

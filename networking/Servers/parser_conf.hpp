@@ -20,12 +20,6 @@ typedef struct s_location {
 class parse_conf
 {
 private:
-	std::vector<t_location> _location;
-	std::map<std::string, t_location> _location_map;
-public:
-	const std::map<std::string, t_location> &get_location_map() const;
-
-private:
 	std::string _server_name;
 	int         _port;
 	std::string _host;
@@ -36,6 +30,7 @@ private:
 	std::string _key;
 	std::string _value;
 
+	std::map<std::string, t_location> _location_map;
 
 	void set_values_server(std::string s);
 	void set_values_location(std::string s, t_location &location);
@@ -53,8 +48,7 @@ public:
 	const std::string &get_key() const;
 	const std::string &get_value() const;
 
-	// TODO get's total vector.
-	const std::vector<t_location> &get_location() const;
+	const std::map<std::string, t_location> &get_location() const;
 };
 
 #endif //__PARSER_CONF_HPP__

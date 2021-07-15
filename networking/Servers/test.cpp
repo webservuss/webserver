@@ -24,8 +24,7 @@ int main()
 		std::cout << "k  " << ex.get_key() <<std::endl;
 		std::cout << "v  " << ex.get_value() <<std::endl;
 		std::cout << BLUE << "----------" << RESET << std::endl;
-		std::map<std::string, t_location> map_locations = ex.get_location_map();
-
+		std::map<std::string, t_location> map_locations = ex.get_location();
 
 		std::cout << "loc_map[\"/\"]._method: " << map_locations["/"]._method << std::endl;
 		std::cout << "loc_map[*.error_image.png]._method: " << map_locations["*.error_image.png"]._method << std::endl;
