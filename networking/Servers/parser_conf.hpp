@@ -38,8 +38,7 @@ private:
 
 
 	void set_values_server(std::string s);
-	void set_values_location(std::string s, int i);
-	void set_values_location_map(std::string s, t_location &location);
+	void set_values_location(std::string s, t_location &location);
 public:
 	parse_conf(std::ifstream &file);
 

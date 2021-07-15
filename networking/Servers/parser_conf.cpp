@@ -28,38 +28,13 @@ void parse_conf::set_values_server(std::string s)
 		_value = s.substr(s.find(' ') + 1, s.size());
 }
 
-void parse_conf::set_values_location(std::string s, int i)
-{
-    int size;
-	std::string key = s.substr(0, s.find(' '));
-	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 2);
-	if (key == "method")
-		_location[i-1]._method = value;
-	if (key == "location") {
-		// get the middle part of "location ... {"
-		s = s.substr(s.find(' ') + 1, s.find('{') - s.find(' ') - 2);
-		_location[i-1]._address = s;
-	}
-
-	if (key == "cgi")
-		_location[i-1]._cgi = value;
-	if (key == "root")
-		_location[i-1]._root = value;
-	if (key == "autoindex")
-		_location[i-1]._autoindex= value;
-	if (key == "client_body_size")
-		_location[i-1]._client_body_size = ft_stoi(value);
-	//std::cout << "l[0]: " << _location[0]._method << std::endl;
-
-}
-
 // This function gets the whole line and a struct (t_location)
-void	parse_conf::set_values_location_map(std::string s, t_location &location)
+void	parse_conf::set_values_location(std::string s, t_location &location)
 {
 	// we should think of a better name then key
 	std::string key = s.substr(0, s.find(' '));
 	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
-	location._method= value;
+	//location._method= value;
 	if (key == "method")
 		location._method= value;
 	if (key == "root")
@@ -90,15 +65,9 @@ void	parse_conf::set_values_location_map(std::string s, t_location &location)
 		line = line.substr(0, line.find('\n'));
 		if (line.empty())
 			continue;
-		if (line[line.length() - 1] == ';') {
-			// we actually could use the ; for setting the value
-			//line = line.substr(0, line.find(';'));
-		}
-		else if (key == "location" && line[line.length() - 1] == '{') {
+		if (key == "location" && line[line.length() - 1] == '{') {
 			is_acc = true;
-			vector_size++;
-			_location.resize(vector_size);
-			map_key = line.substr(line.find(' ') + 1, line.find(' ') - 2); // set map_key for the new way
+			map_key = line.substr(line.find(' ') + 1, line.find('{') - line.find(' ') - 2); // set map_key for the new way
 			_location_map[map_key];
 		}
 		else if (line[line.length() - 1] == '}') {
@@ -109,17 +78,11 @@ void	parse_conf::set_values_location_map(std::string s, t_location &location)
 		if (!is_acc)
 			set_values_server(line);
 		if (is_acc) {
-			set_values_location(line, vector_size);
 			// send the map with the appropriate key
-			std::cout << "map_key: |" << map_key << "|" << std::endl;
-			set_values_location_map(line, _location_map[map_key]); // for some reason it is not working yet
-			//_location_map["/"]._method = "????"; // test to see if it can be assigned
+			set_values_location(line, _location_map[map_key]); // for some reason it is not working yet
 		}
 	}
 }
-
-
-
 
 /* GETTERS */
 
