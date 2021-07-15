@@ -58,7 +58,7 @@ void	parse_conf::set_values_location_map(std::string s, t_location &location)
 {
 	// we should think of a better name then key
 	std::string key = s.substr(0, s.find(' '));
-	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 2);
+	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
 	location._method= value;
 	if (key == "method")
 		location._method= value;
@@ -98,7 +98,7 @@ void	parse_conf::set_values_location_map(std::string s, t_location &location)
 			is_acc = true;
 			vector_size++;
 			_location.resize(vector_size);
-			map_key = line.substr(line.find(' ') + 1, line.find('{') - 2); // set map_key for the new way
+			map_key = line.substr(line.find(' ') + 1, line.find(' ') - 2); // set map_key for the new way
 			_location_map[map_key];
 		}
 		else if (line[line.length() - 1] == '}') {
