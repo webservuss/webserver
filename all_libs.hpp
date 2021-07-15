@@ -19,4 +19,6 @@
 #include <map>
 #include <netinet/in.h>
 #include <fcntl.h>
+
+#include "networking/utils/utils.hpp"
 #endif //WEB_6JULI_ALL_LIBS_HPP
