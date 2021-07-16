@@ -107,6 +107,8 @@ void    HTTP::select_server::handeler()
     char	buffer[30000];
     int		sock = get_socket()->get_sock();
 
+    // get the http
+    HTTP::re_HTTP r (buffer);
 	for (int listnum = 0; listnum < BACKLOG; listnum++)
 	{
 		if (FD_ISSET(_connectlist[listnum],&_socks))

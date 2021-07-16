@@ -1,16 +1,16 @@
-#include "parser_HTTP.hpp"
+#include "re_HTTP.hpp"
 
 #include <iostream>
 #include <map>
 
 
-using namespace HDE;
+using namespace HTTP;
 
 
 
-const std::string parser_HTTP::permisChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!#$&'()*+,/:;=?@[]";
+const std::string re_HTTP::permisChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!#$&'()*+,/:;=?@[]";
 
-HDE::parser_HTTP::parser_HTTP(std::string dataparser)
+HTTP::re_HTTP::re_HTTP(std::string dataparser)
 {
     std::string data;
     std::string line;
@@ -31,19 +31,19 @@ HDE::parser_HTTP::parser_HTTP(std::string dataparser)
 }
 
 
-void HDE::parser_HTTP::set_key(std::string key)
+void HTTP::re_HTTP::set_key(std::string key)
 {
             _key = key;
            
 }
 
-void HDE::parser_HTTP::set_value(std::string value)
+void HTTP::re_HTTP::set_value(std::string value)
 {
             _value = value;
          
 }
 
-void HDE::parser_HTTP::split_line(std::string line){
+void HTTP::re_HTTP::split_line(std::string line){
 
     set_key(line.substr(0, line.find(" ")));
     set_value(line.substr(line.find(" "), line.find('\r')));
