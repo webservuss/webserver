@@ -4,28 +4,28 @@
 
 #include "parser_conf.hpp"
 
-void parse_conf::set_values_server(std::string s)
+void parse_conf::set_values_server(std::string s, t_server &server)
 {
 	// this probably needs a better name than 'key'
 	std::string key = s.substr(0, s.find(' '));
 	if (key == "server_name")
-		_server_name = s.substr(s.find(' ') + 1, s.size());
+		server._server_name = s.substr(s.find(' ') + 1, s.size());
 	if (key == "listen")
-		_port = ft_stoi((s.substr(s.find(' ') + 1, s.size())));
+		server._port = ft_stoi((s.substr(s.find(' ') + 1, s.size())));
 	if (key == "host")
-		_host = s.substr(s.find(' ') + 1, s.size());
+		server._host = s.substr(s.find(' ') + 1, s.size());
 	if (key == "error_page")
-		_error_page = split(s.substr(s.find(' ') + 1, s.size()), ' ');
+		server._error_page = split(s.substr(s.find(' ') + 1, s.size()), ' ');
 	if (key == "auto_index")
-		_auto_index = ft_stoi(s.substr(s.find(' ') + 1, s.size()));
+		server._auto_index = ft_stoi(s.substr(s.find(' ') + 1, s.size()));
 	if (key == "root")
-		_root = s.substr(s.find(' ') + 1, s.size());
+		server._root = s.substr(s.find(' ') + 1, s.size());
 	if (key == "index")
-		_index = s.substr(s.find(' ') + 1, s.size());
+		server._index = s.substr(s.find(' ') + 1, s.size());
 	if (key == "key")
-		_key = s.substr(s.find(' ') + 1, s.size());
+		server._key = s.substr(s.find(' ') + 1, s.size());
 	if (key == "value")
-		_value = s.substr(s.find(' ') + 1, s.size());
+		server._value = s.substr(s.find(' ') + 1, s.size());
 }
 
 // This function gets the whole line and a struct (t_location)
@@ -55,6 +55,7 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 	std::string line;
 	// conf must have empty line at end?
 	bool is_acc = false;
+	int			server_count = 0;
 	std::string map_key;
 	while(std::getline(file, line, '\t'))
 	{
@@ -62,10 +63,15 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 		line = line.substr(0, line.find('\n'));
 		if (line.empty())
 			continue;
+		if (key == "server") {
+			server_count++;
+			_server.resize(server_count);
+			continue;
+		}
 		if (key == "location" && line[line.length() - 1] == '{') {
 			is_acc = true;
 			map_key = line.substr(line.find(' ') + 1, line.find('{') - line.find(' ') - 2); // set map_key for the new way
-			_location_map[map_key];
+			_server[server_count - 1]._location_map[map_key];
 		}
 		else if (line[line.length() - 1] == '}') {
 			is_acc = false;
@@ -73,16 +79,27 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 
 		std::cout << line << std::endl;
 		if (!is_acc)
-			set_values_server(line);
+			set_values_server(line, _server[server_count - 1]);
 		if (is_acc) {
 			// send the map with the appropriate key
-			set_values_location(line, _location_map[map_key]); // for some reason it is not working yet
+			set_values_location(line, _server[server_count - 1]._location_map[map_key]); // for some reason it is not working yet
 		}
 	}
 }
 
+const std::vector<t_server> &parse_conf::get_server() const
+{
+	return _server;
+}
+
+// gaat dit werken?
+int parse_conf::get_server_port(const t_server &server) {
+	return server._port;
+}
+
 /* GETTERS */
 
+/*
 const std::string &parse_conf::get_server_name() const
 {
 	return _server_name;
@@ -132,3 +149,6 @@ const std::map<std::string, t_location> &parse_conf::get_location() const
 {
 	return _location_map;
 }
+*/
+
+

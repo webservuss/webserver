@@ -11,6 +11,13 @@ int main()
     if(file.is_open()){
         std::cout<< RED<< "###########CONFIG OPEN##########" << RESET << std::endl;
 		parse_conf ex(file);
+
+
+
+		std::cout << "..." << ex.get_server_port(ex.get_server()[0])<< std::endl;
+		std::cout << "..." << ex.get_server().size() << std::endl;
+
+		/*
 		std::cout << "EX.GETservname(): |" << ex.get_server_name() << std::endl;
 		std::cout << BLUE << "----------" << RESET << std::endl;
 		std::cout << "sn  " << ex.get_server_name() <<std::endl;
@@ -29,6 +36,7 @@ int main()
 		std::cout << "loc_map[\"/\"]._method: " << map_locations["/"]._method << std::endl;
 		std::cout << "loc_map[*.error_image.png]._method: " << map_locations["*.error_image.png"]._method << std::endl;
 		std::cout << "loc_map[*.ico]._method: " << map_locations["*.ico"]._method << std::endl;
+		 */
 
 	}
     else
