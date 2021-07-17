@@ -14,7 +14,8 @@ int main()
 
 
 
-		std::cout << "..." << ex.get_server_port(ex.get_server()[0])<< std::endl;
+		std::cout << "..." << ex.get_server_port(ex.get_server()[0])[0] << std::endl;
+		std::cout << "..." << ex.get_server_port(ex.get_server()[0])[1] << std::endl;
 		std::cout << "..." << ex.get_server().size() << std::endl;
 
 		/*

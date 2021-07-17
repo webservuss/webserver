@@ -4,26 +4,29 @@
 
 #include "parser_conf.hpp"
 
+using namespace std;
+
 void parse_conf::set_values_server(std::string s, t_server &server)
 {
 	// this probably needs a better name than 'key'
 	std::string key = s.substr(0, s.find(' '));
+	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
 	if (key == "server_name")
-		server._server_name = s.substr(s.find(' ') + 1, s.size());
-	if (key == "listen")
-		server._port = ft_stoi((s.substr(s.find(' ') + 1, s.size())));
+		server._server_name = split(value, ' ');
+	if (key == "port")
+		server._port = split_stoi(value, ' ');
 	if (key == "host")
-		server._host = s.substr(s.find(' ') + 1, s.size());
+		server._host = value;
 	if (key == "error_page")
-		server._error_page = split(s.substr(s.find(' ') + 1, s.size()), ' ');
+		server._error_page = split(value, ' ');
 	if (key == "auto_index")
-		server._auto_index = ft_stoi(s.substr(s.find(' ') + 1, s.size()));
+		server._auto_index = (value == "on") ? true : false;
 	if (key == "root")
-		server._root = s.substr(s.find(' ') + 1, s.size());
+		server._root = value;
 	if (key == "index")
-		server._index = s.substr(s.find(' ') + 1, s.size());
+		server._index = value;
 	if (key == "key")
-		server._key = s.substr(s.find(' ') + 1, s.size());
+		server._key = value;
 	if (key == "value")
 		server._value = s.substr(s.find(' ') + 1, s.size());
 }
@@ -41,7 +44,7 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 	if (key == "cgi")
 		location._cgi = value;
 	if (key == "autoindex")
-		location._autoindex= value;
+		location._auto_index= (value == "on");
 	if (key == "client_body_size")
 		location._client_body_size = ft_stoi(value);
 }
@@ -93,7 +96,7 @@ const std::vector<t_server> &parse_conf::get_server() const
 }
 
 // gaat dit werken?
-int parse_conf::get_server_port(const t_server &server) {
+const std::vector<int>	&parse_conf::get_server_port(const t_server &server) {
 	return server._port;
 }
 

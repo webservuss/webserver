@@ -8,58 +8,44 @@
 #include "../../all_libs.hpp"
 #include "../../http.hpp"
 
-typedef struct s_location {
-	std::string _address; //this one is replaced by the map-key
-	std::string _method;
-	std::string _root;
-	std::string _cgi;
-	std::string _autoindex;
-	int _client_body_size;
-}				t_location;
+using namespace std;
+typedef struct 				s_location {
+	string 					_address; //this one is replaced by the map-key
+	string 					_method;
+	string 					_root;
+	string 					_cgi;
+	bool 					_auto_index;
+	int						_client_body_size;
+}							t_location;
 
-typedef struct	s_server {
-	std::string _server_name;
-	int         _port;
-	std::string _host;
-	std::vector<std::string> _error_page;
-	int         _auto_index;
-	std::string _root;
-	std::string _index;
-	std::string _key;
-	std::string _value;
-
-	std::map<std::string, t_location> _location_map;
-}				t_server;
+typedef struct				s_server {
+	vector<string>			_server_name;
+	vector<int>				_port;
+	string					_host;
+	vector<string>			_error_page;
+	bool       				_auto_index;
+	string					_root;
+	string					_index;
+	string					_key;
+	string					_value;
+	map<string, t_location> _location_map;
+}							t_server;
 
 
 
 class parse_conf
 {
 private:
-	/*
-	std::string _server_name;
-	int         _port;
-	std::string _host;
-	std::vector<std::string> _error_page;
-	int         _auto_index;
-	std::string _root;
-	std::string _index;
-	std::string _key;
-	std::string _value;
+	vector<t_server> _server;
 
-	std::map<std::string, t_location> _location_map;
-	 */
-
-	std::vector<t_server> _server;
-
-	void set_values_server(std::string s, t_server &server);
-	void set_values_location(std::string s, t_location &location);
+	void set_values_server(string s, t_server &server);
+	void set_values_location(string s, t_location &location);
 public:
-	parse_conf(std::ifstream &file);
+	parse_conf(ifstream &file);
 
 	/* GETTERS */
-	int get_server_port(const t_server &server);
-	const std::vector<t_server> &get_server() const;
+	const vector<int>		&get_server_port(const t_server &server);
+	const vector<t_server>	&get_server() const;
 	/*
 	const std::string &get_server_name() const;
 	int get_port() const;

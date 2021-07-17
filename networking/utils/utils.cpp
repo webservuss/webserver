@@ -29,6 +29,18 @@ std::vector<std::string> split(const std::string &s, char delim)
 	return elems;
 }
 
+std::vector<int> split_stoi(std::string s, char delim)
+{
+	std::vector<int>			elems;
+	std::stringstream			ss(s);
+	std::string 				item;
+	while (getline(ss, item, delim))
+	{
+		elems.push_back(ft_stoi(item));
+	}
+	return elems;
+}
+
 int ft_stoi(std::string s)
 {
 	int i;
