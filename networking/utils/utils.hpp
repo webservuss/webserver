@@ -10,4 +10,5 @@ void db(std::string s);
 void dbe(std::string s);
 std::vector<std::string> split(const std::string &s, char delim);
 std::vector<int> split_stoi(std::string s, char delim);
+std::string trim_whitespace_front(const std::string &s);
 #endif //INC_13JUL_UTILS_HPP

@@ -14,7 +14,7 @@ typedef struct 				s_location {
 	string 					_method;
 	string 					_root;
 	string 					_cgi;
-	bool 					_auto_index;
+	bool 					_autoindex;
 	int						_client_body_size;
 }							t_location;
 
@@ -23,7 +23,7 @@ typedef struct				s_server {
 	vector<int>				_port;
 	string					_host;
 	vector<string>			_error_page;
-	bool       				_auto_index;
+	bool       				_autoindex;
 	string					_root;
 	string					_index;
 	string					_key;

@@ -6,29 +6,47 @@
 
 using namespace std;
 
+void set_port(string &value, vector<int> &port)
+{
+	vector<int> elem = split_stoi(value, ' ');
+	for (vector<int>::iterator it = begin(elem); it != end(elem); ++it) {
+		port.push_back(*it);
+	}
+}
+
 void parse_conf::set_values_server(std::string s, t_server &server)
 {
 	// this probably needs a better name than 'key'
-	std::string key = s.substr(0, s.find(' '));
-	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
-	if (key == "server_name")
-		server._server_name = split(value, ' ');
-	if (key == "port")
-		server._port = split_stoi(value, ' ');
-	if (key == "host")
-		server._host = value;
-	if (key == "error_page")
-		server._error_page = split(value, ' ');
-	if (key == "auto_index")
-		server._auto_index = (value == "on") ? true : false;
-	if (key == "root")
-		server._root = value;
-	if (key == "index")
-		server._index = value;
-	if (key == "key")
-		server._key = value;
-	if (key == "value")
-		server._value = s.substr(s.find(' ') + 1, s.size());
+	//server._port = split_stoi(value, ' ');
+	try
+	{
+		std::string key = s.substr(0, s.find(' '));
+		std::string value = s.substr(s.find(' ') + 1, s.find(';') - s.find(' ') - 1);
+		if (key == "server_name")
+			server._server_name = split(value, ' ');
+		else if (key == "port")
+			set_port(value, server._port);
+		else if (key == "host")
+			server._host = value;
+		else if (key == "error_page")
+			server._error_page = split(value, ' ');
+		else if (key == "autoindex")
+			server._autoindex = (value == "on") ? true : false;
+		else if (key == "root")
+			server._root = value;
+		else if (key == "index")
+			server._index = value;
+		else if (key == "key")
+			server._key = value;
+		else if (key == "value")
+			server._value = s.substr(s.find(' ') + 1, s.size());
+		else
+			throw (s);
+	}
+	catch (string n)
+	{
+		std::cout << "Unknown setting: " << n << std::endl;
+	}
 }
 
 // This function gets the whole line and a struct (t_location)
@@ -44,7 +62,7 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 	if (key == "cgi")
 		location._cgi = value;
 	if (key == "autoindex")
-		location._auto_index= (value == "on");
+		location._autoindex= (value == "on");
 	if (key == "client_body_size")
 		location._client_body_size = ft_stoi(value);
 }
@@ -60,12 +78,17 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 	bool is_acc = false;
 	int			server_count = 0;
 	std::string map_key;
-	while(std::getline(file, line, '\t'))
+	while(std::getline(file, line, '\n'))
 	{
-		std::string key = line.substr(0, line.find(" "));
-		line = line.substr(0, line.find('\n'));
-		if (line.empty())
+		line = trim_whitespace_front(line);
+		if (line.empty()) {
+			std::cout << "empty line" << std::endl;
 			continue;
+		}
+		std::string key = line.substr(0, line.find(' '));
+		//line = line.substr(0, line.find('\n'));
+		//std::cout << "l|" << line << "|"<< std::endl;
+		//std::cout << "k|" << key << "|"<< std::endl;
 		if (key == "server") {
 			server_count++;
 			_server.resize(server_count);
@@ -81,8 +104,10 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 		}
 
 		std::cout << line << std::endl;
-		if (!is_acc)
+		if (!is_acc) {
+			cout << "setting server, sc: " << server_count << endl;
 			set_values_server(line, _server[server_count - 1]);
+		}
 		if (is_acc) {
 			// send the map with the appropriate key
 			set_values_location(line, _server[server_count - 1]._location_map[map_key]); // for some reason it is not working yet

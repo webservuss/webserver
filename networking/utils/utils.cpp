@@ -48,3 +48,11 @@ int ft_stoi(std::string s)
 	return i;
 }
 
+std::string trim_whitespace_front(const std::string &s)
+{
+	int i = 0;
+	int len = s.length();
+	while(s[i] == ' ' || s[i] == '\t')
+		i++;
+	return (s.substr(i, len - i));
+}

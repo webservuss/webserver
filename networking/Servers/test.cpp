@@ -6,17 +6,23 @@ int main()
 {
     std::cout<< RED<< "MAIN" << RESET << std::endl;
     std::ifstream file;
-	const char *path = "configs/server.conf";
+	const char *path = "configs/server2.conf";
     file.open(path);
     if(file.is_open()){
         std::cout<< RED<< "###########CONFIG OPEN##########" << RESET << std::endl;
 		parse_conf ex(file);
 
 
+		for (int i = 0; i < ex.get_server().size(); ++i) {
+			vector<int> p = ex.get_server_port(ex.get_server()[i]);
+			std::cout << "Server: " << i << std::endl;
+			for (vector<int>::iterator it = begin(p); it != end(p); ++it)
+				std::cout << "port: " << *it << std::endl;
+		}
 
-		std::cout << "..." << ex.get_server_port(ex.get_server()[0])[0] << std::endl;
-		std::cout << "..." << ex.get_server_port(ex.get_server()[0])[1] << std::endl;
-		std::cout << "..." << ex.get_server().size() << std::endl;
+
+	//	std::cout << "..." << ex.get_server_port(ex.get_server()[0])[0] << std::endl;
+	//	std::cout << "..." << ex.get_server_port(ex.get_server()[0])[1] << std::endl;
 
 		/*
 		std::cout << "EX.GETservname(): |" << ex.get_server_name() << std::endl;
