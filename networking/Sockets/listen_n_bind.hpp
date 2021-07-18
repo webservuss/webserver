@@ -19,11 +19,11 @@ namespace HTTP
         	/* constructor */
         	listen_n_bind(int domain, int service, int protocol, int port, 
 			u_long interface, int bklg);
-            /*copy constructor */
+            /* copy constructor */
             listen_n_bind(const listen_n_bind& x);
-            /*assignment operator */
+            /* assignment operator */
             listen_n_bind& operator=(const listen_n_bind& x);
-            /*destructor */
+            /* destructor */
             ~listen_n_bind();
 
         	/* getters */

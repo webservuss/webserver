@@ -1,28 +1,41 @@
 #include "select_server.hpp"
 
 /* constructor calls simple_server and launches */
-// HTTP::simple_server::simple_server(int domain, int service, int protocol, int port, u_long interface, int bklg)
-HTTP:: select_server::select_server(): simple_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG)
+HTTP:: select_server::select_server()
 {
-    launch();
+	listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG);
+	_servers_socket.push_back(socket->get_sock());
+	_servers_addr.push_back(socket->get_address());
+	launch();
 }
+
+HTTP:: select_server::select_server(std::vector<int> ports)
+{
+	for (int i = 0; i < ports.size(); i++)
+	{
+		listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG);
+		_servers_addr.push_back(socket->get_address());
+		_servers_socket.push_back(socket->get_sock());
+	}
+	launch();
+}
+
 
 /*copy constructor */
 HTTP::select_server::select_server(const select_server& x)
-    : simple_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG)
-
 {
-    _highsock = x._highsock;
-    _socks = x._socks;
-	for (int i = 0; i < BACKLOG; i++)
-	    _connectlist[i] = x._connectlist[i];
+    // _socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG);
+	// _highsock = x._highsock;
+    // _read_fds = x._read_fds;
+	// for (int i = 0; i < BACKLOG; i++)
+	//     _connectlist[i] = x._connectlist[i];
 }
 
 /*assignment operator */
 HTTP::select_server& HTTP::select_server::operator=(const select_server& x)
 {
 	_highsock = x._highsock;
-   	_socks = x._socks;
+   	_read_fds = x._read_fds;
 	for (int i = 0; i < BACKLOG; i++)
 	    _connectlist[i] = x._connectlist[i];
     return *this;
@@ -47,21 +60,21 @@ int HTTP::select_server::selecter()
 {
 	int 			readsocks;
     struct timeval  timeout;
-    int 			sock = get_socket()->get_sock();
+    // int 			sock = _socket->get_sock();
 	
-	FD_ZERO(&_socks);
-	FD_SET(sock,&_socks);
-    _highsock = sock;
+	FD_ZERO(&_read_fds);
+	FD_SET(_servers_socket[0],&_read_fds);
+    _highsock = _servers_socket[0];
 	for (int listnum = 0; listnum < BACKLOG; listnum++) {
 		if (_connectlist[listnum] != 0) {
-			FD_SET(_connectlist[listnum],&_socks);
+			FD_SET(_connectlist[listnum],&_read_fds);
 			if (_connectlist[listnum] > _highsock)
 				_highsock = _connectlist[listnum];
 		}
 	}
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
-	readsocks = select(_highsock+1, &_socks, (fd_set *) 0, (fd_set *) 0, &timeout);
+	readsocks = select(_highsock+1, &_read_fds, (fd_set *) 0, (fd_set *) 0, &timeout);
 	return (readsocks);
 }
 
@@ -70,13 +83,11 @@ int HTTP::select_server::selecter()
 void    HTTP::select_server::accepter()
 {
 	int					connection;
-    int					sock = get_socket()->get_sock();
-    struct sockaddr_in  address = get_socket()->get_address();
-    int 				addrlen = sizeof(address);
 
-    if (FD_ISSET(sock,&_socks))
+    if (FD_ISSET(_servers_socket[0],&_read_fds))
 	{
-		connection = accept(sock, (struct sockaddr *)&address, (socklen_t * )&addrlen);
+    	int 				addrlen = sizeof(_servers_addr[0]);
+		connection = accept(_servers_socket[0], (struct sockaddr *)&_servers_addr[0], (socklen_t * )&addrlen);
 		if (connection < 0) 
 		{
 			std::cout << "error in accept" << std::endl;
@@ -105,11 +116,11 @@ void    HTTP::select_server::handeler()
 {
     int		valread;
     char	buffer[30000];
-    int		sock = get_socket()->get_sock();
+    // int		sock = _socket->get_sock();
 
 	for (int listnum = 0; listnum < BACKLOG; listnum++)
 	{
-		if (FD_ISSET(_connectlist[listnum],&_socks))
+		if (FD_ISSET(_connectlist[listnum],&_read_fds))
         {
 			if ((valread = recv(_connectlist[listnum], buffer, 3000, 0)) < 0) 
 			{

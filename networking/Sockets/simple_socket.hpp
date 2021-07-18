@@ -11,8 +11,9 @@
 namespace HTTP {
     class simple_socket
     {
-        private:
+        protected:
             int                 _sock;
+        private:
             struct sockaddr_in  _address;
             int                 _domain;
             int                 _service;

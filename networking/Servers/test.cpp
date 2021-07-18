@@ -1,5 +1,6 @@
 #include "parser_config.hpp"
 #include "select_server.hpp"
+#include <vector>
 
 int main()
 {
@@ -19,5 +20,14 @@ int main()
     file.close();
 
     //HDE::parser_config_open r();
-    HTTP::select_server t;
+    // int ports[3] = {80, 50, 70};
+    // HTTP::select_server t1(ports, 3);
+    HTTP::select_server t2;
+    // std::vector<int> ports;
+
+    // ports.push_back(80);
+    // ports.push_back(50);
+    // ports.push_back(70);
+
+    // HTTP::select_server t(ports) ;
 }
