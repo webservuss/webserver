@@ -9,7 +9,7 @@ using namespace std;
 void set_port(string &value, vector<int> &port)
 {
 	vector<int> elem = split_stoi(value, ' ');
-	for (vector<int>::iterator it = begin(elem); it != end(elem); ++it) {
+	for (vector<int>::iterator it = elem.begin(); it != elem.end(); ++it) {
 		port.push_back(*it);
 	}
 }
@@ -43,7 +43,7 @@ void parse_conf::set_values_server(std::string s, t_server &server)
 		else
 			throw (s);
 	}
-	catch (string n)
+	catch (string &n)
 	{
 		std::cout << "Unknown setting: " << n << std::endl;
 	}
