@@ -22,12 +22,12 @@ int main()
     //HDE::parser_config_open r();
     // int ports[3] = {80, 50, 70};
     // HTTP::select_server t1(ports, 3);
-    HTTP::select_server t2;
-    // std::vector<int> ports;
+    // HTTP::select_server t2;
+    std::vector<int> ports;
 
-    // ports.push_back(80);
-    // ports.push_back(50);
-    // ports.push_back(70);
-
-    // HTTP::select_server t(ports) ;
+    ports.push_back(4000);
+    ports.push_back(5000);
+    ports.push_back(7000);
+    ports.push_back(8000);
+    HTTP::select_server t(ports) ;
 }

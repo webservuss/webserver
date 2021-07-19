@@ -13,7 +13,8 @@ HTTP:: select_server::select_server(std::vector<int> ports)
 {
 	for (int i = 0; i < ports.size(); i++)
 	{
-		listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG);
+		listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, ports[i], INADDR_ANY, BACKLOG);
+		std::cout << "creating port " << ports[i] << std::endl;
 		_servers_addr.push_back(socket->get_address());
 		_servers_socket.push_back(socket->get_sock());
 	}
@@ -63,18 +64,35 @@ int HTTP::select_server::selecter()
     // int 			sock = _socket->get_sock();
 	
 	FD_ZERO(&_read_fds);
-	FD_SET(_servers_socket[0],&_read_fds);
-    _highsock = _servers_socket[0];
+	// FD_SET(_servers_socket[0],&_read_fds);
+	// _highsock = _servers_socket[0];
+	std::cout << "_servers_socket : ";
+	for (int listnum = 0; listnum < _servers_socket.size(); listnum++) {
+		if (_servers_socket[listnum] != 0) {
+			std::cout << " " << _servers_socket[listnum];
+			FD_SET(_servers_socket[listnum],&_read_fds);
+			if (_servers_socket[listnum] > _highsock)
+				_highsock = _servers_socket[listnum];
+		}
+	}
+	std::cout << "connectlist : ";
 	for (int listnum = 0; listnum < BACKLOG; listnum++) {
 		if (_connectlist[listnum] != 0) {
+			std::cout << " " << _connectlist[listnum];
 			FD_SET(_connectlist[listnum],&_read_fds);
 			if (_connectlist[listnum] > _highsock)
 				_highsock = _connectlist[listnum];
 		}
 	}
+	std::cout << std::endl;
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
-	readsocks = select(_highsock+1, &_read_fds, (fd_set *) 0, (fd_set *) 0, &timeout);
+	readsocks = select(_highsock+1, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
+	if (readsocks < 0)
+	{
+       	std::cout << "error select " << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	return (readsocks);
 }
 
@@ -84,12 +102,15 @@ void    HTTP::select_server::accepter()
 {
 	int					connection;
 
-    if (FD_ISSET(_servers_socket[0],&_read_fds))
+	for (int i = 0; i < _servers_socket.size(); i++) {
+    if (FD_ISSET(_servers_socket[i],&_read_fds))
 	{
-    	int 				addrlen = sizeof(_servers_addr[0]);
-		connection = accept(_servers_socket[0], (struct sockaddr *)&_servers_addr[0], (socklen_t * )&addrlen);
+		sockaddr_in				addr = _servers_addr[i];
+    	int 					addrlen = sizeof(_servers_addr[i]);
+		connection = accept(_servers_socket[i], (struct sockaddr *)&addr, (socklen_t * )&addrlen);
 		if (connection < 0) 
 		{
+   			printf("Oh dear, something went wrong! %s\n", strerror(errno));
 			std::cout << "error in accept" << std::endl;
 			exit(EXIT_FAILURE);
 		}
@@ -107,6 +128,7 @@ void    HTTP::select_server::accepter()
 			close(connection);
 		}
 	}
+	}
 }
 
 /* Run through our sockets and check to see if anything happened with them, if so 'service' them. */
@@ -116,24 +138,24 @@ void    HTTP::select_server::handeler()
 {
     int		valread;
     char	buffer[30000];
-    // int		sock = _socket->get_sock();
 
-	for (int listnum = 0; listnum < BACKLOG; listnum++)
+	for (int i = 0; i < _servers_socket.size(); i++)
 	{
-		if (FD_ISSET(_connectlist[listnum],&_read_fds))
+		if (FD_ISSET(_connectlist[i],&_read_fds))
         {
-			if ((valread = recv(_connectlist[listnum], buffer, 3000, 0)) < 0) 
+			if ((valread = recv(_connectlist[i], buffer, 3000, 0)) < 0) 
 			{
-	    		std::cout << "\nConnection lost: FD=" << _connectlist[listnum] << " Slot" << listnum << std::endl;
-				close(_connectlist[listnum]);
-				_connectlist[listnum] = 0;
+	    		std::cout << "\nConnection lost: FD=" << _connectlist[i] << " Slot" << i << std::endl;
+   				printf("Oh dear, something went wrong! %s\n", strerror(errno));
+				close(_connectlist[i]);
+				_connectlist[i] = 0;
 			} 
     		else 
 			{
-				send(_connectlist[listnum] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
-				send(_connectlist[listnum] , "Content-length: 50\n" , 19 , 0 );  
-				send(_connectlist[listnum] , "Content-Type: text/html\n\n" , 25 , 0 );  
-				send(_connectlist[listnum] , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
+				send(_connectlist[i] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
+				send(_connectlist[i] , "Content-length: 50\n" , 19 , 0 );  
+				send(_connectlist[i] , "Content-Type: text/html\n\n" , 25 , 0 );  
+				send(_connectlist[i] , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
 				std::cout << "\nResponded buffer is: " << buffer << std::endl;
 			}
 		}
@@ -149,16 +171,12 @@ void    HTTP::select_server::launch()
 	memset((char *) &_connectlist, 0, sizeof(_connectlist));
     while(true)
     {
+		FD_ZERO(&_write_fds);
         std::cout << "...................WAITING////" << std::endl;
  		readsocks = selecter();
-		if (readsocks < 0)
-		{
-        	std::cout << "error select " << std::endl;
-			exit(EXIT_FAILURE);
-		}
 		if (readsocks == 0) /* Nothing  to read, just show alive */
 			std::cout << ".";
-        else
+        else if (readsocks > 0)
 		{
 			accepter();
 			handeler();

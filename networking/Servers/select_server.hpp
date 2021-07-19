@@ -4,7 +4,7 @@
 #include "../../http.hpp"
 #include "../utils/http_funct.hpp"
 
-#define BACKLOG 10
+#define BACKLOG 100
 
 namespace HTTP
 {
@@ -15,6 +15,7 @@ namespace HTTP
                 int             _highsock;
                 fd_set          _read_fds;
                 fd_set          _write_fds;
+                fd_set          _write_backup;
                 // std::vector<int>  _connectlist;
                 int             _connectlist[BACKLOG]; //bklg?
                 int             _sockets[BACKLOG]; //bklg?
