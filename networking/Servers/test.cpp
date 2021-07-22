@@ -18,6 +18,9 @@ int main()
 			for (vector<int>::iterator it = p.begin(); it != p.end(); ++it)
 				std::cout << "port: " << *it << std::endl;
 		}
+		vector<t_server> a = conf.get_server();
+		std::cout<< a[0]._server_name[0] << std::endl;
+
 	}
     else
         std::cout << RED << " ERROR no configfile" << RESET << std::endl;
