@@ -29,5 +29,6 @@ int main()
     ports.push_back(5000);
     ports.push_back(7000);
     ports.push_back(8000);
+    std::cout << "about to call ma stuff" << std::endl;
     HTTP::select_server t(ports) ;
 }

@@ -23,8 +23,8 @@ namespace HTTP
                 // listen_n_bind * _socket;
                 std::vector<sockaddr_in>        _servers_addr;
                 std::vector<int>                _servers_socket;
-                std::vector<int>                _client_socket;
-                std::vector<sockaddr_in>        _client_addr;
+                int                _client_socket;
+                sockaddr_in        _client_addr;
             public:
                 /* constructor */
                 select_server();
@@ -49,8 +49,8 @@ namespace HTTP
                 void    		accepter(int i);
                 // int             accept_new_connection(int server_socket);
 
-                void        		read_from_client(int i);
-                void    		send_response(int i);
+                void        	read_from_client();
+                void    		send_response();
                 void    		launch();
             	/* getter */
 		        listen_n_bind * get_socket();

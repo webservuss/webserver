@@ -93,11 +93,13 @@ void    HTTP::select_server::accepter(int i)
 			exit(EXIT_FAILURE);
 		}
 		set_non_blocking(connection);
-        if (std::find(_client_socket.begin(), _client_socket.end(), connection) == _client_socket.end()) {
-        // someName not in name, add it
-            _client_socket.push_back(connection);
-            _client_addr.push_back(addr);
-        }
+        _client_socket = connection;
+        _client_addr = addr;
+        // if (std::find(_client_socket.begin(), _client_socket.end(), connection) == _client_socket.end()) {
+        // // someName not in name, add it
+        //     _client_socket.push_back(connection);
+        //     _client_addr.push_back(addr);
+        // }
         // _client_socket.push_back(connection);
         // _client_addr.push_back(addr);
         std::cout << "NEW CLIENT: " << connection << std::endl;
@@ -114,7 +116,7 @@ void    HTTP::select_server::accepter(int i)
 		// 	close(connection);
 		// }
         // FD_SET(_servers_socket[i], &_read_backup);
-		FD_SET(connection,&_read_fds);
+		FD_SET(_client_socket,&_read_fds);
 		// FD_SET(connection,&_write_backup);
         // FD_SET(connection, &_read_fds);
         std::cout << "out accepter" << std::endl;
@@ -123,35 +125,39 @@ void    HTTP::select_server::accepter(int i)
 /* Run through our sockets and check to see if anything happened with them, if so 'service' them. */
 /* if recv fails connection closed, close this end and free up entry in connectlist */
 /* else send correct to browser */
-void    HTTP::select_server::read_from_client(int i)
+void    HTTP::select_server::read_from_client()
 {
     int		valread;
     char	buffer[30000];
 
     std::cout << "in read_from_client " << std::endl;
-	if ((valread = recv(_client_socket[i], buffer, 3000, 0)) < 0) 
+	if ((valread = recv(_client_socket, buffer, 3000, 0)) < 0) 
 	{
-		std::cout << "\nConnection lost: FD=" << _client_socket[i] << " Slot" << i << std::endl;
+		std::cout << "\nConnection lost: FD=" << _client_socket << std::endl;
 		printf("Oh dear, something went wrong! %s\n", strerror(errno));
-		close(_client_socket[i]);
-		_client_socket[i] = 0;
+		close(_client_socket);
+		_client_socket = 0;
 	}
-	std::cout << "\nResponded buffer is: " << buffer << std::endl;
-    FD_SET(_client_socket[i], &_write_fds);
-            // FD_SET(_client_socket[i], &_write_backup);
+    // else 
+    // {
+	    std::cout << "\nResponded buffer is: " << buffer << std::endl;
+        FD_SET(_client_socket, &_write_fds);
+    // }       // FD_SET(_client_socket[i], &_write_backup);
+	std::cout << "out read from client" << std::endl;
 }
 
-void HTTP::select_server::send_response(int i)
+void HTTP::select_server::send_response()
 {
     std::cout << "in send response" << std::endl;
-	send(_client_socket[i] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
-	send(_client_socket[i] , "Content-length: 50\n" , 19 , 0 );  
-	send(_client_socket[i] , "Content-Type: text/html\n\n" , 25 , 0 );  
-	send(_client_socket[i] , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
+	send(_client_socket , "HTTP/1.1 200 OK\n" , 16 , 0 );  
+	send(_client_socket , "Content-length: 50\n" , 19 , 0 );  
+	send(_client_socket , "Content-Type: text/html\n\n" , 25 , 0 );  
+	send(_client_socket , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
     std::cout << " response mid" << std::endl;
     // FD_SET(_client_socket[i], &_write_backup);
     std::cout << "out send response" << std::endl;
-    FD_CLR(_client_socket[i], &_write_backup);
+    // FD_CLR(_client_socket[i], &_write_backup);
+    FD_CLR(_client_socket, &_write_backup);
 }
 
 /* launch in an endless loop */
@@ -169,8 +175,7 @@ void    HTTP::select_server::launch()
 				_highsock = _servers_socket[listnum];
 		}
 	}
-    _client_socket.clear();
-    _client_addr.clear();
+    _client_socket = -1;
     while(true)
     {
         _read_fds = _read_backup;
@@ -179,49 +184,33 @@ void    HTTP::select_server::launch()
         selecter();
 	    for (int i = 0; i < _servers_socket.size(); i++) 
         {
+			std::cout << "in loop" << std::endl;
             if (FD_ISSET(_servers_socket[i], &_read_fds)) {
                 accepter(i);
-            }
-            for (int j = 0; j < _client_socket.size(); j++) {
-                std::cout << "in for loop " << j << std::endl;
-                if (FD_ISSET(_client_socket[j], &_read_fds)) {
-                    read_from_client(j);
-                }
-                if (FD_ISSET(_client_socket[j], &_write_fds)) {
-                    // parse_request();
-                    send_response(j);
-                }
-            }
+          }
+		              if (_client_socket >= 0 && FD_ISSET(_client_socket, &_read_fds))
+                 read_from_client();
+                //parse_request();
+            if (_client_socket >= 0 && FD_ISSET(_client_socket, &_write_fds))
+                send_response();  
+            // if (_client_socket > 0 && FD_ISSET(_client_socket, &_read_fds))
+            //      read_from_client();
+            //     //parse_request();
+            // if (_client_socket > 0 && FD_ISSET(_client_socket, &_write_fds))
+            //     send_response();
+            // for (int j = 0; j < _client_socket.size(); j++) {
+            //     std::cout << "in for loop " << j << std::endl;
+            //     if (FD_ISSET(_client_socket[j], &_read_fds)) {
+            //         read_from_client(j);
+            //     }
+            //     if (FD_ISSET(_client_socket[j], &_write_fds)) {
+            //         // parse_request();
+            //         send_response(j);
+            //     }
+            // }
+				        _client_socket = -1;
 		}
+		        _client_socket = -1;
 		std::cout << "...................DONE////" << std::endl;
     }
 }
-
-
-// while (true) {
-//     readFds = readFdsBackup;
-//     writeFds = writeFdsBackup;
-// ​
-//     if (select(maxFD, &readFds, &writeFds, 0, 0) == -1)
-//         throw std::runtime_error("Select failed");
-// ​
-//     for (server in servers) {
-//         if (FD_ISSET(server->socketFD, &readFds)) {
-//             add_client();
-//             FD_SET(clientfd, &readFdsBackup);
-//         }
-//         for (client in server->clients()) {
-//             if (FD_ISSET(client->fd, &readFds)) {
-//                 read_from_client();
-//                 if (done_reading())
-//                     FD_SET(client->fd, &writeFdsBackup);
-//             }
-// ​
-//             if (FD_ISSET(client->fd, &writeFds)) {
-//                 parse_request();
-//                 send_response();
-//                 FD_CLR(client->fd, &writeFdsBackup);
-//             }
-//         }
-//     }
-// }

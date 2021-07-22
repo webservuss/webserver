@@ -2,14 +2,17 @@ NAME =		test
 
 SRCS =		networking/Servers/test.cpp \
 			networking/Sockets/simple_socket.cpp \
-			networking/Servers/select_server.cpp \
 			networking/Sockets/listen_n_bind.cpp \
 			networking/utils/http_funct.cpp \
 			networking/Request/parser_HTTP.cpp \
 			networking/Request/utils_HTTP.cpp \
 			networking/Servers/parser_config.cpp \
 			networking/Request/split.cpp  \
-			networking/Request/request.cpp
+			networking/Request/request.cpp \
+			networking/Servers/select_server_new_old.cpp 
+
+# networking/Servers/select_server.cpp \
+# select_server_new_old
 
 OFILES =	$(SRCS:.cpp=.o)
 
