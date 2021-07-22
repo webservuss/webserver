@@ -22,8 +22,14 @@ logical groups and to prevent name collisions that can occur
 
 namespace HDE{
 
-/* make an enum for GET DELETE CONNECT */
+/* make an enum for GET DELETE POST */
+enum method {
 
+    DELETE,
+    GET,
+    POST
+
+};
 
 
 /* method like get etc  */

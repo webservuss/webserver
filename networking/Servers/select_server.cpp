@@ -119,14 +119,14 @@ void    HTTP::select_server::handeler()
 				close(_connectlist[listnum]);
 				_connectlist[listnum] = 0;
 			} 
-    		else 
-			{
-				send(_connectlist[listnum] , "HTTP/1.1 200 OK\n" , 16 , 0 );  
-				send(_connectlist[listnum] , "Content-length: 50\n" , 19 , 0 );  
-				send(_connectlist[listnum] , "Content-Type: text/html\n\n" , 25 , 0 );  
-				send(_connectlist[listnum] , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
-				std::cout << "\nResponded buffer is: " << buffer << std::endl;
-			}
+    		//else
+			//{
+//				send(_connectlist[listnum] , "HTTP/1.1 200 OK\n" , 16 , 0 );
+//				send(_connectlist[listnum] , "Content-length: 50\n" , 19 , 0 );
+//				send(_connectlist[listnum] , "Content-Type: text/html\n\n" , 25 , 0 );
+//				send(_connectlist[listnum] , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );
+//				std::cout << "\nResponded buffer is: " << buffer << std::endl;
+//			}
 		}
 	}
 }

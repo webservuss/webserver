@@ -98,7 +98,7 @@ int parse_conf::get_server_port(const t_server &server) {
 	return server._port;
 }
 
-in
+
 
 /* GETTERS */
 
@@ -153,5 +153,4 @@ const std::map<std::string, t_location> &parse_conf::get_location() const
 	return _location_map;
 }
 */
-
 

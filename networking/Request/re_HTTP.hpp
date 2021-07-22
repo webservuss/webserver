@@ -28,7 +28,11 @@ namespace HTTP{
     /* make an enum for GET POST and DELETE   -- 
 • You need at least GET, POST, and DELETE methods.
  */
-
+enum method{
+    GET,
+    POST,
+    DELETE
+};
 
 
     class re_HTTP
@@ -55,6 +59,7 @@ namespace HTTP{
 
         //getters
         std::string	 get_key();
+        std:: string  request);
 
     };
 

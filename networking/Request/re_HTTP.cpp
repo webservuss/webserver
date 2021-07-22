@@ -10,6 +10,9 @@ using namespace HTTP;
 
 const std::string re_HTTP::permisChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!#$&'()*+,/:;=?@[]";
 
+
+
+// safe all the variables
 HTTP::re_HTTP::re_HTTP(std::string dataparser)
 {
     std::string data;
@@ -25,7 +28,7 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
         mapHeader.insert(std::pair<std::string, std::string>( _key, _value) );
     }
     std::map<std::string, std::string>::iterator it = mapHeader.begin();
-    std::cout << RED <<  "*******************    MAP HEADER CONTAINTS   *******************\n";
+    std::cout << RED <<  "*******************    MAP REQUEST CONTAINTS   *******************\n";
     for (it=mapHeader.begin(); it!=mapHeader.end(); ++it)
     std::cout << GREEN << it->first  << BLUE << " => " << GREEN << it->second << RESET << '\n';
 }
