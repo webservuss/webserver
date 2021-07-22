@@ -36,7 +36,26 @@ typedef struct				s_server {
 class parse_conf
 {
 private:
+<<<<<<< HEAD
 	vector<t_server> _server;
+=======
+	/*
+	std::string _server_name;
+	int         _port;
+	std::string _host;
+	std::vector<std::string> _error_page;
+	int         _auto_index;
+	std::string _root;
+	std::string _index;
+	std::string _key;
+	std::string _value;
+
+	std::map<std::string, t_location> _location_map;
+	 */
+
+	//private
+	std::vector<t_server> _server;
+>>>>>>> sophie_request
 
 	void set_values_server(string s, t_server &server);
 	void set_values_location(string s, t_location &location);

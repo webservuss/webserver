@@ -4,6 +4,7 @@
 #include "simple_server.hpp"
 #include "../../http.hpp"
 #include "../utils/http_funct.hpp"
+#include "../Request/re_HTTP.hpp"
 
 #define BACKLOG 10
 

@@ -23,7 +23,7 @@
 #include <map>
 
 
-namespace HDE{
+namespace HTTP{
 
     /* make an enum for GET POST and DELETE   -- 
 • You need at least GET, POST, and DELETE methods.
@@ -31,9 +31,9 @@ namespace HDE{
 
 
 
-    class parser_HTTP
+    class re_HTTP
     {
-        parser_HTTP(){}
+        re_HTTP(){}
         private:
             std::string _key;
             std::string _value;
@@ -42,7 +42,7 @@ namespace HDE{
 
 
         public:
-            parser_HTTP(std::string dataparser);
+            re_HTTP(std::string dataparser);
             void split_line(std::string line);
             //static const std::map<std::string, method>  mapMethod;
             std::map<std::string, std::string> mapHeader;

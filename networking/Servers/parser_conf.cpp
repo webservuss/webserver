@@ -117,6 +117,7 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 
 const std::vector<t_server> &parse_conf::get_server() const
 {
+    //the total config file
 	return _server;
 }
 
@@ -124,6 +125,8 @@ const std::vector<t_server> &parse_conf::get_server() const
 const std::vector<int>	&parse_conf::get_server_port(const t_server &server) {
 	return server._port;
 }
+
+in
 
 /* GETTERS */
 
