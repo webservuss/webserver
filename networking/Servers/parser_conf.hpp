@@ -50,6 +50,7 @@ private:
 	std::map<std::string, t_location> _location_map;
 	 */
 
+	//private
 	std::vector<t_server> _server;
 
 	void set_values_server(std::string s, t_server &server);
