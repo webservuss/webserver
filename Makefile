@@ -9,10 +9,7 @@ SRCS =		networking/Servers/test.cpp \
 			networking/Servers/parser_config.cpp \
 			networking/Request/split.cpp  \
 			networking/Request/request.cpp \
-			networking/Servers/select_server_new_old.cpp 
-
-# networking/Servers/select_server.cpp \
-# select_server_new_old
+			networking/Servers/select_server.cpp 
 
 OFILES =	$(SRCS:.cpp=.o)
 

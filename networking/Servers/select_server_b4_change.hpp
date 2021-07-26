@@ -12,26 +12,19 @@ namespace HTTP
         {
             private:
                 /* variables needed for select()*/
-                int             _highsock;
-                fd_set          _read_fds;
-                fd_set          _write_fds;
-                fd_set          _write_backup;
-                fd_set          _read_backup;
-                // std::vector<int>  _connectlist;
-                int             _connectlist[BACKLOG]; //bklg?
-                int             _sockets[BACKLOG]; //bklg?
-                // listen_n_bind * _socket;
-                std::vector<sockaddr_in> _servers_addr;
-                std::vector<int>        _servers_socket;
-                std::vector<sockaddr_in> _client_addr;
-                std::vector<int>        _client_socket;
+                int                         _highsock;
+                fd_set                      _read_fds;
+                fd_set                      _write_fds;
+                fd_set                      _write_backup;
+                fd_set                      _read_backup;
+                std::vector<sockaddr_in>    _servers_addr;
+                std::vector<int>            _servers_socket;
+                std::vector<int>            _client_socket;
             public:
                 /* constructor */
                 select_server();
-                //
+                // constructor for multiple ports */
                 select_server(std::vector<int> ports);
-                /* constructor specifying port */
-                // select_server(int port);
                 /* constructor specifying multiple port */
                 select_server(int *port, int numb_ports);
                 /*copy constructor */

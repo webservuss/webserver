@@ -1,4 +1,4 @@
-#include "select_server_new_old.hpp"
+#include "select_server_b4_change.hpp"
 
 /* constructor calls simple_server and launches */
 HTTP:: select_server::select_server()
@@ -11,36 +11,40 @@ HTTP:: select_server::select_server()
 
 HTTP:: select_server::select_server(std::vector<int> ports)
 {
-	std::cout << "ports" << std::endl;
-	std::cout << "siz eis " << ports.size() << std::endl;
 	for (int i = 0; i < ports.size(); i++)
 	{
 		listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, ports[i], INADDR_ANY, BACKLOG);
-		std::cout << "creating port " << ports[i] << std::endl;
 		_servers_addr.push_back(socket->get_address());
 		_servers_socket.push_back(socket->get_sock());
+		delete socket;
 	}
 	launch();
 }
 
-
 /*copy constructor */
 HTTP::select_server::select_server(const select_server& x)
-{
-    // _socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG);
-	// _highsock = x._highsock;
-    // _read_fds = x._read_fds;
-	// for (int i = 0; i < BACKLOG; i++)
-	//     _connectlist[i] = x._connectlist[i];
+{ // TEST THIS
+	_highsock = x._highsock;
+   	_read_fds = x._read_fds;
+    _write_fds = x._write_fds;
+    _write_backup = x._write_backup;
+    _read_backup = x._read_backup;
+    _servers_addr = x._servers_addr;
+    _servers_socket = x._servers_socket;
+    _client_socket = x._client_socket;
 }
 
 /*assignment operator */
 HTTP::select_server& HTTP::select_server::operator=(const select_server& x)
-{
+{ // TEST THIS
 	_highsock = x._highsock;
    	_read_fds = x._read_fds;
-	for (int i = 0; i < BACKLOG; i++)
-	    _connectlist[i] = x._connectlist[i];
+    _write_fds = x._write_fds;
+    _write_backup = x._write_backup;
+    _read_backup = x._read_backup;
+    _servers_addr = x._servers_addr;
+    _servers_socket = x._servers_socket;
+    _client_socket = x._client_socket;
     return *this;
 }
 
@@ -63,7 +67,6 @@ int HTTP::select_server::selecter()
 {
 	int 			readsocks;
     struct timeval  timeout;
-    // int 			sock = _socket->get_sock();
 	
     std::cout << "in selecter " << std::endl;
 	std::cout << std::endl;
@@ -85,40 +88,22 @@ void    HTTP::select_server::accepter(int i)
 {
         std::cout << "in accepter " << std::endl;
     	int					    connection;
-		sockaddr_in				addr = _servers_addr[i];
-    	int 					addrlen = sizeof(_servers_addr[i]);
+		sockaddr_in				addr;
+    	int 					addrlen;
+
+		addr = _servers_addr[i];
+		addrlen = sizeof(_servers_addr[i]);
         connection = accept(_servers_socket[i], (struct sockaddr *)&addr, (socklen_t * )&addrlen);
         if (connection < 0) 
 		{
-   			printf("Oh dear, something went wrong! %s\n", strerror(errno));
-			std::cout << "error in accept" << std::endl;
+			std::cout << "error in accept" << strerror(errno) << std::endl;
 			exit(EXIT_FAILURE);
 		}
 		set_non_blocking(connection);
-        if (std::find(_client_socket.begin(), _client_socket.end(), connection) == _client_socket.end()) {
-        // someName not in name, add it
+        if (std::find(_client_socket.begin(), _client_socket.end(), connection) == _client_socket.end())
             _client_socket.push_back(connection);
-            _client_addr.push_back(addr);
-        }
-        // _client_socket.push_back(connection);
-        // _client_addr.push_back(addr);
         std::cout << "NEW CLIENT: " << connection << std::endl;
-		// for (int listnum = 0; (listnum < BACKLOG) && (connection != -1); listnum ++)
-		// if (_connectlist[listnum] == 0) 
-		// {
-		// 	std::cout << "\nConnection accepted:   FD=" << connection << "Slot" << listnum << std::endl;
-		// 	_connectlist[listnum] = connection;
-		// 	connection = -1;
-		// }
-		// if (connection != -1)
-		// {
-        // 	std::cout << "\nNo room left in queue for new client.\n";
-		// 	close(connection);
-		// }
-        // FD_SET(_servers_socket[i], &_read_backup);
 		FD_SET(connection,&_read_fds);
-		// FD_SET(connection,&_write_backup);
-        // FD_SET(connection, &_read_fds);
         std::cout << "out accepter" << std::endl;
 }
 
@@ -133,10 +118,10 @@ void    HTTP::select_server::read_from_client(int i)
     std::cout << "in read_from_client " << std::endl;
 	if ((valread = recv(_client_socket[i], buffer, 3000, 0)) < 0) 
 	{
-		std::cout << "\nConnection lost: FD=" << _client_socket[i] << " Slot" << i << std::endl;
-		printf("Oh dear, something went wrong! %s\n", strerror(errno));
+		std::cout << "\nConnection lost: FD=" << _client_socket[i] << " Slot" << i  << "error " << strerror(errno)<< std::endl;
 		close(_client_socket[i]);
 		_client_socket[i] = 0;
+		// _client_socket.erase(_client_socket.begin() + i);
 	}
 	std::cout << "\nResponded buffer is: " << buffer << std::endl;
     FD_SET(_client_socket[i], &_write_fds);
@@ -172,7 +157,6 @@ void    HTTP::select_server::launch()
 		}
 	}
     _client_socket.clear();
-    _client_addr.clear();
     while(true)
     {
         _read_fds = _read_backup;
