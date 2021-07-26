@@ -122,6 +122,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._client_sockets[j], &_read_backup);
 		exit(EXIT_FAILURE);
 	}
+	re_HTTP s (buffer);
 	std::cout << "\n buffer is: " << buffer << std::endl;
     FD_SET(_servers[i]._client_sockets[j], &_write_backup);
 	return valread;

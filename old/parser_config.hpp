@@ -1,9 +1,9 @@
 #ifndef parser_config_hpp
 #define parser_config_hpp
 
-#include "../../http.hpp"
+#include "../http.hpp"
 // #include "./simple_server.hpp"
-#include "../utils/colors.hpp"
+#include "../networking/utils/colors.hpp"
 //#include "split.hpp"
 //#include "makeMap.hpp"
 //#include "utils_countspace.hpp"
