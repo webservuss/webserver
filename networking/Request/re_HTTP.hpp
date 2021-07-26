@@ -59,7 +59,7 @@ enum method{
 
         //getters
         std::string	 get_key();
-        std:: string  request);
+        std:: string  request();
 
     };
 
