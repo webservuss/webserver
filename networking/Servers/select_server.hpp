@@ -4,7 +4,7 @@
 #include "../../http.hpp"
 #include "../utils/http_funct.hpp"
 
-#define BACKLOG 100
+#define BACKLOG 0
 
 namespace HTTP
 {
@@ -36,23 +36,15 @@ namespace HTTP
                 // /*assignment operator */
                 select_server& operator=(const select_server& x);
                 // /*destructor */
-
                 ~select_server();
-                /* call select with the correct FD_SET */
-                // int             selecter(int numb);
-                /* implement the virtual void functions from simple_server
-                to accept, handle respond and launch */
                 int     		selecter();
                 void    		accepter(int i);
-                void            read_from_client(int i, int j);
+                int             read_from_client(int i, int j);
                 void            send_response(int i, int j);
-                // int             accept_new_connection(int server_socket);
-
-                void    		handeler();
                 void    		launch();
             	/* getter */
 		        listen_n_bind * get_socket();
-
+                /* set values in struct */
                 void            set_value_server_select_server(int servers_socket, sockaddr_in servers_addr, t_server_select &server);
                 void            set_value_server_select_client(int client_socket, t_server_select &server);
         };
