@@ -70,7 +70,7 @@ int HTTP::select_server::selecter()
 	std::cout << std::endl;
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
-	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, NULL);
+	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
 	if (readsocks < 0)
 	{
        	std::cout << "error select " << std::endl;
@@ -118,14 +118,11 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	{
 		std::cout << "\nConnection lost: FD=" << _servers[i]._client_sockets[j] << " Slot" << i  << "error " << strerror(errno)<< std::endl;
 		close(_servers[i]._client_sockets[j]);
-		_servers[i]._client_sockets[j] = 0;
-		// std::cout << "should be closeing _client_socket[i]" << _client_socket[i] << "and am closing " << *(_client_socket.begin() + i) << std::endl;
-		_servers[i]._client_sockets.erase(_servers[i]._client_sockets.begin() + i);
-		// return (-1);
-		// return ;
+		_servers[i]._client_sockets.erase(_servers[i]._client_sockets.begin() + j);
+	    FD_CLR(_servers[i]._client_sockets[j], &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-	std::cout << "\nResponded buffer is: " << buffer << std::endl;
+	std::cout << "\n buffer is: " << buffer << std::endl;
     FD_SET(_servers[i]._client_sockets[j], &_write_backup);
 	return valread;
 }
@@ -164,24 +161,20 @@ void    HTTP::select_server::launch()
         selecter();
 	    for (int i = 0; i < _servers.size(); i++) 
         {
-			std::cout << i << "_servers.size()" << _servers.size() << std::endl;
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
                 accepter(i);
             }
             for (int j = 0; j < _servers[i]._client_sockets.size(); j++)
 			{
-				int valread;
-                std::cout << j << " in for loop " << _servers[i]._client_sockets[j]  << std::endl;
                 if (FD_ISSET(_servers[i]._client_sockets[j], &_read_fds)) {
-                    valread = read_from_client(i, j);
-					if (valread == 0)
+                    if (read_from_client(i, j) == 0)
 					{
 						FD_CLR(_servers[i]._client_sockets[j], &_read_backup);
 						_servers[i]._client_sockets.erase(_servers[i]._client_sockets.begin() + j);
-						j--;
+						j = 0;
 					}
                 }
-                if (valread != 0 && FD_ISSET(_servers[i]._client_sockets[j], &_write_fds)) {
+                if (FD_ISSET(_servers[i]._client_sockets[j], &_write_fds)) {
                     // parse_request();
                     send_response(i, j);
 					FD_CLR(_servers[i]._client_sockets[j], &_write_backup);

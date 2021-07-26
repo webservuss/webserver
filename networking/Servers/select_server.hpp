@@ -4,7 +4,7 @@
 #include "../../http.hpp"
 #include "../utils/http_funct.hpp"
 
-#define BACKLOG 0
+#define BACKLOG 10
 
 namespace HTTP
 {
