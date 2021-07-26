@@ -105,6 +105,9 @@ void    HTTP::select_server::accepter(int i)
         std::cout << "out accepter" << std::endl;
 }
 
+
+
+
 /* Run through our sockets and check to see if anything happened with them, if so 'service' them. */
 /* if recv fails connection closed, close this end and free up entry in connectlist */
 /* else send correct to browser */
@@ -122,7 +125,16 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._client_sockets[j], &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-	re_HTTP s (buffer);
+
+	std::string s;
+	buffer[valread] = '\0';
+	s = char_string(buffer);
+
+//	s = "";
+//	for( int k = 0;buffer[k] != '\0'; k++){
+//	    s = s + buffer[k];
+//	}
+	re_HTTP buf (s);
 	std::cout << "\n buffer is: " << buffer << std::endl;
     FD_SET(_servers[i]._client_sockets[j], &_write_backup);
 	return valread;

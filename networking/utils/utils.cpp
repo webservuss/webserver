@@ -36,3 +36,13 @@ int ft_stoi(std::string s)
 	return i;
 }
 
+
+std::string char_string(char * buffer){
+
+    std::string s;
+    s = "";
+    for( int k = 0;buffer[k] != '\0'; k++){
+        s = s + buffer[k];
+    }
+    return s;
+}
