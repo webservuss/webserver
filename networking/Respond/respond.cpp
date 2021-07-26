@@ -4,4 +4,4 @@
 #include <map>
 
 
-HTTP respond.resond_line(std::string respond_line);
+// HTTP respond.resond_line(std::string respond_line);

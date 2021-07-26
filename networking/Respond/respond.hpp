@@ -31,7 +31,7 @@ namespace HTTP{
     private:
 
     public:
-        respond_line(std::string respond_line);
+        // respond_line(std::string respond_line);
 
     };
 }
