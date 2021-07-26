@@ -10,8 +10,8 @@
 
 
 #include "../../http.hpp"
-#include "../Servers/simple_server.hpp"
-#include "../Colors.hpp"
+// #include "../Servers/simple_server.hpp"
+#include "../colors.hpp"
 
 
 namespace HTTP{

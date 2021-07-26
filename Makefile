@@ -1,9 +1,7 @@
 NAME =		test
 
 SRCS =		networking/Servers/test.cpp \
-			networking/Servers/simple_server.cpp \
 			networking/Sockets/simple_socket.cpp \
-			networking/Servers/select_server.cpp \
 			networking/Sockets/listen_n_bind.cpp \
 			networking/utils/http_funct.cpp \
 			networking/utils/utils.cpp \
@@ -12,11 +10,12 @@ SRCS =		networking/Servers/test.cpp \
 			networking/Servers/parser_config.cpp \
 			networking/Servers/parser_conf.cpp \
 			networking/Request/split.cpp  \
-			networking/Request/request.cpp
+			networking/Request/request.cpp \
+			networking/Servers/select_server.cpp 
 
 OFILES =	$(SRCS:.cpp=.o)
 
-FLAGS = -std=c++98
+FLAGS = -std=c++98 -g -fsanitize=address
 # -Wall -Werror -Wextra
 
 INCLUDES =	*.hpp

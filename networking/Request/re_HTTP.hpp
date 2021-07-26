@@ -3,9 +3,7 @@
 #define parser_HTTP_hpp
 
 #include "../../http.hpp"
-#include "../Servers/simple_server.hpp"
-#include "split.hpp"
-#include "../Colors.hpp"
+#include "../colors.hpp"
 #include "makeMap.hpp"
 #include "utils_countspace.hpp"
 

@@ -17,8 +17,8 @@ logical groups and to prevent name collisions that can occur
   
 
 #include "../../http.hpp"
-#include "../Servers/simple_server.hpp"
-#include "../Colors.hpp"
+// #include "../Servers/simple_server.hpp"
+#include "../colors.hpp"
 
 namespace HDE{
 
