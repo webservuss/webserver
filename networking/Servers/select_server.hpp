@@ -4,15 +4,23 @@
 #include "../../http.hpp"
 #include "../utils/http_funct.hpp"
 #include "../Request/re_HTTP.hpp"
+# include <sys/time.h>
 
 #define BACKLOG 10
 
 namespace HTTP
 {
+        typedef struct t_client_select {
+            sockaddr_in         _client_addr;
+            int                 _c_sock;
+            struct timeval      _last_active;
+            bool                _active;
+        }   t_client_select;
+
         typedef struct t_server_select {
-            sockaddr_in         _servers_addr;
-            int                 _servers_socket;
-            std::vector<int>    _client_sockets;
+            sockaddr_in                     _servers_addr;
+            int                             _servers_socket;
+            std::vector<t_client_select>    _clients;
         }   t_server_select;
 
         class select_server
@@ -47,7 +55,9 @@ namespace HTTP
 		        listen_n_bind * get_socket();
                 /* set values in struct */
                 void            set_value_server_select_server(int servers_socket, sockaddr_in servers_addr, t_server_select &server);
-                void            set_value_server_select_client(int client_socket, t_server_select &server);
+                void	        make_client(int client_socket, sockaddr_in addr, t_server_select &server);
+                void            check_client_active(t_client_select &client);
+                int             erase_client(int i, int j);
         };
 }
 #endif
