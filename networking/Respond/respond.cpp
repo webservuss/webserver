@@ -10,7 +10,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <fstream>
+#include <vector>
  HTTP::respond::respond(std::map < std::string, std::string > mapHeader){
 
     std::string findKey;
@@ -119,28 +120,33 @@ void HTTP::respond::setbody(){
 
 
 
-    std::ifstream       file("Plop");
-    if (file)
-    {
-        /*
-         * Get the size of the file
-         */
-        file.seekg(0,std::ios::end);
-        std::streampos          length = file.tellg();
-        file.seekg(0,std::ios::beg);
-
-        /*
-         * Use a vector as the buffer.
-         * It is exception safe and will be tidied up correctly.
-         * This constructor creates a buffer of the correct length.
-         * Because char is a POD data type it is not initialized.
-         *
-         * Then read the whole file into the buffer.
-         */
-        std::vector<char>       buffer(length);
-        file.read(&buffer[0],length);
-    }
-
+//    std::ifstream       file("badrequest.html");
+//    if (file)
+//    {
+//        /*
+//         * Get the size of the file
+//         */
+//        file.seekg(0,std::ios::end);
+//        std::streampos          length = file.tellg();
+//        file.seekg(0,std::ios::beg);
+//
+//        /*
+//         * Use a vector as the buffer.
+//         * It is exception safe and will be tidied up correctly.
+//         * This constructor creates a buffer of the correct length.
+//         * Because char is a POD data type it is not initialized.
+//         *
+//         * Then read the whole file into the buffer.
+//         */
+//
+//        std::vector<char> buffer(length);
+//        file.read(&buffer[0],length);
+//        std::string s(buffer.begin(), input.end
+//        std::string s = char_string(buffer);
+//        std::cout << "len :"  << s.size() << std::endl;
+//
+//    }
+//
 
 
 
@@ -174,7 +180,7 @@ void HTTP::respond::setbody(){
 //        sum = numofChars+sum;
 //    }
 //    std::cout << "num  " << sum << std::endl;
-    file.close();
+   // file.close();
 }
 
 
