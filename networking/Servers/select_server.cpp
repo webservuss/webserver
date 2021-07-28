@@ -12,13 +12,12 @@ HTTP:: select_server::select_server()
 
 HTTP:: select_server::select_server(std::vector<int> ports)
 {
-	for (int i = 0; i < ports.size(); i++)
+	for (unsigned long i = 0; i < ports.size(); i++)
 	{
-		listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, ports[i], INADDR_ANY, BACKLOG);
+		listen_n_bind socket = HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, ports[i], INADDR_ANY, BACKLOG);
 		t_server_select newserver;
-		set_value_server_select_server(socket->get_sock(), socket->get_address(), newserver);
+		set_value_server_select_server(socket.get_sock(), socket.get_address(), newserver);
 		_servers.push_back(newserver);
-		delete socket;
 	}
 	launch();
 }
@@ -113,8 +112,9 @@ void    HTTP::select_server::accepter(int i)
 /* else send correct to browser */
 int    HTTP::select_server::read_from_client(int i, int j)
 {
-    int		valread;
-    char	buffer[30000];
+    int			valread;
+    char		buffer[30000];
+	std::string	stringbuff;
 
     std::cout << "in read_from_client " << std::endl;
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, buffer, 3000, 0)) < 0) 
@@ -125,16 +125,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-
-	std::string s;
 	buffer[valread] = '\0';
-	s = char_string(buffer);
-
-//	s = "";
-//	for( int k = 0;buffer[k] != '\0'; k++){
-//	    s = s + buffer[k];
-//	}
-	re_HTTP buf (s);
+	stringbuff = char_string(buffer);
+	re_HTTP requestinfo (stringbuff);
 	std::cout << "\n buffer is: " << buffer << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 	return valread;
@@ -166,12 +159,10 @@ int              HTTP::select_server::erase_client(int i, int j)
 /* launch in an endless loop */
 void    HTTP::select_server::launch()
 {
-    int 			readsocks;
-
     FD_ZERO(&_read_backup);
     FD_ZERO(&_write_backup);
     // add servers to read_backup
-	for (int listnum = 0; listnum < _servers.size(); listnum++) {
+	for (unsigned long listnum = 0; listnum < _servers.size(); listnum++) {
 		if (_servers[listnum]._servers_socket != 0) {
 			FD_SET(_servers[listnum]._servers_socket,&_read_backup);
 			if (_servers[listnum]._servers_socket > _highsock)
@@ -184,12 +175,12 @@ void    HTTP::select_server::launch()
         _write_fds = _write_backup;
         std::cout << "...................WAITING////" << std::endl;
         selecter();
-	    for (int i = 0; i < _servers.size(); i++) 
+	    for (unsigned long i = 0; i < _servers.size(); i++) 
         {
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
                 accepter(i);
             }
-            for (int j = 0; j < _servers[i]._clients.size(); j++)
+            for (unsigned long j = 0; j < _servers[i]._clients.size(); j++)
 			{
 				check_client_active(_servers[i]._clients[j]);
 				if (_servers[i]._clients[j]._active == false)

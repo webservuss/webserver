@@ -47,7 +47,7 @@ std::vector<std::string> utils::split_http(const std::string &str, const std::st
         }
     //}
     std::cout << " array size "<< array.size()<< std::endl;
-    for(int i = 0; i <array.size(); i++)
+    for(unsigned int i = 0; i <array.size(); i++)
     {
         std::cout << "after split" << array[i] << std::endl;
     }
