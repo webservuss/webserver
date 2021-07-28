@@ -12,6 +12,11 @@
 #include <fcntl.h>
 #include <fstream>
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+
  HTTP::respond::respond(std::map < std::string, std::string > mapHeader){
 
     std::string findKey;
@@ -118,9 +123,15 @@ const std::string &HTTP::respond::getStatusline() const {
 
 void HTTP::respond::setbody(){
 
+//    std::ifstream       file("amber.html");
+//    string file_content;
 
+//    std::ifstream       file("./amber.html");
+//    if(!file.is_open()){
+//        std::string s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+//        std::cout << "string" << s << std::endl;
+//    }
 
-//    std::ifstream       file("badrequest.html");
 //    if (file)
 //    {
 //        /*
@@ -148,21 +159,32 @@ void HTTP::respond::setbody(){
 //    }
 //
 
+    std::cout <<  " FUCKING HELL " << std::endl;
+
+    //std::string myText;
+
+// Read from the text file
+    //std::ifstream MyReadFile("amber.html");
+    std::ifstream file;
+    const char *path = "networking/Respond/amber.html";
+    file.open(path);
+    if(file.is_open()) {
+        std::cout << RED << "###########OPEN##########" << RESET << std::endl;
+        std::string s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        std::cout << " NU ECH " << s << std::endl;
+        _body = s;
+
+    }
+    else
+        std::cout << " RED " << std::endl;
 
 
+}
+    //std::cout << "BODY" << ss.str << std::endl;
+    //else
+       // std::cout << RED << " bad request is not open" << RESET << std::endl;
 
-//    std::string line;
-//    int sum = 0;
-//    std::ofstream file("badrequest.html");
-//    std::cout << "in the body " << std::endl;
-//    //const char *path = "./badrequest.html";
-//    //file.open(path);
-//    if(file.is_open())
-//        std::cout<< RED<< "bad request is open" << RESET << std::endl;
-//    else
-//        std::cout << RED << " bad request is not open" << RESET << std::endl;
-
-//    std::ifstream file("badrequest.html");
+//    std::ifstream file("amber.html");
 //
 //    std::string content( (std::istreambuf_iterator<char>(file) ),
 //                         (std::istreambuf_iterator<char>()    ) );
@@ -181,6 +203,6 @@ void HTTP::respond::setbody(){
 //    }
 //    std::cout << "num  " << sum << std::endl;
    // file.close();
-}
+
 
 
