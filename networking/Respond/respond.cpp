@@ -132,9 +132,6 @@ void HTTP::respond::appendheader() {
     }
     _totalheader.append("\r\n");
     _totalheader.append(_body);
-    std::cout << RED <<" $$$$$$$$$$$$$$$$$$$$$$HEADER IN ONE LINE !!!!!!!!!!!: " << "\r"<< header << RESET<<std::endl;
-
-
 }
 
 
