@@ -14,6 +14,8 @@
     std::string findKey;
     findKey = mapHeader["GET"];
      _statusline = status_line(findKey);
+     if(_statusline == " ")
+         std::cout<< " BAD REQUEST" << std::endl;
     setDate();
     setmodified(1);
     findKey = mapHeader["Connection:"];
@@ -41,7 +43,6 @@ std::string HTTP::respond::status_line(std::string findKey){
     if(j == 2)
         return("HTTP/1.1 200 OK");
     return(" ");
-
 }
 
 void HTTP::respond::setDate(){

@@ -6,7 +6,6 @@
 
 void parse_conf::set_values_server(std::string s, t_server &server)
 {
-	// this probably needs a better name than 'key'
 	std::string key = s.substr(0, s.find(' '));
 	if (key == "server_name")
 		server._server_name = s.substr(s.find(' ') + 1, s.size());
@@ -75,12 +74,10 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 		else if (line[line.length() - 1] == '}') {
 			is_acc = false;
 		}
-
 		std::cout << line << std::endl;
 		if (!is_acc)
 			set_values_server(line, _server[server_count - 1]);
 		if (is_acc) {
-			// send the map with the appropriate key
 			set_values_location(line, _server[server_count - 1]._location_map[map_key]); // for some reason it is not working yet
 		}
 	}
@@ -90,7 +87,6 @@ const std::vector<t_server> &parse_conf::get_server() const
 {
 	return _server;
 }
-
 
 int parse_conf::get_server_port(const t_server &server) {
 	return server._port;
