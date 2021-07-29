@@ -134,7 +134,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	std::map <std::string, std::string > respondmap = requestinfo.mapHeader;
     respond m (respondmap);
 
-	//std::cout << "\n buffer is: " << buffer << std::endl;
+
+	_totalheader = m.getTotalheader();
+	std::cout << "\n buffer is: " << buffer << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 	return valread;
 }
@@ -142,11 +144,12 @@ int    HTTP::select_server::read_from_client(int i, int j)
 void HTTP::select_server::send_response(int i, int j)
 {
     std::cout << "in send response" << std::endl;
-	send(_servers[i]._clients[j]._c_sock , "HTTP/1.1 200 OK\n" , 16 , 0 );  
-	send(_servers[i]._clients[j]._c_sock , "Content-length: 50\n" , 19 , 0 );  
-	send(_servers[i]._clients[j]._c_sock , "Content-Type: text/html\n\n" , 25 , 0 );  
-	send(_servers[i]._clients[j]._c_sock, "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
-    FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
+	send(_servers[i]._clients[j]._c_sock , _totalheader.c_str() , _totalheader.size() , 0 );  
+	// send(_servers[i]._clients[j]._c_sock , "HTTP/1.1 200 OK\n" , 16 , 0 );  
+	// send(_servers[i]._clients[j]._c_sock , "Content-length: 50\n" , 19 , 0 );  
+	// send(_servers[i]._clients[j]._c_sock , "Content-Type: text/html\n\n" , 25 , 0 );  
+	// send(_servers[i]._clients[j]._c_sock, "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
+    // FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
     std::cout << "out send response" << std::endl;
 }
 

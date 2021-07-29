@@ -124,7 +124,7 @@ void HTTP::respond::appendheader() {
     _totalheader.append(_statusline);
     _totalheader.append("\r\n");
     std::map<std::string, std::string>::iterator it = _totalrespond.begin();
-    for (it=_totalrespond.begin(); it!=_totalrespond.end(); ++it){
+    for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it) {
 
         _totalheader.append(it->first);
         _totalheader.append(it->second);
@@ -132,9 +132,6 @@ void HTTP::respond::appendheader() {
     }
     _totalheader.append("\r\n");
     _totalheader.append(_body);
-    std::cout << RED <<" $$$$$$$$$$$$$$$$$$$$$$HEADER IN ONE LINE !!!!!!!!!!!: " << "\r"<< _totalheader << RESET<<std::endl;
-
-
 }
 
 
@@ -147,14 +144,11 @@ void HTTP::respond::setbody(){
     file.open(path);
     if(file.is_open()) {
         s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        //std::cout << " NU ECH " << s << std::endl;
         _body = s;
     }
     else
         std::cout << " NOT OPEN RED " << std::endl;
     setContentlen(s);
-
-
 }
 
 const std::string &HTTP::respond::getTotalheader() const {
