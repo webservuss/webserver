@@ -32,7 +32,6 @@
 std::string HTTP::respond::status_line(std::string findKey){
 
 
-
     int n = 0;
     std::cout << findKey << std::endl;
     size_t pos = 0;
