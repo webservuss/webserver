@@ -196,7 +196,7 @@ void    HTTP::select_server::launch()
         {
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
                 accepter(i);
-            }zsh
+            }
             for (unsigned long j = 0; j < _servers[i]._clients.size(); j++)
 			{
 				check_client_active(_servers[i]._clients[j]);
