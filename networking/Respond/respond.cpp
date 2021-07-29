@@ -24,14 +24,10 @@
     setLanguage(findKey);
     setbody();
     appendheader();
-    //std::map<std::string, std::string>::iterator it = _totalrespond.begin();
-
 }
 
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
 std::string HTTP::respond::status_line(std::string findKey){
-
-
 
     std::cout << findKey << std::endl;
     int j = 0;
@@ -47,7 +43,6 @@ std::string HTTP::respond::status_line(std::string findKey){
     return(" ");
 
 }
-
 
 void HTTP::respond::setDate(){
 

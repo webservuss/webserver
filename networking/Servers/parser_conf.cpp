@@ -28,10 +28,10 @@ void parse_conf::set_values_server(std::string s, t_server &server)
 		server._value = s.substr(s.find(' ') + 1, s.size());
 }
 
-// This function gets the whole line and a struct (t_location)
+
 void	parse_conf::set_values_location(std::string s, t_location &location)
 {
-	// we should think of a better name then key
+
 	std::string key = s.substr(0, s.find(' '));
 	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
 	if (key == "method")
@@ -53,7 +53,6 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 		exit(1);
 	}
 	std::string line;
-	// conf must have empty line at end?
 	bool is_acc = false;
 	int			server_count = 0;
 	std::string map_key;
@@ -89,68 +88,10 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 
 const std::vector<t_server> &parse_conf::get_server() const
 {
-    //the total config file
 	return _server;
 }
 
-// gaat dit werken?
+
 int parse_conf::get_server_port(const t_server &server) {
 	return server._port;
 }
-
-
-
-/* GETTERS */
-
-/*
-const std::string &parse_conf::get_server_name() const
-{
-	return _server_name;
-}
-
-int parse_conf::get_port() const
-{
-	return _port;
-}
-
-const std::string &parse_conf::get_host() const
-{
-	return _host;
-}
-
-int parse_conf::get_auto_index() const
-{
-	return _auto_index;
-}
-
-const std::string &parse_conf::get_root() const
-{
-	return _root;
-}
-
-const std::string &parse_conf::get_index() const
-{
-	return _index;
-}
-
-const std::string &parse_conf::get_key() const
-{
-	return _key;
-}
-
-const std::string &parse_conf::get_value() const
-{
-	return _value;
-}
-
-const std::vector<std::string> &parse_conf::get_error_page() const
-{
-	return _error_page;
-}
-
-const std::map<std::string, t_location> &parse_conf::get_location() const
-{
-	return _location_map;
-}
-*/
-
