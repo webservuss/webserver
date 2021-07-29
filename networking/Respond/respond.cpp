@@ -61,7 +61,7 @@ void HTTP::respond::setDate(){
         _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z" , info);
         _date = buffer;
         //std::cout << "date :" << _date << std::endl;
-        _totalrespond.insert(std::pair<std::string, std::string>( "date:", _date) );
+        _totalrespond.insert(std::pair<std::string, std::string>( "Date:", _date) );
 }
 
 
@@ -77,26 +77,26 @@ void ::HTTP::respond::setmodified(int fileFD ){
     _lastmodified.append(timestamp);
     _lastmodified.append("\r\n");
     std::cout << "last modified : " << _lastmodified <<  std::endl;
-    _totalrespond.insert(std::pair<std::string, std::string>( "modified :", _lastmodified) );
+    _totalrespond.insert(std::pair<std::string, std::string>( "Last-Modified:", _lastmodified) );
 }
 
 void HTTP::respond::setconnection(std::string connection){
 
     _connection = connection;
-    _totalrespond.insert(std::pair<std::string, std::string>( "connection:", _connection) );
+    _totalrespond.insert(std::pair<std::string, std::string>( "Connection:", _connection) );
 }
 
 
 void HTTP::respond::setHost(std::string host){
 
     _host = host;
-    _totalrespond.insert(std::pair<std::string, std::string>( "host:", _host) );
+    _totalrespond.insert(std::pair<std::string, std::string>( "Host:", _host) );
 }
 
 void HTTP::respond::setLanguage(std::string contentlanguage){
 
     _language = contentlanguage;
-    _totalrespond.insert(std::pair<std::string, std::string>( "language:", _language) );
+    _totalrespond.insert(std::pair<std::string, std::string>( "Content-Language:", _language) );
 }
 
 
@@ -113,7 +113,7 @@ void HTTP::respond::setContentlen(std::string body){
     std::stringstream ss;
     ss << size;
     ss>> _contentlen;
-    _totalrespond.insert(std::pair<std::string, std::string>( "content_length:", _contentlen) );
+    _totalrespond.insert(std::pair<std::string, std::string>( "Content-Length:", _contentlen) );
 
 }
 
@@ -127,10 +127,11 @@ void HTTP::respond::appendheader() {
     for (it=_totalrespond.begin(); it!=_totalrespond.end(); ++it){
 
         _totalheader.append(it->first);
+        _totalheader.append(" ");
         _totalheader.append(it->second);
         _totalheader.append("\r\n");
     }
-    _totalheader.append("\r\n");
+    // _totalheader.append("\r\n");
     _totalheader.append(_body);
 }
 
