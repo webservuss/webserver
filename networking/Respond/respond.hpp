@@ -52,6 +52,10 @@ namespace HTTP{
         std::string _host;
         std::string _language;
         std::string _body;
+    public:
+        const std::string &getTotalheader() const;
+
+    private:
         std::string _totalheader;
         std::map<std::string, std::string > _totalrespond;
 

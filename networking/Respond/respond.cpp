@@ -120,18 +120,18 @@ void HTTP::respond::setContentlen(std::string body){
 
 void HTTP::respond::appendheader() {
 
-    std::string header;
-    header.append(_statusline);
-    header.append("\r\n");
+
+    _totalheader.append(_statusline);
+    _totalheader.append("\r\n");
     std::map<std::string, std::string>::iterator it = _totalrespond.begin();
     for (it=_totalrespond.begin(); it!=_totalrespond.end(); ++it){
 
-        header.append(it->first);
-        header.append(it->second);
-        header.append("\r\n");
+        _totalheader.append(it->first);
+        _totalheader.append(it->second);
+        _totalheader.append("\r\n");
     }
-    header.append("\r\n");
-    header.append(_body);
+    _totalheader.append("\r\n");
+    _totalheader.append(_body);
     std::cout << RED <<" $$$$$$$$$$$$$$$$$$$$$$HEADER IN ONE LINE !!!!!!!!!!!: " << "\r"<< header << RESET<<std::endl;
 
 
@@ -155,6 +155,10 @@ void HTTP::respond::setbody(){
     setContentlen(s);
 
 
+}
+
+const std::string &HTTP::respond::getTotalheader() const {
+    return _totalheader;
 }
 
 
