@@ -36,7 +36,7 @@ std::string HTTP::respond::status_line(std::string findKey){
     char * needle = strdup("HTTP/1.1");
     char * c = const_cast<char*>(findKey.c_str());
     char *res = c;
-    while((res = std::strstr(res, needle)) != nullptr) {
+    while((res = std::strstr(res, needle)) != NULL) {
         ++res;
         j = 2;
     }
