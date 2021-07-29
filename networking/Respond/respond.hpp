@@ -42,7 +42,7 @@ namespace HTTP{
 
     private:
         std::string _statusline;
-        int         _contentlen;
+        std::string _contentlen;
         std::string _server;
         std::string _lastmodified;
         std::string _contentype;
@@ -51,6 +51,9 @@ namespace HTTP{
         std::string _date;
         std::string _host;
         std::string _language;
+        std::string _body;
+        std::string _totalheader;
+        std::map<std::string, std::string > _totalrespond;
 
 
     public:
@@ -60,24 +63,18 @@ namespace HTTP{
     public:
         respond(std::map < std::string, std::string > mapHeader);
         std::string status_line(std::string getkey);
-
-
         void setLanguage(std::string contentlanguage);
-
-
         void setHost(std::string host);
         int content_len(std::string content_len);
-
-        void setContentlen(int contentlen);
-
+        void setContentlen(std::string s);
         void setStatusline(const std::string &statusline);
         void setDate();
         void setmodified(int fileFD);
         void setcontenttype(const std::string &contentype);
         void setconnection(const std::string connection);
         void setserver(const std::string connection);
-
         void setbody();
+        void appendheader();
 
 
     };

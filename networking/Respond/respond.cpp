@@ -4,24 +4,16 @@
 #include <map>
 #include <time.h>
 #include <sys/time.h>
-#include <string>
-#include <stdio.h>
-#include <iostream>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <fstream>
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <cstring>
+#include <iterator>
 
 
  HTTP::respond::respond(std::map < std::string, std::string > mapHeader){
 
     std::string findKey;
     findKey = mapHeader["GET"];
-    std::string statusline = status_line(findKey);
+     _statusline = status_line(findKey);
     setDate();
     setmodified(1);
     findKey = mapHeader["Connection:"];
@@ -31,16 +23,16 @@
     findKey = mapHeader["Accept-Language:"];
     setLanguage(findKey);
     setbody();
-     std::map<std::string, std::string>::iterator it = mapHeader.begin();
-     std::cout << RED <<  "*******************    MAP REQUEST CONTAINTS   *******************\n";
-     for (it=mapHeader.begin(); it!=mapHeader.end(); ++it)
-         std::cout << GREEN << it->first  << BLUE << " => " << GREEN << it->second << RESET << '\n';
+    appendheader();
+    std::map<std::string, std::string>::iterator it = _totalrespond.begin();
+
 }
 
+//  TODO also add a bad request if we dont find HTTP/1.1 !!!
 std::string HTTP::respond::status_line(std::string findKey){
 
 
-  //  TODO also add a bad request if we dont find HTTP/1.1 !!!
+
     int n = 0;
     std::cout << findKey << std::endl;
     size_t pos = 0;
@@ -71,8 +63,8 @@ void HTTP::respond::setDate(){
         info = localtime(&t);
         _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z" , info);
         _date = buffer;
-        std::cout << "date :" << _date << std::endl;
-
+        //std::cout << "date :" << _date << std::endl;
+        _totalrespond.insert(std::pair<std::string, std::string>( "date:", _date) );
 }
 
 
@@ -88,31 +80,26 @@ void ::HTTP::respond::setmodified(int fileFD ){
     _lastmodified.append(timestamp);
     _lastmodified.append("\r\n");
     std::cout << "last modified : " << _lastmodified <<  std::endl;
-
-
-    //_response.append(last_modified);
-
+    _totalrespond.insert(std::pair<std::string, std::string>( "modified :", _lastmodified) );
 }
 
 void HTTP::respond::setconnection(std::string connection){
 
     _connection = connection;
-    std::cout << "connection: " << _connection << std::endl;
+    _totalrespond.insert(std::pair<std::string, std::string>( "connection:", _connection) );
 }
 
 
 void HTTP::respond::setHost(std::string host){
 
     _host = host;
-    std::cout << "host: " << _host << std::endl;
-
+    _totalrespond.insert(std::pair<std::string, std::string>( "host:", _host) );
 }
 
 void HTTP::respond::setLanguage(std::string contentlanguage){
 
     _language = contentlanguage;
-    std::cout << "content language: " << _language << std::endl;
-
+    _totalrespond.insert(std::pair<std::string, std::string>( "language:", _language) );
 }
 
 
@@ -121,88 +108,56 @@ const std::string &HTTP::respond::getStatusline() const {
     return _statusline;
 }
 
+
+void HTTP::respond::setContentlen(std::string body){
+
+    int size;
+    size = body.size();
+    std::stringstream ss;
+    ss << size;
+    ss>> _contentlen;
+    _totalrespond.insert(std::pair<std::string, std::string>( "content_length:", _contentlen) );
+
+}
+
+
+void HTTP::respond::appendheader() {
+
+    std::string header;
+    header.append(_statusline);
+    header.append("\r\n");
+    std::map<std::string, std::string>::iterator it = _totalrespond.begin();
+    for (it=_totalrespond.begin(); it!=_totalrespond.end(); ++it){
+
+        header.append(it->first);
+        header.append(it->second);
+        header.append("\r\n");
+    }
+    header.append("\r\n");
+    header.append(_body);
+    std::cout << RED <<" $$$$$$$$$$$$$$$$$$$$$$HEADER IN ONE LINE !!!!!!!!!!!: " << "\r"<< header << RESET<<std::endl;
+
+
+}
+
+
+
 void HTTP::respond::setbody(){
 
-//    std::ifstream       file("amber.html");
-//    string file_content;
-
-//    std::ifstream       file("./amber.html");
-//    if(!file.is_open()){
-//        std::string s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-//        std::cout << "string" << s << std::endl;
-//    }
-
-//    if (file)
-//    {
-//        /*
-//         * Get the size of the file
-//         */
-//        file.seekg(0,std::ios::end);
-//        std::streampos          length = file.tellg();
-//        file.seekg(0,std::ios::beg);
-//
-//        /*
-//         * Use a vector as the buffer.
-//         * It is exception safe and will be tidied up correctly.
-//         * This constructor creates a buffer of the correct length.
-//         * Because char is a POD data type it is not initialized.
-//         *
-//         * Then read the whole file into the buffer.
-//         */
-//
-//        std::vector<char> buffer(length);
-//        file.read(&buffer[0],length);
-//        std::string s(buffer.begin(), input.end
-//        std::string s = char_string(buffer);
-//        std::cout << "len :"  << s.size() << std::endl;
-//
-//    }
-//
-
-    std::cout <<  " FUCKING HELL " << std::endl;
-
-    //std::string myText;
-
-// Read from the text file
-    //std::ifstream MyReadFile("amber.html");
+    std::string s;
     std::ifstream file;
     const char *path = "networking/Respond/amber.html";
     file.open(path);
     if(file.is_open()) {
-        std::cout << RED << "###########OPEN##########" << RESET << std::endl;
-        std::string s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        std::cout << " NU ECH " << s << std::endl;
+        s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        //std::cout << " NU ECH " << s << std::endl;
         _body = s;
-
     }
     else
-        std::cout << " RED " << std::endl;
+        std::cout << " NOT OPEN RED " << std::endl;
+    setContentlen(s);
 
 
 }
-    //std::cout << "BODY" << ss.str << std::endl;
-    //else
-       // std::cout << RED << " bad request is not open" << RESET << std::endl;
-
-//    std::ifstream file("amber.html");
-//
-//    std::string content( (std::istreambuf_iterator<char>(file) ),
-//                         (std::istreambuf_iterator<char>()    ) );
-
-
-//    while(std::getline(file, line)){
-//
-//        int numofChars = line.length();
-//        for(unsigned int n = 0; n< line.length(); n++)
-//        {
-//            if(line.at(n) == ' ' )
-//                numofChars--;
-//
-//        }
-//        sum = numofChars+sum;
-//    }
-//    std::cout << "num  " << sum << std::endl;
-   // file.close();
-
 
 
