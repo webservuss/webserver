@@ -134,7 +134,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	std::map <std::string, std::string > respondmap = requestinfo.mapHeader;
     respond m (respondmap);
 
-	std::cout << "\n buffer is: " << buffer << std::endl;
+	//std::cout << "\n buffer is: " << buffer << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 	return valread;
 }
