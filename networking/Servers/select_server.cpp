@@ -125,7 +125,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-	// buffer[valread] = '\0';
+
     std::cout << "read from client" << std::endl;
 
 	stringbuff = char_string(buffer);
@@ -151,11 +151,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 void HTTP::select_server::send_response(int i, int j)
 {
     std::cout << "in send response" << std::endl;
-	std::cout << "_servers[i]._clients[j]._header: " << _servers[i]._clients[j]._header << std::endl; 
-	// send(_servers[i]._clients[j]._c_sock , "HTTP/1.1 200 OK\n" , 16 , 0 );  
-	// send(_servers[i]._clients[j]._c_sock , "Content-length: 50\n" , 19 , 0 );  
-	// send(_servers[i]._clients[j]._c_sock , "Content-Type: text/html\n\n" , 25 , 0 );  
-	// send(_servers[i]._clients[j]._c_sock , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 ); 
+	std::cout << "_servers[i]._clients[j]._header: " << _servers[i]._clients[j]._header << std::endl;
 	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );  
     FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
     std::cout << "out send response" << std::endl;

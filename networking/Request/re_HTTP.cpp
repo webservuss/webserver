@@ -6,6 +6,11 @@
 
 using namespace HTTP;
 
+std::string methods[4] = {
+        "GET",
+        "POST",
+        "DELETE",
+}
 
 
 const std::string re_HTTP::permisChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!#$&'()*+,/:;=?@[]";

@@ -137,6 +137,7 @@ void HTTP::respond::setbody(){
 
     std::string s;
     std::ifstream file;
+    // TODO make the path flexible  looking for - right path.
     const char *path = "networking/Respond/amber.html";
     file.open(path);
     if(file.is_open()) {
