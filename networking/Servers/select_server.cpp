@@ -125,31 +125,39 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-	buffer[valread] = '\0';
+	// buffer[valread] = '\0';
+    std::cout << "read from client" << std::endl;
 
 	stringbuff = char_string(buffer);
 	re_HTTP requestinfo (stringbuff);
 
-
+    std::cout << "b4 respond" << std::endl;
 	std::map <std::string, std::string > respondmap = requestinfo.mapHeader;
-    respond m (respondmap);
+    std::cout << "mid respond" << std::endl;
+	respond m (respondmap);
+    std::cout << "after respond" << std::endl;
 
 
-	_totalheader = m.getTotalheader();
-	std::cout << "\n buffer is: " << buffer << std::endl;
+	// _totalheader = m.getTotalheader();
+	// std::cout << "\n buffer is: " << buffer << std::endl;
+	// _totalheader = m.getTotalheader();
+	_servers[i]._clients[j]._header = m.getTotalheader();
+    std::cout << "after total header" << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+    std::cout << "end read function" << std::endl;
 	return valread;
 }
 
 void HTTP::select_server::send_response(int i, int j)
 {
     std::cout << "in send response" << std::endl;
-	send(_servers[i]._clients[j]._c_sock , _totalheader.c_str() , _totalheader.size() , 0 );  
+	std::cout << "_servers[i]._clients[j]._header: " << _servers[i]._clients[j]._header << std::endl; 
 	// send(_servers[i]._clients[j]._c_sock , "HTTP/1.1 200 OK\n" , 16 , 0 );  
 	// send(_servers[i]._clients[j]._c_sock , "Content-length: 50\n" , 19 , 0 );  
 	// send(_servers[i]._clients[j]._c_sock , "Content-Type: text/html\n\n" , 25 , 0 );  
-	// send(_servers[i]._clients[j]._c_sock, "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 );  
-    // FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
+	// send(_servers[i]._clients[j]._c_sock , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 ); 
+	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );  
+    FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
     std::cout << "out send response" << std::endl;
 }
 
@@ -188,7 +196,7 @@ void    HTTP::select_server::launch()
         {
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
                 accepter(i);
-            }
+            }zsh
             for (unsigned long j = 0; j < _servers[i]._clients.size(); j++)
 			{
 				check_client_active(_servers[i]._clients[j]);

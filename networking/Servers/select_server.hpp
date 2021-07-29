@@ -19,6 +19,7 @@ namespace HTTP
             int                 _c_sock;
             struct timeval      _last_active;
             bool                _active;
+            std::string         _header;
         }   t_client_select;
 
         typedef struct t_server_select {
@@ -37,7 +38,7 @@ namespace HTTP
                 fd_set                          _write_backup;
                 fd_set                          _read_backup;
                 std::vector<t_server_select>    _servers;
-                std::string                     _totalheader;
+                // std::string                     _totalheader;
             public:
                 /* constructor */
                 select_server();
