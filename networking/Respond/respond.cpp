@@ -2,6 +2,159 @@
 
 #include <iostream>
 #include <map>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <cstring>
+#include <iterator>
 
 
-// HTTP respond.resond_line(std::string respond_line);
+ HTTP::respond::respond(std::map < std::string, std::string > mapHeader){
+
+    std::string findKey;
+    findKey = mapHeader["GET"];
+     _statusline = status_line(findKey);
+    setDate();
+    setmodified(1);
+    findKey = mapHeader["Connection:"];
+    setconnection(findKey);
+    findKey = mapHeader["Host:"];
+    setHost(findKey);
+    findKey = mapHeader["Accept-Language:"];
+    setLanguage(findKey);
+    setbody();
+    appendheader();
+    //std::map<std::string, std::string>::iterator it = _totalrespond.begin();
+
+}
+
+//  TODO also add a bad request if we dont find HTTP/1.1 !!!
+std::string HTTP::respond::status_line(std::string findKey){
+
+
+
+    std::cout << findKey << std::endl;
+    int j = 0;
+    char * needle = strdup("HTTP/1.1");
+    char * c = const_cast<char*>(findKey.c_str());
+    char *res = c;
+    while((res = std::strstr(res, needle)) != nullptr) {
+        ++res;
+        j = 2;
+    }
+    if(j == 2)
+        return("HTTP/1.1 200 OK");
+    return(" ");
+
+}
+
+
+void HTTP::respond::setDate(){
+
+        struct timeval tv;
+        time_t t;
+        struct tm *info;
+        char buffer[64];
+        gettimeofday(&tv, NULL);
+        t = tv.tv_sec;
+        info = localtime(&t);
+        _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z" , info);
+        _date = buffer;
+        //std::cout << "date :" << _date << std::endl;
+        _totalrespond.insert(std::pair<std::string, std::string>( "date:", _date) );
+}
+
+
+void ::HTTP::respond::setmodified(int fileFD ){
+
+    struct stat	stat;
+    struct tm	*info;
+    char		timestamp[36];
+
+    fstat(fileFD, &stat);
+    info = localtime(&stat.st_mtime);
+    strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
+    _lastmodified.append(timestamp);
+    _lastmodified.append("\r\n");
+    std::cout << "last modified : " << _lastmodified <<  std::endl;
+    _totalrespond.insert(std::pair<std::string, std::string>( "modified :", _lastmodified) );
+}
+
+void HTTP::respond::setconnection(std::string connection){
+
+    _connection = connection;
+    _totalrespond.insert(std::pair<std::string, std::string>( "connection:", _connection) );
+}
+
+
+void HTTP::respond::setHost(std::string host){
+
+    _host = host;
+    _totalrespond.insert(std::pair<std::string, std::string>( "host:", _host) );
+}
+
+void HTTP::respond::setLanguage(std::string contentlanguage){
+
+    _language = contentlanguage;
+    _totalrespond.insert(std::pair<std::string, std::string>( "language:", _language) );
+}
+
+
+const std::string &HTTP::respond::getStatusline() const {
+
+    return _statusline;
+}
+
+
+void HTTP::respond::setContentlen(std::string body){
+
+    int size;
+    size = body.size();
+    std::stringstream ss;
+    ss << size;
+    ss>> _contentlen;
+    _totalrespond.insert(std::pair<std::string, std::string>( "content_length:", _contentlen) );
+
+}
+
+
+void HTTP::respond::appendheader() {
+
+    std::string header;
+    header.append(_statusline);
+    header.append("\r\n");
+    std::map<std::string, std::string>::iterator it = _totalrespond.begin();
+    for (it=_totalrespond.begin(); it!=_totalrespond.end(); ++it){
+
+        header.append(it->first);
+        header.append(it->second);
+        header.append("\r\n");
+    }
+    header.append("\r\n");
+    header.append(_body);
+    std::cout << RED <<" $$$$$$$$$$$$$$$$$$$$$$HEADER IN ONE LINE !!!!!!!!!!!: " << "\r"<< header << RESET<<std::endl;
+
+
+}
+
+
+
+void HTTP::respond::setbody(){
+
+    std::string s;
+    std::ifstream file;
+    const char *path = "networking/Respond/amber.html";
+    file.open(path);
+    if(file.is_open()) {
+        s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        //std::cout << " NU ECH " << s << std::endl;
+        _body = s;
+    }
+    else
+        std::cout << " NOT OPEN RED " << std::endl;
+    setContentlen(s);
+
+
+}
+
+

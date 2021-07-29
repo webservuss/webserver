@@ -17,11 +17,15 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
 {
     std::string data;
     std::string line;
+    int i = 0;
 
     std::istringstream request_data(dataparser);
+    set_headers(dataparser);
     while(std::getline(request_data, data))
     {
         line = data.substr(0, data.find('\r'));
+        i++;
+
         if(line.size() != 0)
             split_line(line);
         
@@ -33,6 +37,15 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     std::cout << GREEN << it->first  << BLUE << " => " << GREEN << it->second << RESET << '\n';
 }
 
+void HTTP::re_HTTP::set_headers(std::string header){
+
+    std::string totalBody;
+    int i = 0;
+    while(header[i] != '\r')
+        i++;
+    std::cout << "i"  << i << std::endl;
+    totalBody = header.substr(i, header.size()- i);
+}
 
 void HTTP::re_HTTP::set_key(std::string key)
 {

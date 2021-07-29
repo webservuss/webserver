@@ -39,14 +39,14 @@ enum method{
         private:
             std::string _key;
             std::string _value;
-            static const std::string                    permisChar;
+            static const std::string                   permisChar;
+            std::string _headers;
             
 
 
         public:
             re_HTTP(std::string dataparser);
             void split_line(std::string line);
-            //static const std::map<std::string, method>  mapMethod;
             std::map<std::string, std::string> mapHeader;
             
         
@@ -54,10 +54,12 @@ enum method{
         
         void		set_key(std::string key);
         void		set_value(std::string value);
+        void        set_headers(std::string body);
 
         //getters
         std::string	 get_key();
         std:: string  request();
+
 
     };
 
