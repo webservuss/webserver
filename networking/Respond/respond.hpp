@@ -52,6 +52,8 @@ namespace HTTP{
         std::string _host;
         std::string _language;
         std::string _body;
+        int         _status_code;
+
     public:
         const std::string &getTotalheader() const;
 
@@ -63,10 +65,9 @@ namespace HTTP{
     public:
         const std::string &getStatusline() const;
 
-
     public:
         respond(std::map < std::string, std::string > mapHeader);
-        std::string status_line(std::string getkey);
+        void status_line(std::string getkey);
         void setLanguage(std::string contentlanguage);
         void setHost(std::string host);
         int content_len(std::string content_len);

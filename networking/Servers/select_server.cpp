@@ -115,8 +115,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
     int			valread;
     char		buffer[30000];
 	std::string	stringbuff;
+	struct timeval now;
 
-    std::cout << "in read_from_client " << std::endl;
+	// read from correct client
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, buffer, 3000, 0)) < 0) 
 	{
 		std::cout << "\nConnection lost: FD=" << _servers[i]._clients[j]._c_sock << " Slot" << i  << "error " << strerror(errno)<< std::endl;
@@ -125,40 +126,48 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-	// buffer[valread] = '\0';
-    std::cout << "read from client" << std::endl;
-
+	buffer[valread] = '\0';
+	std::cout << "ALL MY BUFFER IS:" << buffer << std::endl;
+	//update clients last active
+	gettimeofday(&now, NULL);
+	_servers[i]._clients[j]._last_active = now;
+std::cout << "and here" << std::endl;
+	// parse buffer into reuqest
 	stringbuff = char_string(buffer);
+std::cout << "and here2" << std::endl;
+std::cout << stringbuff << std::endl;
+std::cout << "and here3" << std::endl;
+
+	if (stringbuff == "")
+		return 1;
 	re_HTTP requestinfo (stringbuff);
-
-    std::cout << "b4 respond" << std::endl;
 	std::map <std::string, std::string > respondmap = requestinfo.mapHeader;
-    std::cout << "mid respond" << std::endl;
+
+	// create response
 	respond m (respondmap);
-    std::cout << "after respond" << std::endl;
-
-
-	// _totalheader = m.getTotalheader();
-	// std::cout << "\n buffer is: " << buffer << std::endl;
-	// _totalheader = m.getTotalheader();
 	_servers[i]._clients[j]._header = m.getTotalheader();
-    std::cout << "after total header" << std::endl;
+	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-    std::cout << "end read function" << std::endl;
 	return valread;
 }
 
 void HTTP::select_server::send_response(int i, int j)
 {
-    std::cout << "in send response" << std::endl;
-	std::cout << "_servers[i]._clients[j]._header: " << _servers[i]._clients[j]._header << std::endl; 
+	struct timeval now;
+
+	//update clients last active
+	gettimeofday(&now, NULL);
+	_servers[i]._clients[j]._last_active = now;
+    // std::cout << "in send response" << std::endl;
+	// std::cout << "HEADER IS " << std::endl;
+	// std::cout << "_servers[i]._clients[j]._header: " << _servers[i]._clients[j]._header << std::endl; 
 	// send(_servers[i]._clients[j]._c_sock , "HTTP/1.1 200 OK\n" , 16 , 0 );  
 	// send(_servers[i]._clients[j]._c_sock , "Content-length: 50\n" , 19 , 0 );  
 	// send(_servers[i]._clients[j]._c_sock , "Content-Type: text/html\n\n" , 25 , 0 );  
 	// send(_servers[i]._clients[j]._c_sock , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 ); 
 	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );  
     FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
-    std::cout << "out send response" << std::endl;
+    // std::cout << "out send response" << std::endl;
 }
 
 int              HTTP::select_server::erase_client(int i, int j)

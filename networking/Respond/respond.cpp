@@ -12,8 +12,9 @@
  HTTP::respond::respond(std::map < std::string, std::string > mapHeader){
 
     std::string findKey;
+
+
     findKey = mapHeader["GET"];
-     _statusline = status_line(findKey);
     setDate();
     setmodified(1);
     findKey = mapHeader["Connection:"];
@@ -23,34 +24,53 @@
     findKey = mapHeader["Accept-Language:"];
     setLanguage(findKey);
     setbody();
+    status_line(findKey);
     appendheader();
     //std::map<std::string, std::string>::iterator it = _totalrespond.begin();
 
 }
 
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
-std::string HTTP::respond::status_line(std::string findKey){
-
-
-
+void HTTP::respond::status_line(std::string findKey)
+{
     std::cout << findKey << std::endl;
-    int j = 0;
-    char * needle = strdup("HTTP/1.1");
-    char * c = const_cast<char*>(findKey.c_str());
-    char *res = c;
-    while((res = std::strstr(res, needle)) != nullptr) {
-        ++res;
-        j = 2;
+    // int j = 0;
+    // char * c = const_cast<char*>(findKey.c_str());
+    // char *res = c;
+    // while((res = std::strstr(res, "HTTP/1.1")) != nullptr) {
+    //     ++res;
+    //     j = 2;
+    // }
+    // _statusline = "";
+    // if (j == 2)
+        _statusline = "HTTP/1.1 ";
+    if (_status_code == 200)
+        _statusline.append("200 OK");
+    else if (_status_code == 404)
+    {
+        _statusline.append("404 Not Found");
+        _body = "<h1>404 Not found</h1>\0";
+        setContentlen(_body);
     }
-    if(j == 2)
-        return("HTTP/1.1 200 OK");
-    return(" ");
-
+    else if (_status_code == 403)
+    {    
+        _statusline.append("403 Forbidden");
+        _body = "<h1>403: You can't do that!</h1>\0";
+        setContentlen(_body);
+    }
+    else if (_status_code == 204)
+    {
+        _statusline.append("204 No Content");
+        _contentlen = "";
+    }
+    std::cout << "status line is " << _statusline << std::endl;
+    std::cout << "status cod is " << _status_code << std::endl;
+    std::cout << "content length cod is " << _contentlen << std::endl;
 }
 
 
-void HTTP::respond::setDate(){
-
+void HTTP::respond::setDate()
+{
         struct timeval tv;
         time_t t;
         struct tm *info;
@@ -87,28 +107,29 @@ void HTTP::respond::setconnection(std::string connection){
 }
 
 
-void HTTP::respond::setHost(std::string host){
-
+void HTTP::respond::setHost(std::string host)
+{
     _host = host;
     _totalrespond.insert(std::pair<std::string, std::string>( "Host:", _host) );
 }
 
-void HTTP::respond::setLanguage(std::string contentlanguage){
-
+void HTTP::respond::setLanguage(std::string contentlanguage)
+{
     _language = contentlanguage;
     _totalrespond.insert(std::pair<std::string, std::string>( "Content-Language:", _language) );
 }
 
 
-const std::string &HTTP::respond::getStatusline() const {
-
+const std::string &HTTP::respond::getStatusline() const 
+{
     return _statusline;
 }
 
 
-void HTTP::respond::setContentlen(std::string body){
-
+void HTTP::respond::setContentlen(std::string body)
+{
     int size;
+
     size = body.size();
     std::stringstream ss;
     ss << size;
@@ -140,19 +161,42 @@ void HTTP::respond::appendheader() {
 void HTTP::respond::setbody(){
 
     std::string s;
-    std::ifstream file;
     const char *path = "networking/Respond/amber.html";
-    file.open(path);
-    if(file.is_open()) {
+    std::ifstream file(path);
+    struct stat sb;
+    if (stat(path, &sb) == -1)
+    {   
+        std::cout << "file NO exists"<< std::endl;
+        _status_code = 404;
+        return;
+    }
+    if(file.is_open())
+    {
         s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         _body = s;
+        std::cout << "IS OPEN FILE" << std::endl;
     }
     else
-        std::cout << " NOT OPEN RED " << std::endl;
+    {
+        std::cout << "FILE IS NOT OPEN" << std::endl;
+        _status_code = 403;
+        return;
+    }
     setContentlen(s);
+    if (_contentlen == "0" && _status_code == 0)
+    {   
+        std::cout << "NO content" << std::endl;
+         _status_code = 204;
+    }
+    else if (_status_code == 0)
+    {    
+        std::cout << "OKK" << std::endl;
+        _status_code = 200;
+    }
 }
 
-const std::string &HTTP::respond::getTotalheader() const {
+const std::string &HTTP::respond::getTotalheader() const
+{
     return _totalheader;
 }
 
