@@ -9,14 +9,31 @@ int main()
     std::ifstream file;
 	const char *path = "configs/server.conf";
     file.open(path);
-    if(file.is_open()){
-        std::cout<< RED<< "###########CONFIG OPEN##########" << RESET << std::endl;
-		parse_conf ex(file);
+    if(!file.is_open()){
+        std::cout << RED << " ERROR no configfile" << RESET << std::endl;
+		return 0;
+	}
+    std::cout<< RED<< "###########CONFIG OPEN##########" << RESET << std::endl;
+	HTTP::parse_conf ex(file);
+	std::cout << "..." << ex.get_server_port(ex.get_server()[0])<< std::endl;
+	std::cout << YELLOW << "..." << ex.get_server().size() << std::endl;
+    file.close();
+
+    // std::vector<int> ports;
+    std::vector<HTTP::t_server> parser_servers = ex.get_server();
+
+	std::vector<int> ports = ex.get_ports();
+	for (unsigned long i = 0; i < ports.size(); i ++)
+		std::cout << "PORT IS " << ports[i] << std::endl;
+    std::cout << "about to call ma stuff" << std::endl;
+    HTTP::select_server t(ports, parser_servers) ;
+}
 
 
-
-		std::cout << "..." << ex.get_server_port(ex.get_server()[0])<< std::endl;
-		std::cout << "..." << ex.get_server().size() << std::endl;
+    //HDE::parser_config_open r();
+    // int ports[3] = {80, 50, 70};
+    // HTTP::select_server t1(ports, 3);
+    // HTTP::select_server t2;
 
 		/*
 		std::cout << "EX.GETservname(): |" << ex.get_server_name() << std::endl;
@@ -38,22 +55,3 @@ int main()
 		std::cout << "loc_map[*.error_image.png]._method: " << map_locations["*.error_image.png"]._method << std::endl;
 		std::cout << "loc_map[*.ico]._method: " << map_locations["*.ico"]._method << std::endl;
 		 */
-
-	}
-    else
-        std::cout << RED << " ERROR no configfile" << RESET << std::endl;
-    file.close();
-
-    //HDE::parser_config_open r();
-    // int ports[3] = {80, 50, 70};
-    // HTTP::select_server t1(ports, 3);
-    // HTTP::select_server t2;
-    std::vector<int> ports;
-
-    ports.push_back(4000);
-    ports.push_back(5000);
-    ports.push_back(7000);
-    ports.push_back(8000);
-    std::cout << "about to call ma stuff" << std::endl;
-    HTTP::select_server t(ports) ;
-}

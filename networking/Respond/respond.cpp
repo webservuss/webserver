@@ -8,61 +8,78 @@
 #include <cstring>
 #include <iterator>
 
-
- HTTP::respond::respond(std::map < std::string, std::string > mapHeader){
-
+HTTP::respond::respond(t_req_n_config req_n_conf)
+{
+    _map_req = req_n_conf._req_map;
+    _pars_server = req_n_conf._parser_server;
     std::string findKey;
-    findKey = mapHeader["GET"];
-     _statusline = status_line(findKey);
-     if(_statusline == " ")
-         std::cout<< " BAD REQUEST" << std::endl;
+
+    findKey = _map_req["GET"];
     setDate();
     setmodified(1);
-    findKey = mapHeader["Connection:"];
+    findKey = _map_req["Connection:"];
     setconnection(findKey);
-    findKey = mapHeader["Host:"];
+    findKey = _map_req["Host:"];
     setHost(findKey);
-    findKey = mapHeader["Accept-Language:"];
+    findKey = _map_req["Accept-Language:"];
     setLanguage(findKey);
     setbody();
+    status_line(findKey);
     appendheader();
 }
 
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
-std::string HTTP::respond::status_line(std::string findKey){
-
+void HTTP::respond::status_line(std::string findKey)
+{
     std::cout << findKey << std::endl;
-    int j = 0;
-    char * needle = strdup("HTTP/1.1");
-    char * c = const_cast<char*>(findKey.c_str());
-    char *res = c;
-    while((res = std::strstr(res, needle)) != NULL) {
-        ++res;
-        j = 2;
+    // int j = 0;
+    // char * c = const_cast<char*>(findKey.c_str());
+    // char *res = c;
+    // while((res = std::strstr(res, "HTTP/1.1")) != nullptr) {
+    //     ++res;
+    //     j = 2;
+    // }
+    // _statusline = "";
+    // if (j == 2)
+        _statusline = "HTTP/1.1 ";
+    if (_status_code == 200)
+        _statusline.append("200 OK");
+    else if (_status_code == 404)
+    { // error  in 404 as will make server fuck up for some reason atm
+        _statusline.append("404 Not Found");
+        // if (_pars_server._error_page)
+        _body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body>\0";
+        setContentlen(_body);
+    } 
+    else if (_status_code == 403)
+    {    
+        _statusline.append("403 Forbidden");
+        _body = "<h1>403: You can't do that!</h1>\0";
+        setContentlen(_body);
     }
-    if(j == 2)
-        return("HTTP/1.1 200 OK");
-    return(" ");
-}
-
-void HTTP::respond::setDate(){
-
-        struct timeval tv;
-        time_t t;
-        struct tm *info;
-        char buffer[64];
-        gettimeofday(&tv, NULL);
-        t = tv.tv_sec;
-        info = localtime(&t);
-        _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z" , info);
-        _date = buffer;
-        //std::cout << "date :" << _date << std::endl;
-        _totalrespond.insert(std::pair<std::string, std::string>( "Date:", _date) );
+    else if (_status_code == 204)
+        _statusline.append("204 No Content");
 }
 
 
-void ::HTTP::respond::setmodified(int fileFD ){
+void HTTP::respond::setDate()
+{
+    struct timeval  tv;
+    time_t          t;
+    struct tm       *info;
+    char            buffer[64];
+    
+    gettimeofday(&tv, NULL);
+    t = tv.tv_sec;
+    info = localtime(&t);
+    _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z" , info);
+    _date = buffer;
+    _totalrespond.insert(std::pair<std::string, std::string>( "Date:", _date) );
+}
 
+
+void ::HTTP::respond::setmodified(int fileFD )
+{
     struct stat	stat;
     struct tm	*info;
     char		timestamp[36];
@@ -76,82 +93,145 @@ void ::HTTP::respond::setmodified(int fileFD ){
     _totalrespond.insert(std::pair<std::string, std::string>( "Last-Modified:", _lastmodified) );
 }
 
-void HTTP::respond::setconnection(std::string connection){
-
+void HTTP::respond::setconnection(std::string connection)
+{
     _connection = connection;
     _totalrespond.insert(std::pair<std::string, std::string>( "Connection:", _connection) );
 }
 
 
-void HTTP::respond::setHost(std::string host){
-
+void HTTP::respond::setHost(std::string host)
+{
     _host = host;
     _totalrespond.insert(std::pair<std::string, std::string>( "Host:", _host) );
 }
 
-void HTTP::respond::setLanguage(std::string contentlanguage){
-
+void HTTP::respond::setLanguage(std::string contentlanguage)
+{
     _language = contentlanguage;
-    _totalrespond.insert(std::pair<std::string, std::string>( "Content-Language:", _language) );
+    _totalrespond.insert(std::pair<std::string, std::string>( "Content-Language:", _language));
 }
 
 
-const std::string &HTTP::respond::getStatusline() const {
-
+const std::string &HTTP::respond::getStatusline() const 
+{
     return _statusline;
 }
 
 
-void HTTP::respond::setContentlen(std::string body){
-
+void HTTP::respond::setContentlen(std::string body)
+{
     int size;
+
     size = body.size();
     std::stringstream ss;
     ss << size;
     ss>> _contentlen;
     _totalrespond.insert(std::pair<std::string, std::string>( "Content-Length:", _contentlen) );
-
 }
 
 
-void HTTP::respond::appendheader() {
-
-
+void HTTP::respond::appendheader()
+{
     _totalheader.append(_statusline);
     _totalheader.append("\r\n");
     std::map<std::string, std::string>::iterator it = _totalrespond.begin();
-    for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it) {
-
-        _totalheader.append(it->first);
-        _totalheader.append(" ");
-        _totalheader.append(it->second);
-        _totalheader.append("\r\n");
+    for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it) 
+    {
+        if (it->first != "Content-Length:" || it->second != "0")
+        {
+            _totalheader.append(it->first);
+            _totalheader.append(" ");
+            _totalheader.append(it->second);
+            _totalheader.append("\r\n");
+        }
     }
-    // _totalheader.append("\r\n");
     _totalheader.append(_body);
+    std::cout << "total header is: " << _totalheader << std::endl;
 }
 
+std::string HTTP::respond::find_total_file_path()
+{
+    std::string total_path;
+    std::string get_req_line = _map_req["GET"].c_str();
+    std::string pathfind = "";
+    std::string resultpathfind = "";
+    int i = 0;
 
+    while (get_req_line[i] != '/')
+        i++;
+    pathfind = get_req_line.substr(i, get_req_line.size() - i);
+    if (pathfind.find(' ') - 1 >= 1) // check not root 
+    {
+        resultpathfind = pathfind.substr(1, pathfind.find(' ') - 1);
+        // really need to do per method now hard coded .html
+        resultpathfind.append(".html");
+    }
+    // if root find index from config
+    if (resultpathfind == "")
+        resultpathfind = _pars_server._index;
+    total_path = _pars_server._root.append(resultpathfind);
+    return (total_path);
+}
 
-void HTTP::respond::setbody(){
+void    HTTP::respond::set_status_code(int code)
+{
+    _status_code = code;
+}
 
-    std::string s;
-    std::ifstream file;
-    // TODO make the path flexible  looking for - right path.
+void    HTTP::respond::setbody()
+{
+    std::string     total_body;
+    std::string     total_path = find_total_file_path();
+    const char      *path = total_path.c_str();
+    std::ifstream   file(path);
+    struct stat     sb;
 
-    const char *path = "networking/Respond/amber.html"; //irl
-    file.open(path);
-    if(file.is_open()) {
-        s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        _body = s;
+    if (stat(path, &sb) == -1)
+    {
+        // if (_pars_server._error_page.size() > 1)
+        // {
+        //     std::string err_pg_path = "";
+        //     std::string err_pg_code = "";
+        //     std::string total_err_path = "";
+        //     std::string root;
+        //     int i = 0;
+        //     while (_pars_server._error_page[0][i] == ' ')
+        //         i++;
+        //     err_pg_code = _pars_server._error_page[0].substr(i, _pars_server._error_page[0].size() - i);
+        //     i = 0;
+        //     while (_pars_server._root[i] == ' ')
+        //         i++;
+        //     root = _pars_server._root.substr(i, _pars_server._root.size() - i);
+        //     err_pg_path = _pars_server._error_page[1].substr(1, _pars_server._error_page.size() - 1);
+        //     // if (err_pg_code == "404")
+        //     //     err_pg_path = root.append(_pars_server._error_page[1].substr(1, _pars_server._error_page.size() - 1));
+        //     std::cout << "root: [ " << root << "]"<< std::endl;
+        //     std::cout << "err_pg_path " << err_pg_path << "]"<< std::endl;
+        //     std::cout << "err_pg_path: [ " << err_pg_path << "]"<< std::endl;
+        // }
+        // // _statusline.append("404 Not Found");
+        // // if (_pars_server._error_page)
+        // // _body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body>\0";
+        // // setContentlen(_body);
+        // // file(path);
+        return (set_status_code(404));   // file doesnt exist
+    }
+    if(file.is_open())
+    {
+        total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        _body = total_body;
     }
     else
-        std::cout << " NOT OPEN RED " << std::endl;
-    setContentlen(s);
+        return (set_status_code(403)); // forbidden no access rights
+    setContentlen(total_body);
+    if (_contentlen == "0" && _status_code == 0)
+        _status_code = 204;
+    else if (_status_code == 0)
+        _status_code = 200;
 }
 
-const std::string &HTTP::respond::getTotalheader() const {
+const std::string &HTTP::respond::getTotalheader() const
+{
     return _totalheader;
 }
-
-

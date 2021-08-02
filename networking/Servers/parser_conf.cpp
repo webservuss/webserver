@@ -1,10 +1,6 @@
-//
-// Created by ruben on 13-07-21.
-//
-
 #include "parser_conf.hpp"
 
-void parse_conf::set_values_server(std::string s, t_server &server)
+void HTTP::parse_conf::set_values_server(std::string s, t_server &server)
 {
 	std::string key = s.substr(0, s.find(' '));
 	if (key == "server_name")
@@ -18,17 +14,17 @@ void parse_conf::set_values_server(std::string s, t_server &server)
 	if (key == "auto_index")
 		server._auto_index = ft_stoi(s.substr(s.find(' ') + 1, s.size()));
 	if (key == "root")
-		server._root = s.substr(s.find(' ') + 1, s.size());
+		server._root = s.substr(s.find(' ') + 1, s.size() - s.find(' ') - 2);
 	if (key == "index")
-		server._index = s.substr(s.find(' ') + 1, s.size());
+		server._index = s.substr(s.find(' ') + 1, s.size() - s.find(' ') - 2);
 	if (key == "key")
 		server._key = s.substr(s.find(' ') + 1, s.size());
 	if (key == "value")
 		server._value = s.substr(s.find(' ') + 1, s.size());
 }
 
-
-void	parse_conf::set_values_location(std::string s, t_location &location)
+// This function gets the whole line and a struct (t_location)
+void	HTTP::parse_conf::set_values_location(std::string s, t_location &location)
 {
 
 	std::string key = s.substr(0, s.find(' '));
@@ -45,7 +41,7 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 		location._client_body_size = ft_stoi(value);
 }
 
-	parse_conf::parse_conf(std::ifstream &file)
+	HTTP::parse_conf::parse_conf(std::ifstream &file)
 {
 	if (!file) {
 		perror("No file");
@@ -55,39 +51,113 @@ void	parse_conf::set_values_location(std::string s, t_location &location)
 	bool is_acc = false;
 	int			server_count = 0;
 	std::string map_key;
-	while(std::getline(file, line, '\t'))
+	while(std::getline(file, line, '\n'))
 	{
-		std::string key = line.substr(0, line.find(" "));
-		line = line.substr(0, line.find('\n'));
-		if (line.empty())
+		std::string s1;
+		int i = 0;
+		while (line[i] == '\t' || line[i] == '\n')
+			i++;
+		s1 = line.substr(i, line.size() - i);
+		std::string key = s1.substr(0, s1.find(" "));
+		s1 = s1.substr(0, s1.find('\n'));
+		if (s1.empty())
 			continue;
 		if (key == "server") {
 			server_count++;
-			_server.resize(server_count);
+			_server.resize(server_count + 1);
+			is_acc = false;
 			continue;
 		}
-		if (key == "location" && line[line.length() - 1] == '{') {
+		if (key == "location" && s1[s1.length() - 1] == '{') {
 			is_acc = true;
-			map_key = line.substr(line.find(' ') + 1, line.find('{') - line.find(' ') - 2); // set map_key for the new way
+			map_key = s1.substr(s1.find(' ') + 1, s1.find('{') - s1.find(' ') - 2); // set map_key for the new way
 			_server[server_count - 1]._location_map[map_key];
 		}
-		else if (line[line.length() - 1] == '}') {
+		else if (s1[s1.length() - 1] == '}') {
 			is_acc = false;
 		}
 		std::cout << line << std::endl;
 		if (!is_acc)
-			set_values_server(line, _server[server_count - 1]);
+			set_values_server(s1, _server[server_count - 1]);
 		if (is_acc) {
 			set_values_location(line, _server[server_count - 1]._location_map[map_key]); // for some reason it is not working yet
+			// send the map with the appropriate key
+			// set_values_location(s1, _server[server_count - 1]._location_map[map_key]); // for some reason it is not working yet
 		}
 	}
 }
 
-const std::vector<t_server> &parse_conf::get_server() const
+const std::vector<HTTP::t_server> &HTTP::parse_conf::get_server() const
 {
 	return _server;
 }
 
-int parse_conf::get_server_port(const t_server &server) {
+// gaat dit werken?
+int HTTP::parse_conf::get_server_port(const t_server &server) {
 	return server._port;
 }
+
+std::vector<int> 	HTTP::parse_conf::get_ports()
+{
+	std::vector<int> ports;
+	for (unsigned long i = 0; i < _server.size(); i++)
+		ports.push_back(get_server_port(_server[i]));
+	return (ports);
+}
+
+
+
+/* GETTERS */
+
+/*
+const std::string &parse_conf::get_server_name() const
+{
+	return _server_name;
+}
+
+int parse_conf::get_port() const
+{
+	return _port;
+}
+
+const std::string &parse_conf::get_host() const
+{
+	return _host;
+}
+
+int parse_conf::get_auto_index() const
+{
+	return _auto_index;
+}
+
+const std::string &parse_conf::get_root() const
+{
+	return _root;
+}
+
+const std::string &parse_conf::get_index() const
+{
+	return _index;
+}
+
+const std::string &parse_conf::get_key() const
+{
+	return _key;
+}
+
+const std::string &parse_conf::get_value() const
+{
+	return _value;
+}
+
+const std::vector<std::string> &parse_conf::get_error_page() const
+{
+	return _error_page;
+}
+
+const std::map<std::string, t_location> &parse_conf::get_location() const
+{
+	return _location_map;
+}
+*/
+

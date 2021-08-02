@@ -37,9 +37,10 @@ int ft_stoi(std::string s)
 }
 
 
-std::string char_string(char * buffer){
-
+std::string char_string(char * buffer)
+{
     std::string s;
+
     s = "";
     for( int k = 0;buffer[k] != '\0'; k++){
         s = s + buffer[k];
