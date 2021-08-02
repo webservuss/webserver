@@ -4,10 +4,10 @@
 #include "../../http.hpp"
 #include "../utils/http_funct.hpp"
 #include "../Request/re_HTTP.hpp"
+#include "../Servers/parser_conf.hpp"
+#include "../utils/req_n_conf.hpp"
 
 # include <sys/time.h>
-
-
 #include "../Respond/respond.hpp"
 
 #define BACKLOG 10
@@ -25,6 +25,7 @@ namespace HTTP
         typedef struct t_server_select {
             sockaddr_in                     _servers_addr;
             int                             _servers_socket;
+            int                             _port;
             std::vector<t_client_select>    _clients;
         }   t_server_select;
 
@@ -38,14 +39,13 @@ namespace HTTP
                 fd_set                          _write_backup;
                 fd_set                          _read_backup;
                 std::vector<t_server_select>    _servers;
+                std::vector<t_server>           _parser_servers;
                 // std::string                     _totalheader;
             public:
                 /* constructor */
-                select_server();
+                // select_server();
                 // constructor for multiple ports */
-                select_server(std::vector<int> ports);
-                /* constructor specifying multiple port */
-                select_server(int *port, int numb_ports);
+                select_server(std::vector<int> ports, std::vector<t_server> parser_servers);
                 /*copy constructor */
                 select_server(const select_server& x);
                 // /*assignment operator */
@@ -60,10 +60,11 @@ namespace HTTP
             	/* getter */
 		        listen_n_bind * get_socket();
                 /* set values in struct */
-                void            set_value_server_select_server(int servers_socket, sockaddr_in servers_addr, t_server_select &server);
+                void            set_value_server_select_server(int servers_socket, sockaddr_in servers_addr, int port, t_server_select &server);
                 void	        make_client(int client_socket, sockaddr_in addr, t_server_select &server);
                 void            check_client_active(t_client_select &client);
                 int             erase_client(int i, int j);
         };
 }
+
 #endif

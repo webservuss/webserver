@@ -25,14 +25,12 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     {
         line = data.substr(0, data.find('\r'));
         i++;
-
         if(line.size() != 0)
             split_line(line);
-        
         mapHeader.insert(std::pair<std::string, std::string>( _key, _value) );
     }
     std::map<std::string, std::string>::iterator it = mapHeader.begin();
-    std::cout << RED <<  "*******************    MAP REQUEST CONTAINTS   *******************\n";
+    std::cout << RED <<  "*******************MAP REQUEST CONTAINTS*******************\n";
     for (it=mapHeader.begin(); it!=mapHeader.end(); ++it)
     std::cout << GREEN << it->first  << BLUE << " => " << GREEN << it->second << RESET << '\n';
 }

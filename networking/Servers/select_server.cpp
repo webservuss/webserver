@@ -1,22 +1,23 @@
 #include "select_server.hpp"
 
-/* constructor calls simple_server and launches */
-HTTP:: select_server::select_server()
-{
-	listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG);
-	t_server_select newserver;
-	set_value_server_select_server(socket->get_sock(), socket->get_address(), newserver);
-	_servers.push_back(newserver);
-	launch();
-}
+// /* constructor calls simple_server and launches */ // need to add in parser_servers here too
+// HTTP:: select_server::select_server()
+// {
+// 	listen_n_bind * socket = new HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, BACKLOG);
+// 	t_server_select newserver;
+// 	set_value_server_select_server(socket->get_sock(), socket->get_address(), newserver);
+// 	_servers.push_back(newserver);
+// 	launch();
+// }
 
-HTTP:: select_server::select_server(std::vector<int> ports)
+HTTP:: select_server::select_server(std::vector<int> ports, std::vector<t_server> parser_servers)
 {
+	_parser_servers = parser_servers;
 	for (unsigned long i = 0; i < ports.size(); i++)
 	{
 		listen_n_bind socket = HTTP::listen_n_bind(AF_INET, SOCK_STREAM, 0, ports[i], INADDR_ANY, BACKLOG);
 		t_server_select newserver;
-		set_value_server_select_server(socket.get_sock(), socket.get_address(), newserver);
+		set_value_server_select_server(socket.get_sock(), socket.get_address(), ports[i], newserver);
 		_servers.push_back(newserver);
 	}
 	launch();
@@ -24,7 +25,7 @@ HTTP:: select_server::select_server(std::vector<int> ports)
 
 /*copy constructor */
 HTTP::select_server::select_server(const select_server& x)
-{ // TEST THIS
+{ // TEST THIS // change
 	_highsock = x._highsock;
    	_read_fds = x._read_fds;
     _write_fds = x._write_fds;
@@ -83,7 +84,6 @@ int HTTP::select_server::selecter()
 /* We have a new connection coming in!  We'll try to find a spot for it in connectlist. */
 void    HTTP::select_server::accepter(int i)
 {
-        std::cout << "in accepter " << std::endl;
     	int					    connection;
 		sockaddr_in				addr;
     	int 					addrlen;
@@ -91,7 +91,6 @@ void    HTTP::select_server::accepter(int i)
 		addr = _servers[i]._servers_addr;
 		addrlen = sizeof(_servers[i]._servers_addr);
         connection = accept(_servers[i]._servers_socket, (struct sockaddr *)&addr, (socklen_t * )&addrlen);
-        // connection = accept(_servers[i]._servers_socket, NULL, NULL);
         if (connection < 0) 
 		{
 			std::cout << "error in accept" << strerror(errno) << std::endl;
@@ -103,9 +102,6 @@ void    HTTP::select_server::accepter(int i)
 		FD_SET(connection,&_read_backup);
         std::cout << "out accepter" << std::endl;
 }
-
-
-
 
 /* Run through our sockets and check to see if anything happened with them, if so 'service' them. */
 /* if recv fails connection closed, close this end and free up entry in connectlist */
@@ -131,20 +127,30 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-std::cout << "and here" << std::endl;
 	// parse buffer into reuqest
 	stringbuff = char_string(buffer);
-std::cout << "and here2" << std::endl;
-std::cout << stringbuff << std::endl;
-std::cout << "and here3" << std::endl;
-
+	std::cout << stringbuff << std::endl;
+	
 	if (stringbuff == "")
 		return 1;
+	
+	s_req_n_config		r_n_c;
 	re_HTTP requestinfo (stringbuff);
-	std::map <std::string, std::string > respondmap = requestinfo.mapHeader;
-
+	std::map <std::string, std::string > reqmap = requestinfo.mapHeader;
+	r_n_c._req_map = reqmap;
+	t_server corresp_pars_serve;
+	for (unsigned long i = 0; i < _parser_servers.size(); i++)
+	{
+		if (_parser_servers[i]._port == _servers[i]._port)
+		{	
+			std::cout << " PORTS EQUAL" << std::endl;
+			corresp_pars_serve = _parser_servers[i];
+			break ;
+		}
+	}
+	r_n_c._parser_server = corresp_pars_serve;
 	// create response
-	respond m (respondmap);
+	respond m (r_n_c);
 	_servers[i]._clients[j]._header = m.getTotalheader();
 	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
@@ -158,16 +164,8 @@ void HTTP::select_server::send_response(int i, int j)
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-    // std::cout << "in send response" << std::endl;
-	// std::cout << "HEADER IS " << std::endl;
-	// std::cout << "_servers[i]._clients[j]._header: " << _servers[i]._clients[j]._header << std::endl; 
-	// send(_servers[i]._clients[j]._c_sock , "HTTP/1.1 200 OK\n" , 16 , 0 );  
-	// send(_servers[i]._clients[j]._c_sock , "Content-length: 50\n" , 19 , 0 );  
-	// send(_servers[i]._clients[j]._c_sock , "Content-Type: text/html\n\n" , 25 , 0 );  
-	// send(_servers[i]._clients[j]._c_sock , "<html><body><H1> YAY SOMETHING Found!!</H1></body></html>" , 50 , 0 ); 
 	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );  
     FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
-    // std::cout << "out send response" << std::endl;
 }
 
 int              HTTP::select_server::erase_client(int i, int j)
@@ -221,15 +219,9 @@ void    HTTP::select_server::launch()
 						j = erase_client(i, j);
 						if (_servers[i]._clients.size() == 0)
 							break;
-						// FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
-						// _servers[i]._clients.erase(_servers[i]._clients.begin() + j);
-						// j = 0;
-						// if (_servers[i]._clients.size() == 0)
-						// 	break;
 					}
                 }
                 if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_write_fds)) {
-                    // parse_request();
                     send_response(i, j);
 					FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
                 }
@@ -251,10 +243,11 @@ void HTTP::select_server::check_client_active(t_client_select &client)
 }
 
 
-void            HTTP::select_server::set_value_server_select_server(int servers_socket, sockaddr_in servers_addr, t_server_select &server)
+void            HTTP::select_server::set_value_server_select_server(int servers_socket, sockaddr_in servers_addr, int port, t_server_select &server)
 {
 	server._servers_addr = servers_addr;
 	server._servers_socket = servers_socket;
+	server._port = port;
 
 }
 

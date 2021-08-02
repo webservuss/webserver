@@ -9,25 +9,42 @@
 #include <iterator>
 
 
- HTTP::respond::respond(std::map < std::string, std::string > mapHeader){
+// HTTP::respond::respond(std::map < std::string, std::string > mapHeader)
+// {
+//     std::string findKey;
 
+//     findKey = mapHeader["GET"];
+//     setDate();
+//     setmodified(1);
+//     findKey = mapHeader["Connection:"];
+//     setconnection(findKey);
+//     findKey = mapHeader["Host:"];
+//     setHost(findKey);
+//     findKey = mapHeader["Accept-Language:"];
+//     setLanguage(findKey);
+//     setbody();
+//     status_line(findKey);
+//     appendheader();
+// }
+
+HTTP::respond::respond(t_req_n_config req_n_conf)
+{
+    _map_req = req_n_conf._req_map;
+    _pars_server = req_n_conf._parser_server;
     std::string findKey;
 
-
-    findKey = mapHeader["GET"];
+    findKey = _map_req["GET"];
     setDate();
     setmodified(1);
-    findKey = mapHeader["Connection:"];
+    findKey = _map_req["Connection:"];
     setconnection(findKey);
-    findKey = mapHeader["Host:"];
+    findKey = _map_req["Host:"];
     setHost(findKey);
-    findKey = mapHeader["Accept-Language:"];
+    findKey = _map_req["Accept-Language:"];
     setLanguage(findKey);
     setbody();
     status_line(findKey);
     appendheader();
-    //std::map<std::string, std::string>::iterator it = _totalrespond.begin();
-
 }
 
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
@@ -149,17 +166,31 @@ void HTTP::respond::appendheader() {
             _totalheader.append("\r\n");
         }
     }
-    // _totalheader.append("\r\n");
     _totalheader.append(_body);
     std::cout << "total header is: " << _totalheader << std::endl;
 }
 
 
 
-void HTTP::respond::setbody(){
-
-    std::string s;
-    const char *path = "networking/Respond/amber.html";
+void HTTP::respond::setbody()
+{
+    std::string root;
+    root = _pars_server._root;
+    std::cout << "ROOT[" << _pars_server._root << "]" << std::endl;
+    std::cout << "Referer:[" << _map_req["Referer:"] << "]"  << std::endl;
+    std::cout << "host:[" << _map_req["Host:"] << "]"  << std::endl;
+    int i = 8 + _map_req["Host:"].size(); // as also needs to get rid of http:://
+    std::string pathfind = "";
+    if (_map_req["Referer:"] != "")
+    {
+        pathfind = _map_req["Referer:"].substr(i, _map_req["Referer:"].size() - i);
+        std::cout << "pathfind: [" << pathfind << "]" << std::endl;
+    }
+    if (pathfind == "")
+        pathfind = _pars_server._index;
+    std::string total_path = _pars_server._root.append(pathfind);
+    std::cout << "PATH TOTAL IS[" << total_path << "]" << std::endl;
+    const char *path = total_path.c_str();
     std::ifstream file(path);
     struct stat sb;
     if (stat(path, &sb) == -1)
@@ -170,9 +201,8 @@ void HTTP::respond::setbody(){
     }
     if(file.is_open())
     {
-        s = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        _body = s;
-        std::cout << "IS OPEN FILE" << std::endl;
+        total_path = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        _body = total_path;
     }
     else
     {
@@ -180,7 +210,7 @@ void HTTP::respond::setbody(){
         _status_code = 403;
         return;
     }
-    setContentlen(s);
+    setContentlen(total_path);
     if (_contentlen == "0" && _status_code == 0)
     {   
         std::cout << "NO content" << std::endl;
@@ -197,5 +227,3 @@ const std::string &HTTP::respond::getTotalheader() const
 {
     return _totalheader;
 }
-
-
