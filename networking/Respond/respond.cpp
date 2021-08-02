@@ -59,13 +59,7 @@ void HTTP::respond::status_line(std::string findKey)
         setContentlen(_body);
     }
     else if (_status_code == 204)
-    {
         _statusline.append("204 No Content");
-        _contentlen = "";
-    }
-    std::cout << "status line is " << _statusline << std::endl;
-    std::cout << "status cod is " << _status_code << std::endl;
-    std::cout << "content length cod is " << _contentlen << std::endl;
 }
 
 
@@ -145,15 +139,19 @@ void HTTP::respond::appendheader() {
     _totalheader.append(_statusline);
     _totalheader.append("\r\n");
     std::map<std::string, std::string>::iterator it = _totalrespond.begin();
-    for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it) {
-
-        _totalheader.append(it->first);
-        _totalheader.append(" ");
-        _totalheader.append(it->second);
-        _totalheader.append("\r\n");
+    for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it) 
+    {
+        if (it->first != "Content-Length:" || it->second != "0")
+        {
+            _totalheader.append(it->first);
+            _totalheader.append(" ");
+            _totalheader.append(it->second);
+            _totalheader.append("\r\n");
+        }
     }
     // _totalheader.append("\r\n");
     _totalheader.append(_body);
+    std::cout << "total header is: " << _totalheader << std::endl;
 }
 
 
@@ -186,7 +184,7 @@ void HTTP::respond::setbody(){
     if (_contentlen == "0" && _status_code == 0)
     {   
         std::cout << "NO content" << std::endl;
-         _status_code = 204;
+        _status_code = 204;
     }
     else if (_status_code == 0)
     {    
