@@ -8,25 +8,6 @@
 #include <cstring>
 #include <iterator>
 
-
-// HTTP::respond::respond(std::map < std::string, std::string > mapHeader)
-// {
-//     std::string findKey;
-
-//     findKey = mapHeader["GET"];
-//     setDate();
-//     setmodified(1);
-//     findKey = mapHeader["Connection:"];
-//     setconnection(findKey);
-//     findKey = mapHeader["Host:"];
-//     setHost(findKey);
-//     findKey = mapHeader["Accept-Language:"];
-//     setLanguage(findKey);
-//     setbody();
-//     status_line(findKey);
-//     appendheader();
-// }
-
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
     _map_req = req_n_conf._req_map;
@@ -177,18 +158,25 @@ void HTTP::respond::setbody()
     std::string root;
     root = _pars_server._root;
     std::cout << "ROOT[" << _pars_server._root << "]" << std::endl;
-    std::cout << "Referer:[" << _map_req["Referer:"] << "]"  << std::endl;
-    std::cout << "host:[" << _map_req["Host:"] << "]"  << std::endl;
-    int i = 8 + _map_req["Host:"].size(); // as also needs to get rid of http:://
+    std::cout << "get:[" << _map_req["GET"] << "]"  << std::endl;
+    int i = 0;
+    std::string get_req_line = _map_req["GET"].c_str();
     std::string pathfind = "";
-    if (_map_req["Referer:"] != "")
+    while (get_req_line[i] != '/')
+        i++;
+    pathfind = get_req_line.substr(i, get_req_line.size() - i);
+    std::string resultpathfind = "";
+    std::cout << "pathfind.find(' ') - 1:" << pathfind.find(' ') - 1 << std::endl;
+    if (pathfind.find(' ') - 1 >= 1)
     {
-        pathfind = _map_req["Referer:"].substr(i, _map_req["Referer:"].size() - i);
-        std::cout << "pathfind: [" << pathfind << "]" << std::endl;
-    }
-    if (pathfind == "")
-        pathfind = _pars_server._index;
-    std::string total_path = _pars_server._root.append(pathfind);
+        resultpathfind = pathfind.substr(1, pathfind.find(' ') - 1);
+        resultpathfind.append(".html");
+    } // really need to do per method now hard coded .html
+    if (resultpathfind == "")
+        resultpathfind = _pars_server._index;
+    std::cout << " pathfind: [" << pathfind << "]" << std::endl;
+    std::cout << " resultpathfind: [" << resultpathfind << "]" << std::endl;
+    std::string total_path = _pars_server._root.append(resultpathfind);
     std::cout << "PATH TOTAL IS[" << total_path << "]" << std::endl;
     const char *path = total_path.c_str();
     std::ifstream file(path);

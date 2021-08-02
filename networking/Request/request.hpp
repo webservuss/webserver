@@ -34,8 +34,6 @@ enum method {
 
 /* method like get etc  */
 class request {
-
-
     public:
     /* receive  a string with httml details from buffer*/
     request(){}
