@@ -179,6 +179,7 @@ void    HTTP::respond::set_status_code(int code)
     _status_code = code;
 }
 
+
 void    HTTP::respond::setbody()
 {
     std::string     total_body;

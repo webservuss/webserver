@@ -3,7 +3,7 @@
 #define parser_HTTP_hpp
 
 #include "../../http.hpp"
-#include "../Colors.hpp"
+#include "../colors.hpp"
 #include "makeMap.hpp"
 #include "utils_countspace.hpp"
 
@@ -33,6 +33,7 @@ enum method{
 };
 
 
+
     class re_HTTP
     {
         re_HTTP(){}
@@ -41,6 +42,9 @@ enum method{
             std::string _value;
             static const std::string                   permisChar;
             std::string _headers;
+            std::string _requestline;
+            std::string _method;
+            std::string  _uri;
             
 
 
@@ -55,10 +59,26 @@ enum method{
         void		set_key(std::string key);
         void		set_value(std::string value);
         void        set_headers(std::string body);
+        void        setrequestline(std::string requestline);
+        void        seturi(std::string uri);
+
+        void setUri(const std::string &uri);
+
+        const std::string &getUri() const;
+
+        const std::string &getRequestline() const;
+
+        void setRequestline(std::string &requestline);
 
         //getters
         std::string	 get_key();
         std:: string  request();
+        void                getrequestline(std::string requestline);
+        std::string         getmethod();
+
+        std::string &getMethod() ;
+
+        void setMethod(const std::string &method);
 
 
     };
