@@ -85,6 +85,8 @@ namespace HTTP{
         void setserver(const std::string connection);
         void setbody();
         void appendheader();
+        std::string find_total_file_path();
+        void    set_status_code(int code);
     };
 }
 

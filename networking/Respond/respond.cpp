@@ -45,11 +45,12 @@ void HTTP::respond::status_line(std::string findKey)
     if (_status_code == 200)
         _statusline.append("200 OK");
     else if (_status_code == 404)
-    {
+    { // error  in 404 as will make server fuck up for some reason atm
         _statusline.append("404 Not Found");
-        _body = "<h1>404 Not found</h1>\0";
+        // if (_pars_server._error_page)
+        _body = "<html><h1>404 Not found</h1></html>\0";
         setContentlen(_body);
-    }
+    } 
     else if (_status_code == 403)
     {    
         _statusline.append("403 Forbidden");
@@ -63,22 +64,22 @@ void HTTP::respond::status_line(std::string findKey)
 
 void HTTP::respond::setDate()
 {
-        struct timeval tv;
-        time_t t;
-        struct tm *info;
-        char buffer[64];
-        gettimeofday(&tv, NULL);
-        t = tv.tv_sec;
-        info = localtime(&t);
-        _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z" , info);
-        _date = buffer;
-        //std::cout << "date :" << _date << std::endl;
-        _totalrespond.insert(std::pair<std::string, std::string>( "Date:", _date) );
+    struct timeval  tv;
+    time_t          t;
+    struct tm       *info;
+    char            buffer[64];
+    
+    gettimeofday(&tv, NULL);
+    t = tv.tv_sec;
+    info = localtime(&t);
+    _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z" , info);
+    _date = buffer;
+    _totalrespond.insert(std::pair<std::string, std::string>( "Date:", _date) );
 }
 
 
-void ::HTTP::respond::setmodified(int fileFD ){
-
+void ::HTTP::respond::setmodified(int fileFD )
+{
     struct stat	stat;
     struct tm	*info;
     char		timestamp[36];
@@ -92,8 +93,8 @@ void ::HTTP::respond::setmodified(int fileFD ){
     _totalrespond.insert(std::pair<std::string, std::string>( "Last-Modified:", _lastmodified) );
 }
 
-void HTTP::respond::setconnection(std::string connection){
-
+void HTTP::respond::setconnection(std::string connection)
+{
     _connection = connection;
     _totalrespond.insert(std::pair<std::string, std::string>( "Connection:", _connection) );
 }
@@ -108,7 +109,7 @@ void HTTP::respond::setHost(std::string host)
 void HTTP::respond::setLanguage(std::string contentlanguage)
 {
     _language = contentlanguage;
-    _totalrespond.insert(std::pair<std::string, std::string>( "Content-Language:", _language) );
+    _totalrespond.insert(std::pair<std::string, std::string>( "Content-Language:", _language));
 }
 
 
@@ -127,13 +128,11 @@ void HTTP::respond::setContentlen(std::string body)
     ss << size;
     ss>> _contentlen;
     _totalrespond.insert(std::pair<std::string, std::string>( "Content-Length:", _contentlen) );
-
 }
 
 
-void HTTP::respond::appendheader() {
-
-
+void HTTP::respond::appendheader()
+{
     _totalheader.append(_statusline);
     _totalheader.append("\r\n");
     std::map<std::string, std::string>::iterator it = _totalrespond.begin();
@@ -151,64 +150,57 @@ void HTTP::respond::appendheader() {
     std::cout << "total header is: " << _totalheader << std::endl;
 }
 
-
-
-void HTTP::respond::setbody()
+std::string HTTP::respond::find_total_file_path()
 {
-    std::string root;
-    root = _pars_server._root;
-    std::cout << "ROOT[" << _pars_server._root << "]" << std::endl;
-    std::cout << "get:[" << _map_req["GET"] << "]"  << std::endl;
-    int i = 0;
+    std::string total_path;
     std::string get_req_line = _map_req["GET"].c_str();
     std::string pathfind = "";
+    std::string resultpathfind = "";
+    int i = 0;
+
     while (get_req_line[i] != '/')
         i++;
     pathfind = get_req_line.substr(i, get_req_line.size() - i);
-    std::string resultpathfind = "";
-    std::cout << "pathfind.find(' ') - 1:" << pathfind.find(' ') - 1 << std::endl;
-    if (pathfind.find(' ') - 1 >= 1)
+    if (pathfind.find(' ') - 1 >= 1) // check not root 
     {
         resultpathfind = pathfind.substr(1, pathfind.find(' ') - 1);
+        // really need to do per method now hard coded .html
         resultpathfind.append(".html");
-    } // really need to do per method now hard coded .html
+    }
+    // if root find index from config
     if (resultpathfind == "")
         resultpathfind = _pars_server._index;
-    std::cout << " pathfind: [" << pathfind << "]" << std::endl;
-    std::cout << " resultpathfind: [" << resultpathfind << "]" << std::endl;
-    std::string total_path = _pars_server._root.append(resultpathfind);
-    std::cout << "PATH TOTAL IS[" << total_path << "]" << std::endl;
-    const char *path = total_path.c_str();
-    std::ifstream file(path);
-    struct stat sb;
+    total_path = _pars_server._root.append(resultpathfind);
+    return (total_path);
+}
+
+void    HTTP::respond::set_status_code(int code)
+{
+    _status_code = code;
+}
+
+void    HTTP::respond::setbody()
+{
+    std::string     total_body;
+    std::string     total_path = find_total_file_path();
+    const char      *path = total_path.c_str();
+    std::ifstream   file(path);
+    struct stat     sb;
+
     if (stat(path, &sb) == -1)
-    {   
-        std::cout << "file NO exists"<< std::endl;
-        _status_code = 404;
-        return;
-    }
+        return (set_status_code(404));   // file doesnt exist
     if(file.is_open())
     {
-        total_path = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        _body = total_path;
+        total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        _body = total_body;
     }
     else
-    {
-        std::cout << "FILE IS NOT OPEN" << std::endl;
-        _status_code = 403;
-        return;
-    }
-    setContentlen(total_path);
+        return (set_status_code(403)); // forbidden no access rights
+    setContentlen(total_body);
     if (_contentlen == "0" && _status_code == 0)
-    {   
-        std::cout << "NO content" << std::endl;
         _status_code = 204;
-    }
     else if (_status_code == 0)
-    {    
-        std::cout << "OKK" << std::endl;
         _status_code = 200;
-    }
 }
 
 const std::string &HTTP::respond::getTotalheader() const
