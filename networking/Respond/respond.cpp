@@ -48,7 +48,7 @@ void HTTP::respond::status_line(std::string findKey)
     { // error  in 404 as will make server fuck up for some reason atm
         _statusline.append("404 Not Found");
         // if (_pars_server._error_page)
-        _body = "<html><h1>404 Not found</h1></html>\0";
+        _body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body>\0";
         setContentlen(_body);
     } 
     else if (_status_code == 403)
@@ -188,7 +188,35 @@ void    HTTP::respond::setbody()
     struct stat     sb;
 
     if (stat(path, &sb) == -1)
+    {
+        // if (_pars_server._error_page.size() > 1)
+        // {
+        //     std::string err_pg_path = "";
+        //     std::string err_pg_code = "";
+        //     std::string total_err_path = "";
+        //     std::string root;
+        //     int i = 0;
+        //     while (_pars_server._error_page[0][i] == ' ')
+        //         i++;
+        //     err_pg_code = _pars_server._error_page[0].substr(i, _pars_server._error_page[0].size() - i);
+        //     i = 0;
+        //     while (_pars_server._root[i] == ' ')
+        //         i++;
+        //     root = _pars_server._root.substr(i, _pars_server._root.size() - i);
+        //     err_pg_path = _pars_server._error_page[1].substr(1, _pars_server._error_page.size() - 1);
+        //     // if (err_pg_code == "404")
+        //     //     err_pg_path = root.append(_pars_server._error_page[1].substr(1, _pars_server._error_page.size() - 1));
+        //     std::cout << "root: [ " << root << "]"<< std::endl;
+        //     std::cout << "err_pg_path " << err_pg_path << "]"<< std::endl;
+        //     std::cout << "err_pg_path: [ " << err_pg_path << "]"<< std::endl;
+        // }
+        // // _statusline.append("404 Not Found");
+        // // if (_pars_server._error_page)
+        // // _body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body>\0";
+        // // setContentlen(_body);
+        // // file(path);
         return (set_status_code(404));   // file doesnt exist
+    }
     if(file.is_open())
     {
         total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
