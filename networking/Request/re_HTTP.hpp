@@ -44,6 +44,7 @@ enum method{
             std::string _headers;
             std::string _requestline;
             std::string _method;
+            std::string  _uri;
             
 
 
@@ -59,6 +60,11 @@ enum method{
         void		set_value(std::string value);
         void        set_headers(std::string body);
         void        setrequestline(std::string requestline);
+        void        seturi(std::string uri);
+
+        void setUri(const std::string &uri);
+
+        const std::string &getUri() const;
 
         const std::string &getRequestline() const;
 

@@ -85,6 +85,9 @@ std::string &re_HTTP::getMethod() {
         if (_method.compare(methods[i]) == 0)
             return methods[i];
     }
+    if (getMethod().empty()) {
+        std::cout << " ERROR: _status = 400" << std::endl;
+    }
     int i = 0;
     return methods[i];
 }
@@ -100,19 +103,31 @@ const std::string &re_HTTP::getRequestline() const {
 void re_HTTP::setRequestline(std::string &requestline) {
 
    std::cout << RED << requestline << RESET << std::endl;
+   //int i;
+    int found = -1;
     for(int i = 0; i < 2; i++)
     {
-        std::size_t found;
+        // int found;
          found = requestline.find(methods[i]);
-      //  if(found == 0)
-            std::cout << "NO METHOD" << std::endl;
-        //if(found != std::string::npos)
-            std::cout << RED << "first 'needle' found at: " <<  found << RESET<< '\n';
+        if(found == -1)
+        {
+            std::cout << "NO METHOD" << std::endl; // error message.
+            break;
+        }
             _method = requestline.substr(found, methods[i].size());
             std::cout << RED <<"method:" << RESET << _method << std::endl;
     }
     std::cout << "here"<< std::endl;
-    std::string  trialmethod = getMethod();
-    std::cout << "method" << trialmethod << std::endl;
     _requestline = requestline;
+}
+
+
+//get URI
+const std::string &re_HTTP::getUri() const {
+    return _uri;
+}
+
+//define URI
+void re_HTTP::setUri(const std::string &uri) {
+    _uri = uri;
 }
