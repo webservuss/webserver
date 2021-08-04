@@ -8,12 +8,15 @@
 #include <cstring>
 #include <iterator>
 
+
+
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
 
+    startres();
     findKey = _map_req["GET"];
     setDate();
     setmodified(1);
@@ -28,19 +31,19 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     appendheader();
 }
 
+
+
+
+void HTTP::respond::startres()
+{
+
+    
+}
+
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
 void HTTP::respond::status_line(std::string findKey)
 {
     std::cout << findKey << std::endl;
-    // int j = 0;
-    // char * c = const_cast<char*>(findKey.c_str());
-    // char *res = c;
-    // while((res = std::strstr(res, "HTTP/1.1")) != nullptr) {
-    //     ++res;
-    //     j = 2;
-    // }
-    // _statusline = "";
-    // if (j == 2)
         _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
         _statusline.append("200 OK");

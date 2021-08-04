@@ -27,7 +27,7 @@
 #include "../Servers/select_server.hpp"
 #include "../utils/req_n_conf.hpp"
 
-#include "../colors.hpp"
+#include "../Colors.hpp"
 
 
 namespace HTTP{
@@ -87,9 +87,10 @@ namespace HTTP{
         void setconnection(const std::string connection);
         void setserver(const std::string connection);
         void setbody();
-        void appendheader();
-        std::string find_total_file_path();
-        void    set_status_code(int code);
+        void                        appendheader();
+        std::string                 find_total_file_path();
+        void                        set_status_code(int code);
+        void                        startres();
     };
 }
 
