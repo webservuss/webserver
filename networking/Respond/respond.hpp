@@ -42,8 +42,8 @@ namespace HTTP{
 //    };
 
 
-    class respond{
-
+    class respond  {
+       // respond(){}
     private:
         std::string _statusline;
         std::string _contentlen;

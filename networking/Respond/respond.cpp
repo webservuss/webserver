@@ -17,7 +17,7 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     std::string findKey;
 
     // sent satus line
-   // startres(req_n_conf);
+   startres();
 
     findKey = _map_req["GET"];
     setDate();
@@ -36,54 +36,54 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
 
 
 
-// void HTTP::respond::startres(std::string statusline)
-// {
-
-//     std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
+void HTTP::respond::startres()
+{
+    std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
+    std::cout << "_map_req[Host:];" << _map_req["URI:"] << std::endl;
     
-//     std::cout << "get method" << res.getmethod() <<std::
-//     if( HTTP._method == "GET")
-//         std::cout<< "method is this "<< std::endl;
-//     if(HTTP._method == "POST" )
-//         std::cout<< "method is this "<< std::endl;
-//     if(_method == "DELETE" )
-//         std::cout<< "method is this "<< std::endl;
-// }
+    
+    if(_map_req.count("GET")>0)
+        std::cout<< "GET "<< std::endl;
+     if(_map_req.count("POST")>0)
+        postmethod();
+     if(_map_req.count("DELETE")>0)
+        std::cout<< "DELETE "<< std::endl;
+}
 
 
-// void HTTP::respond::getmethod()
-// {
-//             //basicly do what is no been done 
-// }
+void HTTP::respond::getmethod()
+{
+            //basicly do what is no been done 
+}
 
 
 
-// void HTTP::respond::postmethod()
-// {
+void HTTP::respond::postmethod()
+{
 
-//     //The stat() function gets status information about a 
-//     //specified file and places it in the area of memory pointed to by the buf argument.
+    //The stat() function gets status information about a 
+    //specified file and places it in the area of memory pointed to by the buf argument.
 
-//     //If the named file is a symbolic link, stat() 
-//     //resolves the symbolic link. It also returns information about the resulting file.
+    //If the named file is a symbolic link, stat() 
+    //resolves the symbolic link. It also returns information about the resulting file.
 
-//     _postheader = _totalheader;
-//     std::string     total_path = find_total_file_path();
-//     filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
-//     // check if the body size is allowed otherwise status code
-//     //open the file from the path 
-//     // set the body for POST 
-//     // use stat for the file 
+    _postheader = _totalheader;
+    std::string     total_path = find_total_file_path();
+    filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
+    // check if the body size is allowed otherwise status code
+    //open the file from the path 
+    // set the body for POST 
+    // use stat for the file 
 
-// }
+}
 
-// void HTTP::respond::deletemethod()
-// {
-//     _postheader = _totalheader;
+void HTTP::respond::deletemethod()
+{
+    _postheader = _totalheader;
 
-//     // check if the body size is allowed otherwise status code
-//     // 
-// }
+    // check if the body size is allowed otherwise status code
+    // 
+}
 
 
 
@@ -204,6 +204,7 @@ void HTTP::respond::appendheader()
 std::string HTTP::respond::find_total_file_path()
 {
     std::string total_path;
+  
     std::string get_req_line = _map_req["GET"].c_str();
     std::string pathfind = "";
     std::string resultpathfind = "";
@@ -222,6 +223,10 @@ std::string HTTP::respond::find_total_file_path()
     if (resultpathfind == "")
         resultpathfind = _pars_server._index;
     total_path = _pars_server._root.append(resultpathfind);
+    std::cout << "get_req_line: [" << get_req_line << "]"<< std::endl;
+    std::cout << "pathfind: [" << pathfind << "]"<< std::endl;
+    std::cout << "resultpathfind: [" << resultpathfind << "]"<< std::endl;
+    std::cout << "_pars_server._root:[" << _pars_server._root  << "]"<< std::endl;
     return (total_path);
 }
 
