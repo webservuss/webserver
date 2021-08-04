@@ -216,7 +216,7 @@ std::string HTTP::respond::find_total_file_path()
     if (pathfind.find(' ') - 1 >= 1) // check not root 
     {
         resultpathfind = pathfind.substr(1, pathfind.find(' ') - 1);
-        // really need to do per method now hard coded .html
+        // TODO really need to do per method now hard coded .html. Uncomment this to show images for index.html.
         resultpathfind.append(".html");
     }
     // if root find index from config
