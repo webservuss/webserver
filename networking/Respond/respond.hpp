@@ -58,7 +58,12 @@ namespace HTTP{
         std::string _body;
         t_server    _pars_server;
         int         _status_code;
+        std::string _postheader;
+        std::string _deleteheader;
         std::map <std::string, std::string> _map_req;
+        int         filefd;
+        const char  *_path;
+        const char  *_pathpost;
         // t_req_n_config  _req_n_conf;
 
     public:
@@ -91,6 +96,8 @@ namespace HTTP{
         std::string                 find_total_file_path();
         void                        set_status_code(int code);
         void                        startres();
+        void                        postmethod();
+        void                        deletemethod();
     };
 }
 

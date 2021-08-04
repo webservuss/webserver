@@ -16,7 +16,9 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
 
-    startres();
+    // sent satus line
+   // startres(req_n_conf);
+
     findKey = _map_req["GET"];
     setDate();
     setmodified(1);
@@ -34,16 +36,53 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
 
 
 
-void HTTP::respond::startres()
+void HTTP::respond::startres(std::string statusline)
 {
 
+    std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
+    
+    std::cout << "get method" << res.getmethod() <<std::
+    if( HTTP._method == "GET")
+        std::cout<< "method is this "<< std::endl;
+    if(HTTP._method == "POST" )
+        std::cout<< "method is this "<< std::endl;
+    if(_method == "DELETE" )
+        std::cout<< "method is this "<< std::endl;
+}
+
+
+void HTTP::respond::getmethod()
+{
     
 }
+
+
+
+void HTTP::respond::postmethod()
+{
+    _postheader = _totalheader;
+    std::string     total_path = find_total_file_path();
+    filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
+    // check if the body size is allowed otherwise status code
+    //open the file from the path 
+    // set the body for POST 
+}
+
+void HTTP::respond::deletemethod()
+{
+    _postheader = _totalheader;
+
+    // check if the body size is allowed otherwise status code
+    //
+}
+
+
 
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
 void HTTP::respond::status_line(std::string findKey)
 {
-    std::cout << findKey << std::endl;
+    std::cout << findKey << "PRINT THIS LINE " << std::endl;
+    
         _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
         _statusline.append("200 OK");
@@ -187,11 +226,11 @@ void    HTTP::respond::setbody()
 {
     std::string     total_body;
     std::string     total_path = find_total_file_path();
-    const char      *path = total_path.c_str();
-    std::ifstream   file(path);
+    const char      *_path = total_path.c_str();
+    std::ifstream   file(_path);
     struct stat     sb;
 
-    if (stat(path, &sb) == -1)
+    if (stat(_path, &sb) == -1)
     {
         // if (_pars_server._error_page.size() > 1)
         // {
