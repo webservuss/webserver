@@ -48,6 +48,7 @@ void HTTP::respond::startres()
         postmethod();
      if(_map_req.count("DELETE")>0)
         std::cout<< "DELETE "<< std::endl;
+    postmethod();
 }
 
 
@@ -60,6 +61,7 @@ void HTTP::respond::getmethod()
 
 void HTTP::respond::postmethod()
 {
+    std::cout << "ik ben in en post method" << std::endl;
 
     //The stat() function gets status information about a 
     //specified file and places it in the area of memory pointed to by the buf argument.
@@ -68,8 +70,10 @@ void HTTP::respond::postmethod()
     //resolves the symbolic link. It also returns information about the resulting file.
 
     _postheader = _totalheader;
-    std::string     total_path = find_total_file_path();
+    //std::string     total_path = find_total_file_path();
+    std::string total_path = "./example.txt";
     filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
+    
     // check if the body size is allowed otherwise status code
     //open the file from the path 
     // set the body for POST 
