@@ -36,45 +36,54 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
 
 
 
-void HTTP::respond::startres(std::string statusline)
-{
+// void HTTP::respond::startres(std::string statusline)
+// {
 
-    std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
+//     std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
     
-    std::cout << "get method" << res.getmethod() <<std::
-    if( HTTP._method == "GET")
-        std::cout<< "method is this "<< std::endl;
-    if(HTTP._method == "POST" )
-        std::cout<< "method is this "<< std::endl;
-    if(_method == "DELETE" )
-        std::cout<< "method is this "<< std::endl;
-}
+//     std::cout << "get method" << res.getmethod() <<std::
+//     if( HTTP._method == "GET")
+//         std::cout<< "method is this "<< std::endl;
+//     if(HTTP._method == "POST" )
+//         std::cout<< "method is this "<< std::endl;
+//     if(_method == "DELETE" )
+//         std::cout<< "method is this "<< std::endl;
+// }
 
 
-void HTTP::respond::getmethod()
-{
-    
-}
+// void HTTP::respond::getmethod()
+// {
+//             //basicly do what is no been done 
+// }
 
 
 
-void HTTP::respond::postmethod()
-{
-    _postheader = _totalheader;
-    std::string     total_path = find_total_file_path();
-    filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
-    // check if the body size is allowed otherwise status code
-    //open the file from the path 
-    // set the body for POST 
-}
+// void HTTP::respond::postmethod()
+// {
 
-void HTTP::respond::deletemethod()
-{
-    _postheader = _totalheader;
+//     //The stat() function gets status information about a 
+//     //specified file and places it in the area of memory pointed to by the buf argument.
 
-    // check if the body size is allowed otherwise status code
-    //
-}
+//     //If the named file is a symbolic link, stat() 
+//     //resolves the symbolic link. It also returns information about the resulting file.
+
+//     _postheader = _totalheader;
+//     std::string     total_path = find_total_file_path();
+//     filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
+//     // check if the body size is allowed otherwise status code
+//     //open the file from the path 
+//     // set the body for POST 
+//     // use stat for the file 
+
+// }
+
+// void HTTP::respond::deletemethod()
+// {
+//     _postheader = _totalheader;
+
+//     // check if the body size is allowed otherwise status code
+//     // 
+// }
 
 
 

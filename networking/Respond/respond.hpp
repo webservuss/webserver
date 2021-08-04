@@ -98,6 +98,7 @@ namespace HTTP{
         void                        startres();
         void                        postmethod();
         void                        deletemethod();
+        void                        getmethod();
     };
 }
 
