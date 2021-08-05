@@ -3,7 +3,7 @@
 
 #include "../../all_libs.hpp"
 #include "../../http.hpp"
-#include "../colors.hpp"
+#include "../Colors.hpp"
 namespace HTTP {
 
 typedef struct s_location {

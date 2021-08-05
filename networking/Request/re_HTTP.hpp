@@ -3,7 +3,7 @@
 #define parser_HTTP_hpp
 
 #include "../../http.hpp"
-#include "../colors.hpp"
+#include "../Colors.hpp"
 #include "makeMap.hpp"
 #include "utils_countspace.hpp"
 
@@ -23,14 +23,7 @@
 
 namespace HTTP{
 
-    /* make an enum for GET POST and DELETE   -- 
-• You need at least GET, POST, and DELETE methods.
- */
-enum method{
-    GET,
-    POST,
-    DELETE
-};
+
 
 
 

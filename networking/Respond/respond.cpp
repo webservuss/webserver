@@ -8,11 +8,16 @@
 #include <cstring>
 #include <iterator>
 
+
+
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
+
+    // sent satus line
+   startres();
 
     findKey = _map_req["GET"];
     setDate();
@@ -28,19 +33,69 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     appendheader();
 }
 
+
+
+
+void HTTP::respond::startres()
+{
+    std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
+    std::cout << "_map_req[Host:];" << _map_req["URI:"] << std::endl;
+    
+    
+    if(_map_req.count("GET")>0)
+        std::cout<< "GET "<< std::endl;
+     if(_map_req.count("POST")>0)
+        postmethod();
+     if(_map_req.count("DELETE")>0)
+        std::cout<< "DELETE "<< std::endl;
+    postmethod();
+}
+
+
+void HTTP::respond::getmethod()
+{
+            //basicly do what is no been done 
+}
+
+
+
+void HTTP::respond::postmethod()
+{
+    std::cout << "ik ben in en post method" << std::endl;
+
+    //The stat() function gets status information about a 
+    //specified file and places it in the area of memory pointed to by the buf argument.
+
+    //If the named file is a symbolic link, stat() 
+    //resolves the symbolic link. It also returns information about the resulting file.
+
+    _postheader = _totalheader;
+    //std::string     total_path = find_total_file_path();
+    std::string total_path = "./example.txt";
+    filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
+    
+    // check if the body size is allowed otherwise status code
+    //open the file from the path 
+    // set the body for POST 
+    // use stat for the file 
+
+}
+
+void HTTP::respond::deletemethod()
+{
+    _postheader = _totalheader;
+
+    // check if the body size is allowed otherwise status code
+    // 
+}
+
+
+
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
 void HTTP::respond::status_line(std::string findKey)
 {
-    std::cout << findKey << std::endl;
-    // int j = 0;
-    // char * c = const_cast<char*>(findKey.c_str());
-    // char *res = c;
-    // while((res = std::strstr(res, "HTTP/1.1")) != nullptr) {
-    //     ++res;
-    //     j = 2;
-    // }
-    // _statusline = "";
-    // if (j == 2)
+    std::cout << findKey << "PRINT THIS LINE " << std::endl;
+    
         _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
         _statusline.append("200 OK");
@@ -153,6 +208,7 @@ void HTTP::respond::appendheader()
 std::string HTTP::respond::find_total_file_path()
 {
     std::string total_path;
+  
     std::string get_req_line = _map_req["GET"].c_str();
     std::string pathfind = "";
     std::string resultpathfind = "";
@@ -171,6 +227,10 @@ std::string HTTP::respond::find_total_file_path()
     if (resultpathfind == "")
         resultpathfind = _pars_server._index;
     total_path = _pars_server._root.append(resultpathfind);
+    std::cout << "get_req_line: [" << get_req_line << "]"<< std::endl;
+    std::cout << "pathfind: [" << pathfind << "]"<< std::endl;
+    std::cout << "resultpathfind: [" << resultpathfind << "]"<< std::endl;
+    std::cout << "_pars_server._root:[" << _pars_server._root  << "]"<< std::endl;
     return (total_path);
 }
 
@@ -184,11 +244,11 @@ void    HTTP::respond::setbody()
 {
     std::string     total_body;
     std::string     total_path = find_total_file_path();
-    const char      *path = total_path.c_str();
-    std::ifstream   file(path);
+    const char      *_path = total_path.c_str();
+    std::ifstream   file(_path);
     struct stat     sb;
 
-    if (stat(path, &sb) == -1)
+    if (stat(_path, &sb) == -1)
     {
         // if (_pars_server._error_page.size() > 1)
         // {

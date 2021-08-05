@@ -27,13 +27,28 @@
 #include "../Servers/select_server.hpp"
 #include "../utils/req_n_conf.hpp"
 
-#include "../colors.hpp"
+#include "../Colors.hpp"
 
 
 namespace HTTP{
 
+<<<<<<< HEAD
     class respond{
 
+=======
+    /* make an enum for GET DELETE POST */
+//    enum method {
+//
+//        DELETE,
+//        GET,
+//        POST
+//
+//    };
+
+
+    class respond  {
+       // respond(){}
+>>>>>>> 273f3ac906d33437d3717320214c307c75642208
     private:
         std::string _statusline;
         std::string _contentlen;
@@ -45,8 +60,17 @@ namespace HTTP{
         std::string _body;
         t_server    _pars_server;
         int         _status_code;
+        std::string _postheader;
+        std::string _deleteheader;
         std::map <std::string, std::string> _map_req;
+<<<<<<< HEAD
 
+=======
+        int         filefd;
+        const char  *_path;
+        const char  *_pathpost;
+        // t_req_n_config  _req_n_conf;
+>>>>>>> 273f3ac906d33437d3717320214c307c75642208
 
     public:
         const std::string &getTotalheader() const;
@@ -67,9 +91,19 @@ namespace HTTP{
         void setmodified            (int fileFD);
         void setconnection          (const std::string connection);
         void setbody();
+<<<<<<< HEAD
         void appendheader();
         std::string find_total_file_path();
         void    set_status_code     (int code);
+=======
+        void                        appendheader();
+        std::string                 find_total_file_path();
+        void                        set_status_code(int code);
+        void                        startres();
+        void                        postmethod();
+        void                        deletemethod();
+        void                        getmethod();
+>>>>>>> 273f3ac906d33437d3717320214c307c75642208
     };
 }
 
