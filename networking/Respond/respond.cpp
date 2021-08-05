@@ -113,10 +113,10 @@ void HTTP::respond::setLanguage(std::string contentlanguage)
 }
 
 
-const std::string &HTTP::respond::getStatusline() const 
-{
-    return _statusline;
-}
+//const std::string &HTTP::respond::getStatusline() const
+//{
+//    return _statusline;
+//}
 
 
 void HTTP::respond::setContentlen(std::string body)
