@@ -4,8 +4,8 @@
 #include <iostream>
 
 
-HDE::header::header(const std::string& key, const std::string& value ) : key(key), value(value)
-{}
+//HDE::header::header(const std::string& key, const std::string& value ) : key(key), value(value)
+//{}
 
 void HDE::header::set_value(const std::string& value)
 {

@@ -79,6 +79,7 @@ namespace HTTP{
 
     public:
         respond(s_req_n_config req_n_conf);
+        ~respond();
         // respond(std::map < std::string, std::string > mapHeader);
         void status_line(std::string getkey);
         void setLanguage(std::string contentlanguage);
