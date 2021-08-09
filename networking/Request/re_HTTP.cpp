@@ -25,7 +25,7 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     int i = 0;
 
     // here set the request line and define the method.
-    //getMethod();
+    //getMethod(); //
     std::istringstream request_data(dataparser);
     set_headers(dataparser);
     while(std::getline(request_data, data))
@@ -51,14 +51,15 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
 
 }
 
-void HTTP::re_HTTP::set_headers(std::string header){
+void HTTP::re_HTTP::set_headers(std::string header) {
 
     std::string totalBody;
     int i = 0;
-    while(header[i] != '\r')
+    while (header[i] != '\r')
         i++;
-    std::cout << "i"  << i << std::endl;
-    totalBody = header.substr(i, header.size()- i);
+    std::cout << "i" << i << std::endl;
+    totalBody = header.substr(i, header.size() - i);
+    std::cout << "TOTAL BODY " << totalBody << std::endl;
 }
 
 void HTTP::re_HTTP::set_key(std::string key)

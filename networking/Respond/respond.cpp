@@ -9,6 +9,18 @@
 #include <iterator>
 
 
+// TODO :
+// check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
+// and then continue.
+
+//yes also notes, we need to implement the following status codes: for redirect 301 (moved permenantely),
+
+//307 (temporary redirect) and 405(method not allowed e.g. if method not same as config) and
+
+
+//413 (request entity is larger than limits defined by server
+//(I think this is what you are talking about)) after that status codes should be done
+
 
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
@@ -16,8 +28,10 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
 
+    // see if its redirection if it is
+
     // sent satus line
-   startres();
+    startres();
 
     findKey = _map_req["GET"];
     setDate();
@@ -36,24 +50,38 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
 
 
 
-void HTTP::respond::startres()
-{
+void HTTP::respond::startres() {
     std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
     std::cout << "_map_req[Host:];" << _map_req["URI:"] << std::endl;
-    
-    
-    if(_map_req.count("GET")>0)
-        std::cout<< "GET "<< std::endl;
-     if(_map_req.count("POST")>0)
+    // check if method  is same as in config file. if not its 405 method not allowed  wrong code so if there differen methods.
+    // limits 414 request entity
+    // check if the methods are allowed?
+
+    if (_map_req.count("GET") > 0) {
+        std::cout << "GET " << std::endl;
+
+        //getmethod();
+    }
+    if (_map_req.count("POST") > 0)
+    {
+        std::cout << "DELETE " << std::endl;
         postmethod();
-     if(_map_req.count("DELETE")>0)
-        std::cout<< "DELETE "<< std::endl;
-    postmethod();
+    }
+
+     if(_map_req.count("DELETE")>0) {
+
+         std::cout << "DELETE " << std::endl;
+         //deletemethod();
+     }
+     else
+         std::cout << " the method is nog right" << std::endl;
+   // postmethod();
 }
 
 
 void HTTP::respond::getmethod()
 {
+            // so this should be just a
             //basicly do what is no been done 
 }
 
@@ -63,28 +91,72 @@ void HTTP::respond::postmethod()
 {
     std::cout << "ik ben in en post method" << std::endl;
 
-    //The stat() function gets status information about a 
-    //specified file and places it in the area of memory pointed to by the buf argument.
+    // NOTE The stat() function gets status information about a specified file and places it in the area of memory pointed to by the buf argument.
 
     //If the named file is a symbolic link, stat() 
     //resolves the symbolic link. It also returns information about the resulting file.
+    std::cout << _body << std::endl;
+//    int serverMaximum = _body.size();
+//    if( serverMaximum > _body.length())
+//        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
 
     _postheader = _totalheader;
     //std::string     total_path = find_total_file_path();
-    std::string total_path = "./example.txt";
+    std::string total_path = "./index.html";
     filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
+    if(this->filefd == -1 && _status == 200)
+       // this->setstatus(403);
+        std::cout << "status code 403 " << std::endl;
+    struct stat statBuf;
+    if(stat(total_path.c_str(), &statBuf) < 0 && _status == 200)
+        std::cout << "status code 201 " << std::endl;
+    // this->setstatus(201);
     
     // check if the body size is allowed otherwise status code
-    //open the file from the path 
+    // open the file from the path
     // set the body for POST 
     // use stat for the file 
 
 }
 
+/*The DELETE method requests that
+the origin server delete the resource
+ identified by the Request-URI. This method
+ MAY be overridden by human intervention
+ (or other means) on the origin server.
+ The client cannot be guaranteed that the
+ operation has been carried out, even if
+ the status code returned from the origin
+ server indicates that the action has been
+ completed successfully. However, the server
+ SHOULD NOT indicate success unless, at the
+ time the response is given, it intends to
+ delete the resource or move it to an inaccessible
+ location.
+
+//A successful response SHOULD be
+200 (OK) if the response includes an
+entity describing the status, 202 (Accepted)
+ if the action has not yet been enacted, or
+ 204 (No Content) if the action has been enacted
+ but the response does not include an entity. */
+
+//If the request passes through a
+// cache and the Request-URI identifies
+// one or more currently cached entities,
+// those entries SHOULD be treated as stale.
+// Responses to this method are not cacheable.
+
+
+
+
 void HTTP::respond::deletemethod()
 {
     _postheader = _totalheader;
-
+   // int ret  = remove(file.c_str());
+     // if( ret != 0)
+          // set statuscode notfound
+    // what happens in deletemethod ?
     // check if the body size is allowed otherwise status code
     // 
 }
