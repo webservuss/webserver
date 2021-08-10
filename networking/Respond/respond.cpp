@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <cstring>
 #include <iterator>
-
+#include <wait.h>
 
 // TODO :
 // check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
@@ -378,10 +378,13 @@ void    HTTP::respond::setbody()
 //	}
 
 //    if (lastword == ".html")
-	if (total_path.find(".html") != std::string::npos)
+	if (total_path.find(".php") != std::string::npos)
 	{
-    	std::cout << "kom ik hier: " << _path << total_path << std::endl;
-    	exit(2);
+		// _body will be filled by php_cgi()
+		cgi_php();
+	}
+    else
+	{
 		std::ifstream   file(_path);
 		if(file.is_open())
 		{
@@ -394,11 +397,6 @@ void    HTTP::respond::setbody()
 			return (set_status_code(403)); // forbidden no access rights
 		}
 		file.close();
-	}
-    else
-	{
-    	// _body will be filled by php_cgi()
-    	cgi_php();
 	}
     setContentlen(total_body);
     if (_contentlen == "0" && _status_code == 0)
