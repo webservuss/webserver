@@ -7,7 +7,8 @@
 #include <sys/stat.h>
 #include <cstring>
 #include <iterator>
-#include <wait.h>
+#include <sys/wait.h>
+
 
 // TODO :
 // check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
