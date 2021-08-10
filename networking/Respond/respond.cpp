@@ -336,17 +336,34 @@ void    HTTP::respond::set_status_code(int code)
 
 void 	HTTP::respond::cgi_php()
 {
-    //char **envp  = "aar";
-
-	//execve("/usr/bin/php-cgi /home/ruben/WEBSERVER/9aug/hello_world.php", "niks", "niks, niks");
+    char *av[]  = {(char*)"php", (char *)"hello_world.php", NULL};
+    char *ev[]  = {(char*)"lll", (char*)"rejkrh", NULL};
+    char filename[] ="php";
+	
 	pid_t pid;
 	int status = 0;
+    int p;
+
+    
 
 	pid = fork();
+    if (pid == -1)
+        std::cout << RED << "forking failed" << RESET << std::endl;
 
 	if (pid == 0) {
-		system("/usr/bin/php-cgi /home/ruben/WEBSERVER/9aug/hello_world.php");
+        std::cout << RED<< "HERE "<<  RESET << std::endl;
+		//system("bin/hello_world.php");
+
+        //int fd = open("index.html", O_RDWR, O_CREAT);
+        dup2(fd, 1);
+        dup2(fd, 2);
+
+        execve(filename, av, ev);
+        close(fd);
+        
+       // execve("/usr/local/Cellar/php@7.2/7.2.34_4/bin/php-cgi/hello_world.php",  args, envp);
 		//_body;
+      //  exit(EXIT_SUCCESS);
 	}
 	else {
 		waitpid(pid, &status, 0);
