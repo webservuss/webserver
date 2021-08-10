@@ -64,7 +64,7 @@ void HTTP::respond::startres() {
     }
     if (_map_req.count("POST") > 0)
     {
-        std::cout << "DELETE " << std::endl;
+        std::cout << "POST" << std::endl;
         postmethod();
     }
 
