@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <cstring>
 #include <iterator>
-
+#include <wait.h>
 
 // TODO :
 // check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
@@ -333,6 +333,27 @@ void    HTTP::respond::set_status_code(int code)
     _status_code = code;
 }
 
+void 	HTTP::respond::cgi_php()
+{
+
+	//char **envp  = "aar";
+
+	//execve("/usr/bin/php-cgi /home/ruben/WEBSERVER/9aug/hello_world.php", "niks", "niks, niks");
+	pid_t pid;
+	int status = 0;
+
+	pid = fork();
+
+	if (pid == 0) {
+		system("/usr/bin/php-cgi /home/ruben/WEBSERVER/9aug/hello_world.php");
+		_body
+	}
+	else {
+		waitpid(pid, &status, 0);
+	}
+}
+
+
 
 void    HTTP::respond::setbody()
 {
@@ -345,18 +366,40 @@ void    HTTP::respond::setbody()
     {
         return (set_status_code(404));   // file doesnt exist
     }
-	std::ifstream   file(_path);
-	if(file.is_open())
-    {
-        total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		_body = total_body;
-    }
+ //   std::string lastword;
+  //  std::string path_string = _path;
+//    int i = total_path.length() -1;
+//    if(isspace(total_path[i]))
+//	{
+//		while(isspace(total_path[i])) i--;
+//
+//		 lastword = total_path.substr(i + 1);
+//		std::cout << lastword << std::endl;
+//	}
+
+//    if (lastword == ".html")
+	if (total_path.find(".html") != std::string::npos)
+	{
+    	std::cout << "kom ik hier: " << _path << total_path << std::endl;
+    	exit(2);
+		std::ifstream   file(_path);
+		if(file.is_open())
+		{
+			total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			_body = total_body;
+		}
+		else
+		{
+			file.close();
+			return (set_status_code(403)); // forbidden no access rights
+		}
+		file.close();
+	}
     else
 	{
-		file.close();
-		return (set_status_code(403)); // forbidden no access rights
+    	// _body will be filled by php_cgi()
+    	cgi_php();
 	}
-    file.close();
     setContentlen(total_body);
     if (_contentlen == "0" && _status_code == 0)
         _status_code = 204;
