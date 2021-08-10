@@ -59,6 +59,7 @@ namespace HTTP{
         int         _status_code;
         std::string _postheader;
         std::string _deleteheader;
+        
         std::map <std::string, std::string> _map_req;
         std::string       _contentype;
         int _status;
@@ -90,24 +91,15 @@ namespace HTTP{
         void setmodified            (int fileFD);
         void setconnection          (const std::string connection);
         void setbody();
-<<<<<<< HEAD
-        void setcontenttype         (const std::string &contentype);
-
-        void appendheader();
-        std::string find_total_file_path();
-
-
-       // std::string                 find_total_file_path();
-=======
 		void cgi_php();
         void                        appendheader();
         std::string                 find_total_file_path();
->>>>>>> a022aaf6f468833582d08cd702239bf1868cb580
         void                        set_status_code(int code);
         void                        startres();
         void                        postmethod();
         void                        deletemethod();
         void                        getmethod();
+        void                        setcontenttype(const std::string &contentype);
         int         setstatus;
 
     };

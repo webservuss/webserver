@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <cstring>
 #include <iterator>
-#include <wait.h>
+
 
 // TODO :
 // check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
@@ -335,8 +335,7 @@ void    HTTP::respond::set_status_code(int code)
 
 void 	HTTP::respond::cgi_php()
 {
-
-	//char **envp  = "aar";
+    //char **envp  = "aar";
 
 	//execve("/usr/bin/php-cgi /home/ruben/WEBSERVER/9aug/hello_world.php", "niks", "niks, niks");
 	pid_t pid;
@@ -346,11 +345,12 @@ void 	HTTP::respond::cgi_php()
 
 	if (pid == 0) {
 		system("/usr/bin/php-cgi /home/ruben/WEBSERVER/9aug/hello_world.php");
-		_body
+		//_body;
 	}
 	else {
 		waitpid(pid, &status, 0);
 	}
+
 }
 
 
