@@ -93,6 +93,7 @@ namespace HTTP{
         void setconnection(const std::string connection);
         void setserver(const std::string connection);
         void setbody();
+		void cgi_php();
         void                        appendheader();
         std::string                 find_total_file_path();
         void                        set_status_code(int code);
