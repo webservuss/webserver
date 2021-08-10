@@ -5,17 +5,21 @@ then you must F_GETFL the old flags, | the new flag in, and then F_SETFL the res
  as two separate system calls; */
 void                HTTP::set_non_blocking(int sock)
 {
-    int opts;
+//    int opts;
 
-	opts = fcntl(sock,F_GETFL);
-	if (opts < 0) {
-		perror("fcntl(F_GETFL)");
-		exit(EXIT_FAILURE);
-	}
-	opts = (opts | O_NONBLOCK);
-	if (fcntl(sock,F_SETFL,opts) < 0) {
-		perror("fcntl(F_SETFL)");
-		exit(EXIT_FAILURE);
-	}
-	return;
+	if (fcntl(sock, F_SETFL, O_NONBLOCK) < 0)
+		exit(1);
+	else
+		return;
+//	opts = fcntl(sock,F_GETFL);
+//	if (opts < 0) {
+//		perror("fcntl(F_GETFL)");
+//		exit(EXIT_FAILURE);
+//	}
+//	opts = (opts | O_NONBLOCK);
+//	if (fcntl(sock,F_SETFL,opts) < 0) {
+//		perror("fcntl(F_SETFL)");
+//		exit(EXIT_FAILURE);
+//	}
+//	return;
 }

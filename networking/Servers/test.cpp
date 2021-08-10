@@ -5,6 +5,11 @@
 
 int main()
 {
+	// uncomment this to suppress cout
+	//std::cout.rdbuf(NULL);
+
+
+
     std::cout<< RED<< "MAIN" << RESET << std::endl;
     std::ifstream file;
 	const char *path = "configs/server.conf";

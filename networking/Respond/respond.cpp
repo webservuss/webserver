@@ -24,6 +24,7 @@
 
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
+	_status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
@@ -47,7 +48,8 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     appendheader();
 }
 
-
+HTTP::respond::~respond()
+{}
 
 
 void HTTP::respond::startres() {
@@ -175,9 +177,24 @@ void HTTP::respond::status_line(std::string findKey)
     { // error  in 404 as will make server fuck up for some reason atm
         _statusline.append("404 Not Found");
         // if (_pars_server._error_page)
-        _body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body>\0";
-        setContentlen(_body);
-    } 
+        //_body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body></html>";
+        std::ifstream file("html_pages/auto_error.html");
+        std::string total_body;
+		if(file.is_open())
+		{
+			total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			_body = total_body;
+		}
+		else
+		{
+			// TODO throw exception
+			std::cout << YELLOW << "404 NOT OPEN" << RESET << std::endl;
+			exit(10);
+		}
+		file.close();
+		setcontenttype("text/html");
+		setContentlen(_body);
+    }
     else if (_status_code == 403)
     {    
         _statusline.append("403 Forbidden");
@@ -188,6 +205,11 @@ void HTTP::respond::status_line(std::string findKey)
         _statusline.append("204 No Content");
 }
 
+void HTTP::respond::setcontenttype(const std::string &contentype)
+{
+	_contentype = contentype;
+	_totalrespond.insert(std::pair<std::string, std::string>("Content-Type:", _contentype));
+}
 
 void HTTP::respond::setDate()
 {
@@ -265,7 +287,7 @@ void HTTP::respond::appendheader()
     std::map<std::string, std::string>::iterator it = _totalrespond.begin();
     for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it) 
     {
-        if (it->first != "Content-Length:" || it->second != "0")
+        if ((it->first != "Content-Length:" || it->second != "0") && (!it->second.empty()))
         {
             _totalheader.append(it->first);
             _totalheader.append(" ");
@@ -292,8 +314,8 @@ std::string HTTP::respond::find_total_file_path()
     if (pathfind.find(' ') - 1 >= 1) // check not root 
     {
         resultpathfind = pathfind.substr(1, pathfind.find(' ') - 1);
-        // really need to do per method now hard coded .html
-        resultpathfind.append(".html");
+        // TODO really need to do per method now hard coded .html. Uncomment this to show images for index.html.
+        //resultpathfind.append(".html");
     }
     // if root find index from config
     if (resultpathfind == "")
@@ -316,47 +338,25 @@ void    HTTP::respond::setbody()
 {
     std::string     total_body;
     std::string     total_path = find_total_file_path();
-    const char      *_path = total_path.c_str();
-    std::ifstream   file(_path);
+	const char      *_path = total_path.c_str();
     struct stat     sb;
 
     if (stat(_path, &sb) == -1)
     {
-        // if (_pars_server._error_page.size() > 1)
-        // {
-        //     std::string err_pg_path = "";
-        //     std::string err_pg_code = "";
-        //     std::string total_err_path = "";
-        //     std::string root;
-        //     int i = 0;
-        //     while (_pars_server._error_page[0][i] == ' ')
-        //         i++;
-        //     err_pg_code = _pars_server._error_page[0].substr(i, _pars_server._error_page[0].size() - i);
-        //     i = 0;
-        //     while (_pars_server._root[i] == ' ')
-        //         i++;
-        //     root = _pars_server._root.substr(i, _pars_server._root.size() - i);
-        //     err_pg_path = _pars_server._error_page[1].substr(1, _pars_server._error_page.size() - 1);
-        //     // if (err_pg_code == "404")
-        //     //     err_pg_path = root.append(_pars_server._error_page[1].substr(1, _pars_server._error_page.size() - 1));
-        //     std::cout << "root: [ " << root << "]"<< std::endl;
-        //     std::cout << "err_pg_path " << err_pg_path << "]"<< std::endl;
-        //     std::cout << "err_pg_path: [ " << err_pg_path << "]"<< std::endl;
-        // }
-        // // _statusline.append("404 Not Found");
-        // // if (_pars_server._error_page)
-        // // _body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body>\0";
-        // // setContentlen(_body);
-        // // file(path);
         return (set_status_code(404));   // file doesnt exist
     }
-    if(file.is_open())
+	std::ifstream   file(_path);
+	if(file.is_open())
     {
         total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        _body = total_body;
+		_body = total_body;
     }
     else
-        return (set_status_code(403)); // forbidden no access rights
+	{
+		file.close();
+		return (set_status_code(403)); // forbidden no access rights
+	}
+    file.close();
     setContentlen(total_body);
     if (_contentlen == "0" && _status_code == 0)
         _status_code = 204;

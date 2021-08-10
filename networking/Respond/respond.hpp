@@ -60,6 +60,7 @@ namespace HTTP{
         std::string _postheader;
         std::string _deleteheader;
         std::map <std::string, std::string> _map_req;
+        std::string       _contentype;
         int _status;
 
 
@@ -79,6 +80,7 @@ namespace HTTP{
 
     public:
         respond(s_req_n_config req_n_conf);
+        ~respond();
         // respond(std::map < std::string, std::string > mapHeader);
         void status_line            (std::string getkey);
         void setLanguage            (std::string contentlanguage);
@@ -88,6 +90,7 @@ namespace HTTP{
         void setmodified            (int fileFD);
         void setconnection          (const std::string connection);
         void setbody();
+        void setcontenttype         (const std::string &contentype);
 
         void appendheader();
         std::string find_total_file_path();
