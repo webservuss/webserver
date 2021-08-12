@@ -8,7 +8,9 @@
 #include <cstring>
 #include <iterator>
 #include <sys/wait.h>
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
 // TODO :
 // check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
 // and then continue.
@@ -33,10 +35,11 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     
     startres();
     
-    findKey = _map_req["GET"];
+
     setDate();
     setmodified(1);
     findKey = _map_req["Connection:"];
+    std::cout << "KEY" << findKey << std::endl;
     setconnection(findKey);
     findKey = _map_req["Host:"];
     setHost(findKey);
@@ -103,24 +106,33 @@ void HTTP::respond::postmethod()
     //    if( serverMaximum > _body.length())
     //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
 
-    _postheader = _totalheader;
+  //  int fd;
+   
   //  std::string     total_path = find_total_file_path();
-    std::string total_path = "html_pages/index.html";
-    std::cout << GREEN << "total_path :: " << total_path << R << std::endl;
-    std::ifstream file("html_pages/auto_error.html");
-    filefd = open(total_path.c_str(), O_WRONLY | O_APPEND | O_CREAT);
-
+    std::ifstream file("html_pages/welcome.php");
+    std::cout << GREEN << "file :: " << file << R << std::endl;
+   // std::ifstream file("html_pages/index.html");
+    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
+       // std::ifstream file("html_pages/auto_error.html");
+        std::string total_body;
+        if (file.is_open())
+        {
+            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            _body = total_body;
+            std::cout << RED <<  "POST :" << _body << R <<  std::endl;
+        }
     if (this->filefd == -1 && _status == 200)
         // this->setstatus(403);
         std::cout << "status code 403 " << std::endl;
-    struct stat statBuf;
-    if (stat(total_path.c_str(), &statBuf) < 0 && _status == 200)
-        std::cout << "status code 201 " << std::endl;
+    //struct stat statBuf;
+   // if (stat(file, &statBuf) < 0 && _status == 200)
+      //  std::cout << "status code 201 " << std::endl;
     // this->setstatus(201);
+    std::cout << RED << "BODY :" <<_body << R <<std::endl;
     if (write(filefd, _body.c_str(),_body.length()) == -1)
         std::cout<< "WRITE " << std::endl;
     close(filefd);
-    std::cout << GREEN << "BEN JE HIER  " << total_path << R << std::endl;
+    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
     // check if the body size is allowed otherwise status code
     // open the file from the path
     // set the body for POST
@@ -169,7 +181,7 @@ void HTTP::respond::deletemethod()
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
 void HTTP::respond::status_line(std::string findKey)
 {
-    std::cout << findKey << "PRINT THIS LINE " << std::endl;
+    std::cout << RED << findKey << "PRINT THIS LINE " << R<<std::endl;
 
     _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
@@ -239,7 +251,7 @@ void ::HTTP::respond::setmodified(int fileFD)
     strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
     _lastmodified.append(timestamp);
     _lastmodified.append("\r\n");
-    std::cout << "last modified : " << _lastmodified << std::endl;
+    //std::cout << "last modified : " << _lastmodified << std::endl;
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified:", _lastmodified));
 }
 
