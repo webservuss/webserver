@@ -38,6 +38,7 @@ namespace HTTP{
             std::string _requestline;
             std::string _method;
             std::string  _uri;
+            std::string  _totalBody;
             
 
 

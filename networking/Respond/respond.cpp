@@ -32,10 +32,8 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     // see if its redirection if it is
 
     // sent satus line
-    
+    std::cout << YELLOW << "***************RESPOND%%%%%%%%%%%%%%%%%%%%" << R << std::endl;
     startres();
-    
-
     setDate();
     setmodified(1);
     findKey = _map_req["Connection:"];
@@ -45,7 +43,6 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     setHost(findKey);
     findKey = _map_req["Accept-Language:"];
     setLanguage(findKey);
-    std::cout <<  "KOM JE HIER" << _body << std::endl;
     setbody();
      std::cout <<  "BODY>?" << _body << std::endl;
     status_line(findKey);
@@ -58,8 +55,8 @@ HTTP::respond::~respond()
 
 void HTTP::respond::startres()
 {
-    std::cout << " WE Will check what the getter is and depending on that the respond will react" << std::endl;
-    std::cout << "_map_req[Host:];" << _map_req["URI:"] << std::endl;
+    std::cout << RED << "***************************  WE Will check what the getter is and depending on that the respond will react" << std::endl;
+    
     // check if method  is same as in config file. if not its 405 method not allowed  wrong code so if there differen methods.
     // limits 414 request entity
     // check if the methods are allowed?
@@ -72,7 +69,7 @@ void HTTP::respond::startres()
     }
     if (_map_req.count("POST") > 0)
     {
-        std::cout << RED << "POST" << RESET << std::endl;
+        std::cout << RED << "*******************************POST" << RESET << std::endl;
         return postmethod();
     }
 
@@ -312,7 +309,7 @@ void HTTP::respond::appendheader()
 std::string HTTP::respond::find_total_file_path()
 {
     std::string total_path;
-
+    std::cout << "HER" << std::endl;
     std::string get_req_line = _map_req["GET"].c_str();
     // std::string get_post_line = _map_req["POST"].c_str();
     // std::string get_delete_line = _map_req["DELETE"].c_str();
