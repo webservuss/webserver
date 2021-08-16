@@ -8,7 +8,7 @@
 
 using namespace HTTP;
 
-std::string methods[4] = {
+std::string methods[3] = {
         "GET",
         "POST",
         "DELETE",
@@ -22,28 +22,37 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     std::string data;
     std::string line;
     std::string method;
-    int i = 0;
+    int j = 0;
 
     // here set the request line and define the method.
     //getMethod(); //
     std::istringstream request_data(dataparser);
     set_headers(dataparser);
-    while(std::getline(request_data, data))
+    int len ;
+    int i = 0;
+    len = _totalBody.length();
+    std::cout << "LEN" << len << std::endl;
+    while(std::getline(request_data, data ) && !request_data.eof())
     {
         line = data.substr(0, data.find('\r'));
-
-        while(i == 0) {
-
-            std::cout << RED<< "were here? " << RESET <<std::endl;
+        std::cout << RED <<"line: "<< "{"  << line << "}"<< std::endl;
+        if (i == 0)
+        {
             setRequestline(line);
+            mapHeader.insert(std::pair<std::string, std::string>( "METHOD", _method) );
+            mapHeader.insert(std::pair<std::string, std::string>( "URI", _uri) );
+            mapHeader.insert(std::pair<std::string, std::string>( "PROTOCOL", _protocol) );
             i++;
         }
-
+        std::cout  << RED << "HERE 1 "<< std::endl;
         if(line.size() != 0)
             split_line(line);
         mapHeader.insert(std::pair<std::string, std::string>( _key, _value) );
-    }
+        std::cout << "j" << j <<std::endl;
+        j++;
+        }
 
+    std::cout  << RED << "HERE 2 "<< std::endl;
     std::map<std::string, std::string>::iterator it = mapHeader.begin();
     std::cout << RED <<  "*******************MAP REQUEST CONTAINTS*******************\n";
     for (it=mapHeader.begin(); it!=mapHeader.end(); ++it)
@@ -53,13 +62,13 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
 
 void HTTP::re_HTTP::set_headers(std::string header) {
 
-    std::string totalBody;
+   // std::string _totalBody;
     int i = 0;
     while (header[i] != '\r')
         i++;
     std::cout << "i" << i << std::endl;
-    totalBody = header.substr(i, header.size() - i);
-    std::cout << "TOTAL BODY " << totalBody << std::endl;
+    _totalBody = header.substr(i, header.size() - i);
+    std::cout << "TOTAL BODY " << _totalBody << std::endl;
 }
 
 void HTTP::re_HTTP::set_key(std::string key)
@@ -96,6 +105,7 @@ std::string &re_HTTP::getMethod() {
     }
     int i = 0;
     return methods[i];
+    std::cout << YELLOW << "method" << _method << R << std::endl;
 }
 
 void re_HTTP::setMethod(const std::string &method) {
@@ -108,28 +118,40 @@ const std::string &re_HTTP::getRequestline() const {
 
 void re_HTTP::setRequestline(std::string &requestline) {
 
-   std::cout << RED << requestline << RESET << std::endl;
-   //int i;
+    
     int found = -1;
-    for(int i = 0; i < 2; i++)
+    for(int i = 0; i < 3; i++)
     {
-        // int found;
-         found = requestline.find(methods[i]);
-        if(found == -1)
+        std::cout << YELLOW<< "i" << i << R << std::endl;
+        found = requestline.find(methods[i]);
+        std::cout << RED << "FOUND" << found << std::endl;
+        std::cout << GREEN << methods[i] << " method" << RESET <<  std::endl;
+        if(found != -1)
         {
-            std::cout << "NO METHOD" << std::endl; // error message.
+            std::cout << YELLOW " HERE" << R << std::endl;
+            _method = requestline.substr(found, methods[i].size());
+            _requestline = requestline.substr(_method.size(), requestline.size()- methods[i].size());
+            std::cout << "requestline : " <<  _requestline << std::endl;
             break;
         }
-            _method = requestline.substr(found, methods[i].size());
-            std::cout << RED <<"method:" << RESET << _method << std::endl;
     }
-    std::cout << "here"<< std::endl;
-    _requestline = requestline;
+
+    if(found == -1)
+    {
+        std::cout << "NO METHOD" << std::endl; // error message.
+        _method = "";
+        _uri = "";
+        _protocol = "";
+    }
+    // _requestline = requestline;
+    // std::string lin = requestline.c_str();
+
 }
 
 
 //get URI
 const std::string &re_HTTP::getUri() const {
+    std::cout << YELLOW << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< _uri << R <<  std::endl;
     return _uri;
 }
 

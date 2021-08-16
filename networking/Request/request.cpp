@@ -5,8 +5,7 @@
 #include <iostream>
 #include <map>
 #include <string>
-
-
+#include <curl/curl.h>
 
 
 /* loop through the string  */
