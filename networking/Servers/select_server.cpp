@@ -141,17 +141,18 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	re_HTTP requestinfo (stringbuff);
 	std::map <std::string, std::string > reqmap = requestinfo.mapHeader;
 	r_n_c._req_map = reqmap;
-	t_server corresp_pars_serve;
-	for (unsigned long i = 0; i < _parser_servers.size(); i++)
-	{
-		if (_parser_servers[i]._port == _servers[i]._port)
-		{	
-			std::cout << " PORTS EQUAL" << std::endl;
-			corresp_pars_serve = _parser_servers[i];
-			break ;
-		}
-	}
-	r_n_c._parser_server = corresp_pars_serve;
+//	t_server corresp_pars_serve;
+//	for (unsigned long i = 0; i < _parser_servers.size(); i++)
+//	{
+//		if (_parser_servers[i]._port == _servers[i]._port)
+//		{
+//			std::cout << " PORTS EQUAL" << std::endl;
+//			corresp_pars_serve = _parser_servers[i];
+//			break ;
+//		}
+//	}
+//	r_n_c._parser_server = corresp_pars_serve;
+	r_n_c._parser_server = _parser_servers[i];
 	// create response
 	respond m (r_n_c);
 	_servers[i]._clients[j]._header = m.getTotalheader();
