@@ -142,7 +142,7 @@ void re_HTTP::setRequestline(std::string &requestline) {
         found = lin.find("HTTP/1.1");
         int i = 0;
         while (lin[i] == ' ')
-         i++;
+        i++;
         std::cout << "SET URI" << std::endl;
         _uri = _requestline.substr(i, found);
         std::cout << "SET URI" << _uri << std::endl;
