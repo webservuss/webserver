@@ -29,10 +29,6 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
 
-    // see if its redirection if it is
-
-    // sent satus line
-    std::cout << YELLOW << "***************RESPOND%%%%%%%%%%%%%%%%%%%%" << R << std::endl;
     startres();
     setDate();
     setmodified(1);
@@ -55,8 +51,6 @@ HTTP::respond::~respond()
 
 void HTTP::respond::startres()
 {
-   
- 
     if (_map_req.count("GET") > 0)
         setbody();
     if (_map_req.count("POST") > 0)
@@ -65,7 +59,6 @@ void HTTP::respond::startres()
         deletemethod();
     else
         std::cout << " the method is nog right" << std::endl;
-
 }
 
 void HTTP::respond::postmethod()
@@ -89,8 +82,6 @@ void HTTP::respond::postmethod()
     // close(file);
     
 }
-
-
 
 void HTTP::respond::deletemethod()
 {
