@@ -65,7 +65,7 @@ void HTTP::respond::postmethod()
 {
     // if (bodysize < contentlen())
        // std::cout << " check the size" << std::endl;
-    std::ifstream file("html_pages/html_pages/index.html");
+    std::ifstream file("html_pages/index.html");
     std::cout << GREEN << "file :: " << file << R << std::endl;
         std::string total_body;
         if (file.is_open())
@@ -218,34 +218,25 @@ void HTTP::respond::appendheader()
     std::cout << RED << "total header is: " << RESET << _totalheader << std::endl;
 }
 
+// add the root to the path . and maybe append html maybe... 
 std::string HTTP::respond::find_total_file_path()
 {
     std::string total_path;
    
     std::string get_req_line = _map_req["GET"].c_str();
-    //std::string get_post_line = _map_req["POST"].c_str();
-    //std::string get_delete_line = _map_req["DELETE"].c_str();
-
+    std::string get_reg_line;
     std::string pathfind = "";
     std::string resultpathfind = "";
     int i = 0;
-   
-  
-    //std::cout << RED<< " POST " << get_post_line << RESET <<  std::endl;
+ 
     while (get_req_line[i] != '/' )
-    {
         i++;
-         //std::cout << "while" << std::endl;
-        //std::cout << "8" << std::endl;
-    }
-    //if(_map_req["GET"].c_str() > 0 )
-    
-    if (_map_req.count("GET") > 0)
-    {
-        std::cout << "pathfind for GET" << pathfind << std::endl;
-        pathfind = get_req_line.substr(i, get_req_line.size() - i);
-    }
-    
+    // if (_map_req.count("GET") > 0)
+    // {
+    //     std::cout << "pathfind for GET" << pathfind << std::endl;
+    //     pathfind = get_req_line.substr(i, get_req_line.size() - i);
+    // }
+    pathfind = get_req_line.substr(i, get_req_line.size() - i);
     if (pathfind.find(' ') - 1 >= 1) // check not root
     {
         std::cout << "9" << std::endl;
@@ -257,8 +248,7 @@ std::string HTTP::respond::find_total_file_path()
     if (resultpathfind == "")
         resultpathfind = _pars_server._index;
     total_path = _pars_server._root.append(resultpathfind);
-    std::cout << "10" << std::endl;
-    std::cout << "get_req_line: [" << get_req_line << "]" << std::endl;
+    std::cout << RED << "get_req_line: [" << get_req_line << "]" << R << std::endl;
     std::cout << "pathfind: [" << pathfind << "]" << std::endl;
     std::cout << "resultpathfind: [" << resultpathfind << "]" << std::endl;
     std::cout << "_pars_server._root:[" << _pars_server._root << "]" << std::endl;
@@ -273,7 +263,7 @@ void HTTP::respond::set_status_code(int code)
 
 void HTTP::respond::setbody()
 {
-    std::cout << RED << "0" << RESET << std::endl;
+    
     if (_map_req.count("POST") < 0)
         return;
     std::string total_body;
@@ -287,11 +277,11 @@ void HTTP::respond::setbody()
         return (set_status_code(404)); // file doesnt exist
     }
 
-    if (total_path.find(".php") != std::string::npos)
-    {
-        std::cout << RED << "2" << RESET << std::endl;
-       // cgi_php();
-    }
+    // if (total_path.find(".php") != std::string::npos)
+    // {
+    //     std::cout << RED << "2" << RESET << std::endl;
+    //    // cgi_php();
+    // }
     else
     {
         std::cout << RED << "3" << RESET << std::endl;
