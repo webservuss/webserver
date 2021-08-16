@@ -1,5 +1,7 @@
 NAME =		test
 
+CC =		clang++
+
 SRCS =		networking/Servers/test.cpp \
 			networking/Sockets/simple_socket.cpp \
 			networking/Sockets/listen_n_bind.cpp \
@@ -25,10 +27,10 @@ INCLUDES =	*.hpp
 all:		$(NAME)
 
 $(NAME):	$(OFILES) $(INCLUDES)
-	g++ -o $(NAME) $(SRCS) $(FLAGS)
+	$(CC) -o $(NAME) $(SRCS) $(FLAGS)
 
 %.o: %.cpp $(INCLUDE)
-	gcc $(FLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
 	/bin/rm -f $(OFILES)
