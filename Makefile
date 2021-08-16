@@ -12,7 +12,8 @@ SRCS =		networking/Servers/test.cpp \
 			networking/Servers/parser_conf.cpp \
 			networking/Request/split.cpp  \
 			networking/Servers/select_server.cpp\
-			networking/Respond/respond.cpp
+			networking/Respond/respond.cpp \
+			networking/Respond/CGI.cpp
 
 OFILES =	$(SRCS:.cpp=.o)
 

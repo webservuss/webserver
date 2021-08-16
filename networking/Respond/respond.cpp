@@ -282,7 +282,7 @@ std::string HTTP::respond::find_total_file_path()
         std::cout << "9" << std::endl;
         resultpathfind = pathfind.substr(1, pathfind.find(' ') - 1);
         // TODO really need to do per method now hard coded .html. Uncomment this to show images for index.html.
-        resultpathfind.append(".html");
+        //resultpathfind.append(".html");
     }
    // if root find index from config
     if (resultpathfind == "")
@@ -301,67 +301,19 @@ void HTTP::respond::set_status_code(int code)
     _status_code = code;
 }
 
-void HTTP::respond::cgi_php()
-{
-    char *av[]  = {(char*)"php", (char *)"hello_world.php", NULL};
-    char *ev[]  = {(char*)"lll", (char*)"rejkrh", NULL};
-    char filename[] ="php";
-	
-	pid_t pid;
-	int status = 0;
-    // int p;
-
-    
-
-	pid = fork();
-    if (pid == -1)
-        std::cout << RED << "forking failed" << RESET << std::endl;
-
-	if (pid == 0) {
-        std::cout << RED<< "HERE "<<  RESET << std::endl;
-		//system("bin/hello_world.php");
-
-        int fd = open("index.html", O_RDWR, O_CREAT);
-        dup2(fd, 1);
-        dup2(fd, 2);
-
-        execve(filename, av, ev);
-        close(fd);
-        
-       // execve("/usr/local/Cellar/php@7.2/7.2.34_4/bin/php-cgi/hello_world.php",  args, envp);
-		//_body;
-      //  exit(EXIT_SUCCESS);
-	}
-	else {
-		waitpid(pid, &status, 0);
-	}
-
-    if (pid == 0)
-    {
-        system("/usr/bin/php-cgi /home/ruben/WEBSERVER/9aug/hello_world.php");
-        //_body;
-    }
-    else
-    {
-        waitpid(pid, &status, 0);
-    }
-}
-
 void HTTP::respond::setbody()
 {
-    std::cout << RED << "0" << RESET << std::endl;
     std::string total_body;
     std::string total_path = find_total_file_path();
     const char *_path = total_path.c_str();
     struct stat     sb;
 
-    std::cout << RED << "00_path" << _path << RESET << std::endl;
     if (stat(_path, &sb) == -1)
     {
         std::cout << RED << "1" << RESET << std::endl;
         return (set_status_code(404)); // file doesnt exist
     }
-    //   std::string lastword;
+	//   std::string lastword;
     //  std::string path_string = _path;
     //    int i = total_path.length() -1;
     //    if(isspace(total_path[i]))
@@ -373,11 +325,11 @@ void HTTP::respond::setbody()
     //	}
 
     //    if (lastword == ".html")
-    if (total_path.find(".php") != std::string::npos)
+	if (total_path.find(".php") != std::string::npos)
     {
-        std::cout << RED << "2" << RESET << std::endl;
         // _body will be filled by php_cgi()
-        // cgi_php();
+        HTTP::CGI cgi(_map_req, _pars_server, total_path);
+        _body = cgi.get_cgi_body();
     }
     // else
 
@@ -412,9 +364,11 @@ void HTTP::respond::setbody()
 	if (total_path.find(".php") != std::string::npos)
 	{
 		// _body will be filled by php_cgi()
-		// cgi_php();
+		HTTP::CGI cgi(_map_req, _pars_server, total_path);
+		_body = cgi.get_cgi_body();
+
 	}
-    else
+	else
 	{
         std::cout << YELLOW << "HEREEEEE" << RESET << std::endl;
         std::ifstream   file(_path);
