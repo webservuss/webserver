@@ -36,14 +36,16 @@ namespace HTTP{
             static const std::string                   permisChar;
             std::string _headers;
             std::string _requestline;
-            std::string _method;
-            std::string  _uri;
+            std::string _method; //
+            std::string  _uri; //
             std::string  _totalBody;
+            std::string _protocol; //
             
 
 
         public:
             re_HTTP(std::string dataparser);
+            ~re_HTTP();
             void split_line(std::string line);
             std::map<std::string, std::string> mapHeader;
             
@@ -54,11 +56,11 @@ namespace HTTP{
         void		set_value(std::string value);
         void        set_headers(std::string body);
         void        setrequestline(std::string requestline);
-        void        seturi(std::string uri);
+        // void        seturi(std::string uri);
 
-        void setUri(const std::string &uri);
+        // void setUri(const std::string &uri);
 
-        const std::string &getUri() const;
+        // const std::string &getUri() const;
 
         const std::string &getRequestline() const;
 

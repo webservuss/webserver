@@ -36,10 +36,12 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     {
         line = data.substr(0, data.find('\r'));
         std::cout << RED <<"line: "<< "{"  << line << "}"<< std::endl;
-        while(i == 0) {
-
-            std::cout << RED<< "were here? " << RESET <<std::endl;
+        if (i == 0) 
+        {
             setRequestline(line);
+            mapHeader.insert(std::pair<std::string, std::string>( "METHOD", _method) );
+            mapHeader.insert(std::pair<std::string, std::string>( "URI", _uri) );
+            mapHeader.insert(std::pair<std::string, std::string>( "PROTOCOL", _protocol) );
             i++;
         }
         std::cout  << RED << "HERE 1 "<< std::endl;
@@ -55,8 +57,8 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     std::cout << RED <<  "*******************MAP REQUEST CONTAINTS*******************\n";
     for (it=mapHeader.begin(); it!=mapHeader.end(); ++it)
     std::cout << GREEN << it->first  << BLUE << " => " << GREEN << it->second << RESET << '\n';
-
 }
+
 
 void HTTP::re_HTTP::set_headers(std::string header) {
 
@@ -128,37 +130,51 @@ void re_HTTP::setRequestline(std::string &requestline) {
         {
             std::cout << YELLOW " HERE" << R << std::endl;
             _method = requestline.substr(found, methods[i].size());
-            _requestline = requestline.substr(_method.size(), requestline.size()- methods[i].size());
-            std::cout << "requestline : " <<  _requestline << std::endl;
+            std::string tmp = requestline.substr(_method.size() + 1, requestline.size()- methods[i].size());
+            _uri = tmp.substr(0, tmp.find(' '));
+            std::cout << "_method : [" <<  _method << "]" << std::endl;
+            std::cout << "_uri : [" <<  _uri << "]" << std::endl;
+            _protocol = tmp.substr(_uri.size() + 1, tmp.size() - _uri.size());
+            std::cout << "_protocol : [" <<  _protocol << "]" << std::endl;
             break;
         }
     }
     if(found == -1)
-            std::cout << "NO METHOD" << std::endl; // error message.
-    _requestline = requestline;
-    std::string lin = requestline.c_str();
-    if( _method == "POST")
     {
-        found = lin.find("HTTP/1.1");
-        int i = 0;
-        while (lin[i] == ' ')
-        i++;
-        std::cout << "SET URI" << std::endl;
-        _uri = _requestline.substr(i, found);
-        std::cout << "SET URI" << _uri << std::endl;
+        std::cout << "NO METHOD" << std::endl; // error message.
+        _method = "";
+        _uri = "";
+        _protocol = "";
     }
-      
-
+    // _requestline = requestline;
+    // std::string lin = requestline.c_str();
+    // if( _method == "POST")
+    // {
+    //     found = lin.find("HTTP/1.1");
+    //     int i = 0;
+    //     while (lin[i] == ' ')
+    //     i++;
+    //     std::cout << "SET URI" << std::endl;
+    //     _uri = _requestline.substr(i, found);
+    //     std::cout << "SET URI" << _uri << std::endl;
+    // }
 }
 
 
 //get URI
-const std::string &re_HTTP::getUri() const {
-    std::cout << YELLOW << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< _uri << R <<  std::endl;
-    return _uri;
-}
+// const std::string &re_HTTP::getUri() const {
+//     std::cout << YELLOW << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< _uri << R <<  std::endl;
+//     return _uri;
+// }
 
 //define URI
-void re_HTTP::setUri(const std::string &uri) {
-    _uri = uri;
+// void re_HTTP::setUri(const std::string &uri) {
+//     _uri = uri;
+// }
+
+HTTP::re_HTTP::~re_HTTP()
+{
+    std::cout << "destructor" << std::endl;
+    for (std::map<std::string, std::string>::iterator itft = mapHeader.begin(); itft!=mapHeader.end(); ++itft)
+        std::cout << itft->first << " => " << itft->second << '\n';
 }
