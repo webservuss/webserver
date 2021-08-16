@@ -30,21 +30,20 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     std::string findKey;
 
     // see if its redirection if it is
-
     // sent satus line
     std::cout << YELLOW << "***************RESPOND%%%%%%%%%%%%%%%%%%%%" << R << std::endl;
     startres();
     setDate();
     setmodified(1);
-    findKey = _map_req["Connection:"];
+    findKey = _map_req["Connection"];
     std::cout << "KEY" << findKey << std::endl;
     setconnection(findKey);
-    findKey = _map_req["Host:"];
+    findKey = _map_req["Host"];
     setHost(findKey);
-    findKey = _map_req["Accept-Language:"];
+    findKey = _map_req["Accept-Language"];
     setLanguage(findKey);
     setbody();
-     std::cout <<  "BODY>?" << _body << std::endl;
+    std::cout <<  "BODY>?" << _body << std::endl;
     status_line(findKey);
     appendheader();
 }
@@ -61,27 +60,15 @@ void HTTP::respond::startres()
     // limits 414 request entity
     // check if the methods are allowed?
 
-    if (_map_req.count("GET") > 0)
-    {
-        std::cout << "GET " << std::endl;
-
-        //returm getmethod();
-    }
-    if (_map_req.count("POST") > 0)
-    {
-        std::cout << RED << "*******************************POST" << RESET << std::endl;
+    std::cout << "_map_req[METHOD][" << _map_req["METHOD"] << "]" << std::endl;
+    if (_map_req["METHOD"].compare("GET") == 0)
+        // return ;
+    if (_map_req["METHOD"].compare("POST") == 0)
         return postmethod();
-    }
-
-    if (_map_req.count("DELETE") > 0)
-    {
-
-        std::cout << "DELETE " << std::endl;
-        //deletemethod();
-    }
+    if (_map_req["METHOD"].compare("DELETE") == 0)
+        return deletemethod();
     else
         std::cout << " the method is nog right" << std::endl;
-    // return postmethod();
 }
 
 void HTTP::respond::getmethod()
@@ -113,7 +100,7 @@ void HTTP::respond::postmethod()
         {
             total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
             _body = total_body;
-            std::cout << RED <<  "POST :" << _body << R <<  std::endl;
+            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
         }
     if (this->filefd == -1 && _status == 200)
         // this->setstatus(403);
@@ -122,7 +109,7 @@ void HTTP::respond::postmethod()
    // if (stat(file, &statBuf) < 0 && _status == 200)
       //  std::cout << "status code 201 " << std::endl;
     // this->setstatus(201);
-    std::cout << RED << "BODY :" <<_body << R <<std::endl;
+    std::cout << RED << "BODY =" <<_body << R <<std::endl;
     if (write(filefd, _body.c_str(),_body.length()) == -1)
         std::cout<< "WRITE " << std::endl;
     close(filefd);
@@ -184,7 +171,7 @@ void HTTP::respond::status_line(std::string findKey)
 void HTTP::respond::setcontenttype(const std::string &contentype)
 {
     _contentype = contentype;
-    _totalrespond.insert(std::pair<std::string, std::string>("Content-Type:", _contentype));
+    _totalrespond.insert(std::pair<std::string, std::string>("Content-Type", _contentype));
 }
 
 void HTTP::respond::setDate()
@@ -199,7 +186,7 @@ void HTTP::respond::setDate()
     info = localtime(&t);
     _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z", info);
     _date = buffer;
-    _totalrespond.insert(std::pair<std::string, std::string>("Date:", _date));
+    _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
 }
 
 void ::HTTP::respond::setmodified(int fileFD)
@@ -214,25 +201,25 @@ void ::HTTP::respond::setmodified(int fileFD)
     _lastmodified.append(timestamp);
     _lastmodified.append("\r\n");
     //std::cout << "last modified : " << _lastmodified << std::endl;
-    _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified:", _lastmodified));
+    _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
 
 void HTTP::respond::setconnection(std::string connection)
 {
     _connection = connection;
-    _totalrespond.insert(std::pair<std::string, std::string>("Connection:", _connection));
+    _totalrespond.insert(std::pair<std::string, std::string>("Connection", _connection));
 }
 
 void HTTP::respond::setHost(std::string host)
 {
     _host = host;
-    _totalrespond.insert(std::pair<std::string, std::string>("Host:", _host));
+    _totalrespond.insert(std::pair<std::string, std::string>("Host", _host));
 }
 
 void HTTP::respond::setLanguage(std::string contentlanguage)
 {
     _language = contentlanguage;
-    _totalrespond.insert(std::pair<std::string, std::string>("Content-Language:", _language));
+    _totalrespond.insert(std::pair<std::string, std::string>("Content-Language", _language));
 }
 
 //const std::string &HTTP::respond::getStatusline() const
@@ -248,7 +235,7 @@ void HTTP::respond::setContentlen(std::string body)
     std::stringstream ss;
     ss << size;
     ss >> _contentlen;
-    _totalrespond.insert(std::pair<std::string, std::string>("Content-Length:", _contentlen));
+    _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
 }
 
 void HTTP::respond::appendheader()
@@ -258,10 +245,10 @@ void HTTP::respond::appendheader()
     std::map<std::string, std::string>::iterator it = _totalrespond.begin();
     for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it)
     {
-        if ((it->first != "Content-Length:" || it->second != "0") && (!it->second.empty()))
+        if ((it->first != "Content-Length" || it->second != "0") && (!it->second.empty()))
         {
             _totalheader.append(it->first);
-            _totalheader.append(" ");
+            _totalheader.append(": ");
             _totalheader.append(it->second);
             _totalheader.append("\r\n");
         }
@@ -367,8 +354,9 @@ void HTTP::respond::setbody()
     std::string total_body;
     std::string total_path = find_total_file_path();
     const char *_path = total_path.c_str();
-    struct stat sb;
-    std::cout << RED << "00" << RESET << std::endl;
+    struct stat     sb;
+
+    std::cout << RED << "00_path" << _path << RESET << std::endl;
     if (stat(_path, &sb) == -1)
     {
         std::cout << RED << "1" << RESET << std::endl;
@@ -388,7 +376,7 @@ void HTTP::respond::setbody()
     //    if (lastword == ".html")
     if (total_path.find(".php") != std::string::npos)
     {
-        std::cout << RED << "2 CGI" << RESET << std::endl;
+        std::cout << RED << "2" << RESET << std::endl;
         // _body will be filled by php_cgi()
         // cgi_php();
     }
@@ -421,7 +409,7 @@ void HTTP::respond::setbody()
 //		std::cout << lastword << std::endl;
 //	}
 
-//    if (lastword == ".html")
+//    if (lastword == ".html")	
 	if (total_path.find(".php") != std::string::npos)
 	{
 		// _body will be filled by php_cgi()
@@ -429,11 +417,14 @@ void HTTP::respond::setbody()
 	}
     else
 	{
-		std::ifstream   file(_path);
+        std::cout << YELLOW << "HEREEEEE" << RESET << std::endl;
+        std::ifstream   file(_path);
 		if(file.is_open())
 		{
-			total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 			_body = total_body;
+            std::cout << "AND U " << std::endl;
+            std::cout << "body:" << _body << std::endl;
 		}
 		else
 		{

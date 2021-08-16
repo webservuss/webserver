@@ -39,7 +39,7 @@ namespace HTTP{
             std::string _method; //
             std::string  _uri; //
             std::string  _totalBody;
-            std::string _protocol; //
+            std::string _protocol;
             
 
 

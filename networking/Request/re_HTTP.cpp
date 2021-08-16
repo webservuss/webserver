@@ -50,7 +50,7 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
         mapHeader.insert(std::pair<std::string, std::string>( _key, _value) );
         std::cout << "j" << j <<std::endl;
         j++;
-    }
+        }
 
     std::cout  << RED << "HERE 2 "<< std::endl;
     std::map<std::string, std::string>::iterator it = mapHeader.begin();
@@ -139,6 +139,7 @@ void re_HTTP::setRequestline(std::string &requestline) {
             break;
         }
     }
+
     if(found == -1)
     {
         std::cout << "NO METHOD" << std::endl; // error message.
@@ -148,16 +149,6 @@ void re_HTTP::setRequestline(std::string &requestline) {
     }
     // _requestline = requestline;
     // std::string lin = requestline.c_str();
-    // if( _method == "POST")
-    // {
-    //     found = lin.find("HTTP/1.1");
-    //     int i = 0;
-    //     while (lin[i] == ' ')
-    //     i++;
-    //     std::cout << "SET URI" << std::endl;
-    //     _uri = _requestline.substr(i, found);
-    //     std::cout << "SET URI" << _uri << std::endl;
-    // }
 }
 
 
