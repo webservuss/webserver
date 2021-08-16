@@ -60,6 +60,8 @@ namespace HTTP{
         std::string _postheader;
         std::string _deleteheader;
         std::string _postbodylen;
+        std::string _deletefile;
+        
         
         std::map <std::string, std::string> _map_req;
         std::string       _contentype;
