@@ -132,6 +132,7 @@ void re_HTTP::setRequestline(std::string &requestline) {
             _method = requestline.substr(found, methods[i].size());
             std::string tmp = requestline.substr(_method.size() + 1, requestline.size()- methods[i].size());
             _uri = tmp.substr(0, tmp.find(' '));
+            _uri = _uri.substr(1, _uri.size() - 1);
             std::cout << "_method : [" <<  _method << "]" << std::endl;
             std::cout << "_uri : [" <<  _uri << "]" << std::endl;
             _protocol = tmp.substr(_uri.size() + 1, tmp.size() - _uri.size());

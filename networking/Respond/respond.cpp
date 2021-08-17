@@ -215,12 +215,17 @@ void HTTP::respond::setLanguage(std::string contentlanguage)
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Language", _language));
 }
 
+//const std::string &HTTP::respond::getStatusline() const
+//{
+//    return _statusline;
+//}
+
 void HTTP::respond::setContentlen(std::string body)
 {
-    int                 size;
-    std::stringstream   ss;
+    int size;
 
     size = body.size();
+    std::stringstream ss;
     ss << size;
     ss >> _contentlen;
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
@@ -249,11 +254,11 @@ void HTTP::respond::appendheader()
 // add the root to the path . and maybe append html maybe... 
 std::string HTTP::respond::find_total_file_path()
 {
-    std::string rel_path;
-    std::string total_path;
+    std::string rel_path = "";
+    std::string total_path = "";
 
-    rel_path = _map_req["URI"];
-    if (rel_path == "\\")
+    rel_path = _map_req["URI"].c_str();
+    if (rel_path == " " || rel_path == "")
         rel_path = _pars_server._index;
     total_path = _pars_server._root.append(rel_path);
     return (total_path);
@@ -278,6 +283,7 @@ void HTTP::respond::setbody()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, total_path);
 		_body = cgi.get_cgi_body();
+
 	}
 	else
 	{
