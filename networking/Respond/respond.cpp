@@ -22,12 +22,14 @@
 //413 (request entity is larger than limits defined by server
 //(I think this is what you are talking about)) after that status codes should be done
 
-HTTP::respond::respond(t_req_n_config req_n_conf)
+HTTP::respond::respond(t_req_n_config req_n_conf, int fd)
 {
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
+    std::cout << YELLOW << fd << R << std::cout;
+    _fd = fd;
 
     // see if its redirection if it is
     std::cout << YELLOW << "***************RESPOND%%%%%%%%%%%%%%%%%%%%" << R << std::endl;
@@ -62,7 +64,7 @@ void HTTP::respond::getmethod()
     std::string findKey;
 
     setDate();
-    setmodified();
+    setmodified(_fd);
     setconnection(_map_req["Connection"]);
     setHost(_map_req["Host"]);
     setLanguage(_map_req["Accept-Language"]);
@@ -81,33 +83,34 @@ void HTTP::respond::postmethod()
     //    if( serverMaximum > _body.length())
     //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
     //if (maxbodysize < _body.length()[]
-  //  int fd;
+//     int fd;
    
-    std::string     total_path = find_total_file_path();
-    std::ifstream file("html_pages/welcome.php");
-    std::cout << GREEN << "file :: " << file << R << std::endl;
-   // std::ifstream file("html_pages/index.html");
-    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
-       // std::ifstream file("html_pages/auto_error.html");
-        std::string total_body;
-        if (file.is_open())
-        {
-            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _body = total_body;
-            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
-        }
-    if (this->filefd == -1 && _status == 200)
-        // this->setstatus(403);
-        std::cout << "status code 403 " << std::endl;
-    //struct stat statBuf;
-   // if (stat(file, &statBuf) < 0 && _status == 200)
-      //  std::cout << "status code 201 " << std::endl;
-    // this->setstatus(201);
-    std::cout << RED << "BODY =" <<_body << R <<std::endl;
-    if (write(filefd, _body.c_str(),_body.length()) == -1)
-        std::cout<< "WRITE " << std::endl;
-    close(filefd);
-    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
+//     std::string     total_path = find_total_file_path();
+//     std::ifstream file("html_pages/welcome.php");
+//     std::cout << GREEN << "file :: " << file << R << std::endl;
+//    // std::ifstream file("html_pages/index.html");
+//    // fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
+//        // std::ifstream file("html_pages/auto_error.html");
+//         std::string total_body;
+//         if (file.is_open())
+//         {
+//             total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+//             _body = total_body;
+//             std::cout << RED <<  "POST =" << _body << R <<  std::endl;
+//         }
+//     if (this->filefd == -1 && _status == 200)
+//         // this->setstatus(403);
+//         std::cout << "status code 403 " << std::endl;
+//     //struct stat statBuf;
+//    // if (stat(file, &statBuf) < 0 && _status == 200)
+//       //  std::cout << "status code 201 " << std::endl;
+//     // this->setstatus(201);
+    
+//     std::cout << RED << "BODY =" <<_body << R <<std::endl;
+//     if (write(filefd, _body.c_str(),_body.length()) == -1)
+//         std::cout<< "WRITE " << std::endl;
+//     close(filefd);
+//     std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
 }
 
 
@@ -181,14 +184,14 @@ void HTTP::respond::setDate()
     _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
 }
 
-void ::HTTP::respond::setmodified()
+void ::HTTP::respond::setmodified(int fd)
 {
     struct stat stat;
     struct tm *info;
     char timestamp[36];
-    int fileFD = 1; // change this to right thing
+    //int fileFD = 1; // change this to right thing
 
-    fstat(fileFD, &stat);
+    fstat(fd, &stat);
     info = localtime(&stat.st_mtime);
     strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
     _lastmodified.append(timestamp);

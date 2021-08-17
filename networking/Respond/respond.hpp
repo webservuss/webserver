@@ -62,6 +62,7 @@ namespace HTTP{
         std::string _deleteheader;
         std::string _postbodylen;
         std::string _deletefile;
+        int         _fd;
         
         
         std::map <std::string, std::string> _map_req;
@@ -84,7 +85,7 @@ namespace HTTP{
 
 
     public:
-        respond(s_req_n_config req_n_conf);
+        respond(s_req_n_config req_n_conf, int fd);
         ~respond();
         // respond(std::map < std::string, std::string > mapHeader);
         void status_line            ();
@@ -92,7 +93,7 @@ namespace HTTP{
         void setHost                (std::string host);
         void setContentlen          (std::string s);
         void setDate();
-        void setmodified            ();
+        void setmodified            (int fd);
         void setconnection          (const std::string connection);
         void setbody();
 		void cgi_php();
