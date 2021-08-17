@@ -62,7 +62,7 @@ namespace HTTP{
         std::string _deleteheader;
         std::string _postbodylen;
         std::string _deletefile;
-        
+        std::string _totalpath;
         
         std::map <std::string, std::string> _map_req;
         std::string       _contentype;
@@ -97,7 +97,7 @@ namespace HTTP{
         void setbody();
 		void cgi_php();
         void                        appendheader();
-        std::string                 find_total_file_path();
+        void                 find_total_file_path();
         void                        set_status_code(int code);
         void                        startres();
         void                        postmethod();

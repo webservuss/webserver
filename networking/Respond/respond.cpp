@@ -29,8 +29,6 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     _pars_server = req_n_conf._parser_server;
     std::string findKey;
 
-    // see if its redirection if it is
-    std::cout << YELLOW << "***************RESPOND%%%%%%%%%%%%%%%%%%%%" << R << std::endl;
     startres();
 }
 
@@ -74,16 +72,13 @@ void HTTP::respond::getmethod()
 void HTTP::respond::postmethod()
 {
     std::cout << "ik ben in en post method" << std::endl;
-
-    
-    
     //    int serverMaximum = _body.size();
     //    if( serverMaximum > _body.length())
     //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
     //if (maxbodysize < _body.length()[]
-  //  int fd;
+    //  int fd;
    
-    std::string     total_path = find_total_file_path();
+    std::string     total_path = _totalpath;
     std::ifstream file("html_pages/welcome.php");
     std::cout << GREEN << "file :: " << file << R << std::endl;
    // std::ifstream file("html_pages/index.html");
@@ -183,17 +178,24 @@ void HTTP::respond::setDate()
 
 void ::HTTP::respond::setmodified()
 {
-    struct stat stat;
+    struct stat stats;
     struct tm *info;
-    char timestamp[36];
-    int fileFD = 1; // change this to right thing
+    char timestamp[1000];
+    // int fileFD = 1; // change this to right thing
 
-    fstat(fileFD, &stat);
-    info = localtime(&stat.st_mtime);
-    strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
-    _lastmodified.append(timestamp);
+    // fstat(fileFD, &stats);
+    if (stat(_totalpath.c_str(), &stats) == 0)
+    {
+        info = gmtime(&stats.st_mtime);
+        strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
+        _lastmodified.append(timestamp);
+
+    }
+    // info = localtime(&stats.st_mtime);
+    // strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
+    // _lastmodified.append(timestamp);
     _lastmodified.append("\r\n");
-    //std::cout << "last modified : " << _lastmodified << std::endl;
+    std::cout << YELLOW << "last modified : " << _lastmodified << R<< std::endl;
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
 
@@ -252,16 +254,15 @@ void HTTP::respond::appendheader()
 }
 
 // add the root to the path . and maybe append html maybe... 
-std::string HTTP::respond::find_total_file_path()
+void HTTP::respond::find_total_file_path()
 {
-    std::string rel_path = "";
-    std::string total_path = "";
+    std::string rel_path;
 
     rel_path = _map_req["URI"].c_str();
     if (rel_path == " " || rel_path == "")
         rel_path = _pars_server._index;
-    total_path = _pars_server._root.append(rel_path);
-    return (total_path);
+    _totalpath = _pars_server._root.append(rel_path);
+    return ;
 }
 
 void HTTP::respond::set_status_code(int code)
@@ -271,26 +272,24 @@ void HTTP::respond::set_status_code(int code)
 
 void HTTP::respond::setbody()
 {
-    std::string     total_path;
     const char      *_path;
     struct stat     sb;
 
-    total_path = find_total_file_path();
-    _path = total_path.c_str();
+    find_total_file_path();
+    _path = _totalpath.c_str();
     if (stat(_path, &sb) == -1)
         return (set_status_code(404)); // file doesnt exist
-	if (total_path.find(".php") != std::string::npos)// _body will be filled by php_cgi()
+	if (_totalpath.find(".php") != std::string::npos)// _body will be filled by php_cgi()
 	{
-		HTTP::CGI cgi(_map_req, _pars_server, total_path);
+		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
 		_body = cgi.get_cgi_body();
-
 	}
 	else
 	{
         std::ifstream   file(_path);
 		if(file.is_open())
             _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		else
+        else
 		{
 			file.close();
 			return (set_status_code(403)); // forbidden no access rights
