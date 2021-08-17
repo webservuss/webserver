@@ -30,22 +30,8 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
     std::string findKey;
 
     // see if its redirection if it is
-    // sent satus line
     std::cout << YELLOW << "***************RESPOND%%%%%%%%%%%%%%%%%%%%" << R << std::endl;
     startres();
-    setDate();
-    setmodified(1);
-    findKey = _map_req["Connection"];
-    std::cout << "KEY" << findKey << std::endl;
-    setconnection(findKey);
-    findKey = _map_req["Host"];
-    setHost(findKey);
-    findKey = _map_req["Accept-Language"];
-    setLanguage(findKey);
-    setbody();
-    std::cout <<  "BODY>?" << _body << std::endl;
-    status_line(findKey);
-    appendheader();
 }
 
 HTTP::respond::~respond()
@@ -62,19 +48,27 @@ void HTTP::respond::startres()
 
     std::cout << "_map_req[METHOD][" << _map_req["METHOD"] << "]" << std::endl;
     if (_map_req["METHOD"].compare("GET") == 0)
-        // return ;
+        return getmethod() ;
     if (_map_req["METHOD"].compare("POST") == 0)
         return postmethod();
     if (_map_req["METHOD"].compare("DELETE") == 0)
         return deletemethod();
     else
-        std::cout << " the method is nog right" << std::endl;
+        std::cout << " the method is nog right" << std::endl; // 405
 }
 
 void HTTP::respond::getmethod()
 {
-    // so this should be just a
-    //basicly do what is no been done
+    std::string findKey;
+
+    setDate();
+    setmodified();
+    setconnection(_map_req["Connection"]);
+    setHost(_map_req["Host"]);
+    setLanguage(_map_req["Accept-Language"]);
+    setbody();
+    status_line();
+    appendheader();
 }
 
 void HTTP::respond::postmethod()
@@ -128,10 +122,8 @@ void HTTP::respond::deletemethod()
 }
 
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
-void HTTP::respond::status_line(std::string findKey)
+void HTTP::respond::status_line()
 {
-    std::cout << RED << findKey << "PRINT THIS LINE " << R<<std::endl;
-
     _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
         _statusline.append("200 OK");
@@ -189,11 +181,12 @@ void HTTP::respond::setDate()
     _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
 }
 
-void ::HTTP::respond::setmodified(int fileFD)
+void ::HTTP::respond::setmodified()
 {
     struct stat stat;
     struct tm *info;
     char timestamp[36];
+    int fileFD = 1; // change this to right thing
 
     fstat(fileFD, &stat);
     info = localtime(&stat.st_mtime);
@@ -222,17 +215,12 @@ void HTTP::respond::setLanguage(std::string contentlanguage)
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Language", _language));
 }
 
-//const std::string &HTTP::respond::getStatusline() const
-//{
-//    return _statusline;
-//}
-
 void HTTP::respond::setContentlen(std::string body)
 {
-    int size;
+    int                 size;
+    std::stringstream   ss;
 
     size = body.size();
-    std::stringstream ss;
     ss << size;
     ss >> _contentlen;
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
@@ -261,38 +249,13 @@ void HTTP::respond::appendheader()
 // add the root to the path . and maybe append html maybe... 
 std::string HTTP::respond::find_total_file_path()
 {
+    std::string rel_path;
     std::string total_path;
-    std::cout << "HER" << std::endl;
-    std::string get_req_line = _map_req["GET"].c_str();
-    // std::string get_post_line = _map_req["POST"].c_str();
-    // std::string get_delete_line = _map_req["DELETE"].c_str();
 
-    std::string pathfind = "";
-    std::string resultpathfind = "";
-    int i = 0;
-
-    //std::cout << RED<< " POST " << get_post_line << RESET <<  std::endl;
-    while (get_req_line[i] != '/' )
-        i++;
-        //std::cout << "8" << std::endl;
-    // }
-    pathfind = get_req_line.substr(i, get_req_line.size() - i);
-    if (pathfind.find(' ') - 1 >= 1) // check not root
-    {
-        std::cout << "9" << std::endl;
-        resultpathfind = pathfind.substr(1, pathfind.find(' ') - 1);
-        // TODO really need to do per method now hard coded .html. Uncomment this to show images for index.html.
-        //resultpathfind.append(".html");
-    }
-   // if root find index from config
-    if (resultpathfind == "")
-        resultpathfind = _pars_server._index;
-    total_path = _pars_server._root.append(resultpathfind);
-    std::cout << RED << "get_req_line: [" << get_req_line << "]" << R << std::endl;
-    std::cout << "pathfind: [" << pathfind << "]" << std::endl;
-    std::cout << "resultpathfind: [" << resultpathfind << "]" << std::endl;
-    std::cout << "_pars_server._root:[" << _pars_server._root << "]" << std::endl;
-    std::cout << "12" << std::endl;
+    rel_path = _map_req["URI"];
+    if (rel_path == "\\")
+        rel_path = _pars_server._index;
+    total_path = _pars_server._root.append(rel_path);
     return (total_path);
 }
 
@@ -303,82 +266,24 @@ void HTTP::respond::set_status_code(int code)
 
 void HTTP::respond::setbody()
 {
-    std::string total_body;
-    std::string total_path = find_total_file_path();
-    const char *_path = total_path.c_str();
+    std::string     total_path;
+    const char      *_path;
     struct stat     sb;
 
+    total_path = find_total_file_path();
+    _path = total_path.c_str();
     if (stat(_path, &sb) == -1)
-    {
-        std::cout << RED << "1" << RESET << std::endl;
         return (set_status_code(404)); // file doesnt exist
-    }
-	//   std::string lastword;
-    //  std::string path_string = _path;
-    //    int i = total_path.length() -1;
-    //    if(isspace(total_path[i]))
-    //	{
-    //		while(isspace(total_path[i])) i--;
-    //
-    //		 lastword = total_path.substr(i + 1);
-    //		std::cout << lastword << std::endl;
-    //	}
-
-    //    if (lastword == ".html")
-	if (total_path.find(".php") != std::string::npos)
-    {
-        // _body will be filled by php_cgi()
-        HTTP::CGI cgi(_map_req, _pars_server, total_path);
-        _body = cgi.get_cgi_body();
-    }
-    // else
-
-    // {
-    //     std::cout << RED << "3" << RESET << std::endl;
-    //     std::ifstream file(_path);
-    //     if (file.is_open())
-    //     {
-    //         total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    //         _body = total_body;
-    //     }
-    //     else
-    //     {
-    //         file.close();
-    //         return (set_status_code(403)); // forbidden no access rights
-    //     }
-    //     file.close();
-    // }
-    // setContentlen(_body);
- //   std::string lastword;
-  //  std::string path_string = _path;
-//    int i = total_path.length() -1;
-//    if(isspace(total_path[i]))
-//	{
-//		while(isspace(total_path[i])) i--;
-//
-//		 lastword = total_path.substr(i + 1);
-//		std::cout << lastword << std::endl;
-//	}
-
-//    if (lastword == ".html")	
-	if (total_path.find(".php") != std::string::npos)
+	if (total_path.find(".php") != std::string::npos)// _body will be filled by php_cgi()
 	{
-		// _body will be filled by php_cgi()
 		HTTP::CGI cgi(_map_req, _pars_server, total_path);
 		_body = cgi.get_cgi_body();
-
 	}
 	else
 	{
-        std::cout << YELLOW << "HEREEEEE" << RESET << std::endl;
         std::ifstream   file(_path);
 		if(file.is_open())
-		{
-            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-			_body = total_body;
-            std::cout << "AND U " << std::endl;
-            std::cout << "body:" << _body << std::endl;
-		}
+            _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		else
 		{
 			file.close();
@@ -386,7 +291,7 @@ void HTTP::respond::setbody()
 		}
 		file.close();
 	}
-    setContentlen(total_body);
+    setContentlen(_body);
     if (_contentlen == "0" && _status_code == 0)
         _status_code = 204;
     else if (_status_code == 0)

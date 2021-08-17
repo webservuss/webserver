@@ -87,12 +87,12 @@ namespace HTTP{
         respond(s_req_n_config req_n_conf);
         ~respond();
         // respond(std::map < std::string, std::string > mapHeader);
-        void status_line            (std::string getkey);
+        void status_line            ();
         void setLanguage            (std::string contentlanguage);
         void setHost                (std::string host);
         void setContentlen          (std::string s);
         void setDate();
-        void setmodified            (int fileFD);
+        void setmodified            ();
         void setconnection          (const std::string connection);
         void setbody();
 		void cgi_php();
