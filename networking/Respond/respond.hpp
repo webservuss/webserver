@@ -63,6 +63,7 @@ namespace HTTP{
         std::string _postbodylen;
         std::string _deletefile;
         std::string _totalpath;
+        std::string _relativepath;
         
         std::map <std::string, std::string> _map_req;
         std::string       _contentype;
@@ -105,6 +106,7 @@ namespace HTTP{
         void                        getmethod();
         void                        setcontenttype(const std::string &contentype);
         int         setstatus;
+void    check_methods_same();
 
     };
 }
