@@ -11,6 +11,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+// als het niet een extensie heeft dan check if auto index is on = if yes dan zie pagina met folders en bestanden 
 // TODO :
 // check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
 // and then continue.
@@ -142,31 +144,61 @@ void HTTP::respond::deletemethod()
 
 }
 
+void HTTP::respond::set404(std::string root)
+{
+    std::cout << YELLOW << "HERE" <<  R << std::endl;
+    std::cout << YELLOW << _relativepath << R<<  std::endl;
+    std::ifstream file(root);
+      std::string total_body;
+          if (file.is_open())
+        {
+            // total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            // _body = total_body;
+            _body = total_body = ("hallo is this working");
+        }
+}
+
 //  TODO also add a bad request if we dont find HTTP/1.1 !!!
 void HTTP::respond::status_line()
 {
+    //find first 404;
+
+    std::cout << YELLOW << "last modified : " << _pars_server._error_page[1] << R<< std::endl;
     _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
         _statusline.append("200 OK");
+
     else if (_status_code == 404)
-    { // error  in 404 as will make server fuck up for some reason atm
+    { 
         _statusline.append("404 Not Found");
-        // if (_pars_server._error_page)
-        //_body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body></html>";
+        //404 auto error page go what is in config file if there isnt then go to default. 
         std::ifstream file("html_pages/auto_error.html");
         std::string total_body;
-        if (file.is_open())
+        if ( _pars_server._error_page[0] == "404")
         {
+            std::cout << YELLOW << "404" <<  R << std::endl;
+            std::string root = _pars_server._error_page[1];
+            set404(root);
+        }
+            //_body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body></html>";
+
+        else if (file.is_open())
+        {
+
             total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
             _body = total_body;
-            std::cout << RED <<  "BODYYYYYY" << _body << R <<  std::endl;
         }
         else
         {
-            // TODO throw exception
             std::cout << YELLOW << "404 NOT OPEN" << RESET << std::endl;
             exit(10);
         }
+            // else
+        // {
+        //     _statusline.append("403 Forbidden");
+        //      _body = "<h1>403: You can't do that!</h1>\0";
+        //     setContentlen(_body);
+        // }
         file.close();
         setcontenttype("text/html");
         setContentlen(_body);
