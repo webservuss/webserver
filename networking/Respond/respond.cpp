@@ -1,84 +1,74 @@
 #include "respond.hpp"
-
-#include <iostream>
-#include <map>
-#include <time.h>
-#include <sys/time.h>
 #include <sys/stat.h>
-#include <cstring>
-#include <iterator>
-#include <sys/wait.h>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
-// als het niet een extensie heeft dan check if auto index is on = if yes dan zie pagina met folders en bestanden 
-// TODO :
-// check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
-// and then continue.
-
-//yes also notes, we need to implement the following status codes: for redirect 301 (moved permenantely),
-
-//307 (temporary redirect) and 405(method not allowed e.g. if method not same as config) and
-
-//413 (request entity is larger than limits defined by server
-//(I think this is what you are talking about)) after that status codes should be done
+// TODO : 413 (request entity is larger than limits defined by server
 
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
-    std::string findKey;
 
-    startres();
-}
-
-HTTP::respond::~respond()
-{
-}
-
-void HTTP::respond::startres()
-{
-    std::cout << RED << "***************************  WE Will check what the getter is and depending on that the respond will react" << std::endl;
-    
-    // check if method  is same as in config file. if not its 405 method not allowed  wrong code so if there differen methods.
-    // limits 414 request entity
-    // check if the methods are allowed?
-
-    std::cout << "_map_req[METHOD][" << _map_req["METHOD"] << "]" << std::endl;
-    if (_map_req["METHOD"].compare("GET") == 0)
-        return getmethod();
-    if (_map_req["METHOD"].compare("POST") == 0)
-        return postmethod();
-    if (_map_req["METHOD"].compare("DELETE") == 0)
-        return deletemethod();
+    if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
+        set_status_code(405);
+    else if (_map_req["METHOD"].compare("GET") == 0)
+        getmethod();
+    else if (_map_req["METHOD"].compare("POST") == 0)
+        postmethod();
+    else if (_map_req["METHOD"].compare("DELETE") == 0)
+        deletemethod();
     else
-        return set_status_code(405); // 405
+        set_status_code(405);
 }
 
-void    HTTP::respond::check_methods_same()
-{
-    std::string key = "/";
-    key = key.append(_relativepath);
-    std::cout << "key[" << key << "]" << std::endl;
-    std::cout << "_pars_server._location_map[key]._method[" << _pars_server._location_map[key]._method << "]" << std::endl;
-    if (_pars_server._location_map[key]._method != "")
-    {
-        std::cout << "method found server loaction block found" << std::endl;
-        if (_map_req["METHOD"].compare(_pars_server._location_map[key]._method) != 0)
-            return (set_status_code(405));
-        else
-            std::cout << "successful method" << std::endl;
-    }
-    else
-        std::cout << "shit aint found" << std::endl;
+HTTP::respond::~respond()   {}
 
-    std::cout << YELLOW <<"_map_req[METHOD][" << _map_req["METHOD"] << "]" << std::endl;
-    std::cout << "_totalpath" << _totalpath << "]" << std::endl;
-    std::cout << "_relativepath[" << _relativepath << "]" << std::endl;
-    std::cout << "_pars_server[/]is: [" << _pars_server._location_map["/"]._method << "]" << std::endl;
-    std::cout << "_pars_server[kdkd]is: [" << _pars_server._location_map["poo"]._method << "]" << R << std::endl;
+// CAN SOMEONE CHECK COPY CONSTRUCTOR AND ASSIGNMENT OPPERATOR
+/*copy constructor */
+HTTP::respond::respond(const respond& x)
+{ // TEST THIS // change
+        std::cout << "IN" << std::endl;
+
+        _statusline = x._statusline;
+        _contentlen = x._contentlen;
+        _lastmodified = x._lastmodified;
+        _connection = x._connection;
+        _contentype = x._contentype;
+        _date = x._date;
+        _host = x._host;
+        _language = x._language;
+        _body = x._body;
+        _pars_server = x._pars_server;
+        _status_code = x._status_code;
+        _totalpath = x._totalpath;
+        _relativepath = x._relativepath;
+        _totalheader = x._totalheader;
+        _totalrespond = x._totalrespond;
+        _map_req = x._map_req;
+        filefd = x.filefd; // think this will go
+}
+
+/*assignment operator */
+HTTP::respond& HTTP::respond::operator=(const respond& x)
+{ // TEST THIS
+        _statusline = x._statusline;
+        _contentlen = x._contentlen;
+        _lastmodified = x._lastmodified;
+        _connection = x._connection;
+        _contentype = x._contentype;
+        _date = x._date;
+        _host = x._host;
+        _language = x._language;
+        _body = x._body;
+        _pars_server = x._pars_server;
+        _status_code = x._status_code;
+        _totalpath = x._totalpath;
+        _relativepath = x._relativepath;
+        _totalheader = x._totalheader;
+        _totalrespond = x._totalrespond;
+        _map_req = x._map_req;
+        filefd = x.filefd; // think this will go
+        return *this;
 }
 
 void HTTP::respond::getmethod()
@@ -86,15 +76,14 @@ void HTTP::respond::getmethod()
     std::string findKey;
 
     find_total_file_path();
-    check_methods_same();
     setDate();
     setmodified();
     setconnection(_map_req["Connection"]);
     setHost(_map_req["Host"]);
     setLanguage(_map_req["Accept-Language"]);
     setbody();
-    status_line();
-    appendheader();
+    set_status_line();
+    set_total_response();
 }
 
 void HTTP::respond::postmethod()
@@ -119,7 +108,7 @@ void HTTP::respond::postmethod()
             _body = total_body;
             std::cout << RED <<  "POST =" << _body << R <<  std::endl;
         }
-    if (this->filefd == -1 && _status == 200)
+    if (this->filefd == -1 && _status_code == 200)
         // this->setstatus(403);
         std::cout << "status code 403 " << std::endl;
     //struct stat statBuf;
@@ -137,14 +126,14 @@ void HTTP::respond::postmethod()
 
 void HTTP::respond::deletemethod()
 {
-    _postheader = _totalheader;
+    // _postheader = _totalheader;
     // int ret  = remove(file.c_str());
     // if( ret != 0)
     // set statuscode notfound
 
 }
 
-void HTTP::respond::setnoconfig404(std::string root)
+void HTTP::respond::set_no_config404(std::string root)
 {
     
     std::ifstream file ("html_pages/auto_error.html");
@@ -160,7 +149,7 @@ void HTTP::respond::setnoconfig404(std::string root)
 }
 
 
-void HTTP::respond::status_line()
+void HTTP::respond::set_status_line()
 {
     std::string total_body;
     std::cout << YELLOW << "last modified : " << _pars_server._error_page[1] << R<< std::endl;
@@ -179,13 +168,13 @@ void HTTP::respond::status_line()
     // }
 
     else if (_status_code == 404)
-    { 
+    {
         _statusline.append("404 Not Found");
         std::ifstream file("html_pages/auto_error.html");
         if ( _pars_server._error_page[0] == "404" || _pars_server._error_page[0] == "404;")
         {
             std::string root = _pars_server._error_page[1];
-            setnoconfig404(root);
+            set_no_config404(root);
         }
         else if (file.is_open())
         {
@@ -215,6 +204,8 @@ void HTTP::respond::status_line()
     }
     else if (_status_code == 204)
         _statusline.append("204 No Content");
+    else if (_status_code == 301)
+        _statusline.append("301 Moved Permanently");
 }
 
 void HTTP::respond::setcontenttype(const std::string &contentype)
@@ -243,21 +234,14 @@ void ::HTTP::respond::setmodified()
     struct stat stats;
     struct tm *info;
     char timestamp[1000];
-    // int fileFD = 1; // change this to right thing
 
-    // fstat(fileFD, &stats);
     if (stat(_totalpath.c_str(), &stats) == 0)
     {
-        std::cout << "IN" << std::endl;
         info = gmtime(&stats.st_mtime);
         strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
         _lastmodified = timestamp;
+        _lastmodified.append("\r\n");
     }
-    // info = localtime(&stats.st_mtime);
-    // strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
-    // _lastmodified.append(timestamp);
-    _lastmodified.append("\r\n");
-    std::cout << YELLOW << "last modified : " << _lastmodified << R<< std::endl;
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
 
@@ -279,11 +263,6 @@ void HTTP::respond::setLanguage(std::string contentlanguage)
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Language", _language));
 }
 
-//const std::string &HTTP::respond::getStatusline() const
-//{
-//    return _statusline;
-//}
-
 void HTTP::respond::setContentlen(std::string body)
 {
     int size;
@@ -295,11 +274,12 @@ void HTTP::respond::setContentlen(std::string body)
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
 }
 
-void HTTP::respond::appendheader()
+void HTTP::respond::set_total_response()
 {
+    std::map<std::string, std::string>::iterator it;
     _totalheader.append(_statusline);
     _totalheader.append("\r\n");
-    std::map<std::string, std::string>::iterator it = _totalrespond.begin();
+    it = _totalrespond.begin();
     for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it)
     {
         if ((it->first != "Content-Length" || it->second != "0") && (!it->second.empty()))
@@ -310,26 +290,53 @@ void HTTP::respond::appendheader()
             _totalheader.append("\r\n");
         }
     }
-
     _totalheader.append(_body);
-    std::cout << RED << "total header is: " << RESET << _totalheader << std::endl;
 }
 
-// add the root to the path . and maybe append html maybe... 
 void HTTP::respond::find_total_file_path()
 {
-    std::string relpath;
+    std::string key;
+    std::string redir;
+
     _relativepath = _map_req["URI"].c_str();
-    relpath = _relativepath;
-    if (_relativepath == " " || _relativepath == "")
-        relpath = _pars_server._index;
-    _totalpath = _pars_server._root.append(relpath);
+    key = "/";
+    key = key.append(_relativepath);
+    while (key != "/")
+    {
+        key = key.substr(0, key.find_last_of('/') + 1);
+        if (_pars_server._location_map.count(key) == 1)
+            break;
+        if (key[key.size()] == '/')
+            key = key.substr(0, key.size() - 1);
+    }
+    if (_pars_server._location_map[key]._redir != "")
+    {
+        _status_code = 301;
+        _relativepath = _relativepath.substr(key.size() - 1, _relativepath.size() - key.size() + 1);
+        redir = _pars_server._location_map[key]._redir;
+        _relativepath = _pars_server._location_map[key]._redir.append(_relativepath);
+        if (_relativepath[_relativepath.size()] == '/')
+            _relativepath = _relativepath.substr(0, _relativepath.size() - 1);
+        key = redir;
+    }
+    if (_pars_server._location_map.count(key) == 1)
+    {
+        if (_map_req["METHOD"].compare(_pars_server._location_map[key]._method) != 0)
+            return (set_status_code(405));
+        else
+        {
+            if (_relativepath == "" || _relativepath == "/")
+                _relativepath = _pars_server._location_map[key]._index;
+            _totalpath = _pars_server._location_map[key]._root.append(_relativepath);
+        }
+    }
     return ;
 }
 
 void HTTP::respond::set_status_code(int code)
 {
     _status_code = code;
+    return;
 }
 
 void HTTP::respond::setbody()
@@ -337,7 +344,8 @@ void HTTP::respond::setbody()
     const char      *_path;
     struct stat     sb;
 
-    // find_total_file_path();
+    if (_status_code == 405)
+        return;
     _path = _totalpath.c_str();
     if (stat(_path, &sb) == -1)
         return (set_status_code(404)); // file doesnt exist
@@ -352,10 +360,7 @@ void HTTP::respond::setbody()
 		if(file.is_open())
             _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         else
-		{
-			file.close();
 			return (set_status_code(403)); // forbidden no access rights
-		}
 		file.close();
 	}
     setContentlen(_body);

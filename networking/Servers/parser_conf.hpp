@@ -3,7 +3,7 @@
 
 #include "../../all_libs.hpp"
 #include "../../http.hpp"
-#include "../Colors.hpp"
+#include "../utils/colors.hpp"
 namespace HTTP {
 
 typedef struct s_location {
@@ -11,8 +11,10 @@ typedef struct s_location {
 	std::string _method;
 	std::string _root;
 	std::string _cgi;
+	std::string _index;
 	std::string _autoindex;
-	int _client_body_size;
+	int 		_client_body_size;
+	std::string	_redir;
 }				t_location;
 
 typedef struct							s_server {

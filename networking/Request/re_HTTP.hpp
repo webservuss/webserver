@@ -1,81 +1,36 @@
 
-#ifndef parser_HTTP_hpp
-#define parser_HTTP_hpp
+#ifndef re_HTTP_hpp
+#define re_HTTP_hpp
 
 #include "../../http.hpp"
-#include "../Colors.hpp"
-#include "makeMap.hpp"
-#include "utils_countspace.hpp"
-
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <cstring>
-#include <iterator>
-#include <sstream>
-#include <sstream>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <string>
-#include <map>
-
+#include "../utils/colors.hpp"
+// #include "makeMap.hpp"
 
 namespace HTTP{
-
-
-
-
-
     class re_HTTP
     {
-        re_HTTP(){}
         private:
-            std::string _key;
-            std::string _value;
-            static const std::string                   permisChar;
             std::string _headers;
-            std::string _requestline;
-            std::string _method; //
-            std::string  _uri; //
-            std::string  _totalBody;
+            std::string _method;
+            std::string  _uri;
+            std::string  _totalBody; // do no think we need this
             std::string _protocol;
-            
-
+            // re_HTTP(){}
+        public:
+            std::map<std::string, std::string> _map_header;
 
         public:
+            /*constructors & destructors */
             re_HTTP(std::string dataparser);
+            re_HTTP(const re_HTTP& x);
             ~re_HTTP();
-            void split_line(std::string line);
-            std::map<std::string, std::string> mapHeader;
-            
-        
-        //setters
-        
-        void		set_key(std::string key);
-        void		set_value(std::string value);
-        void        set_headers(std::string body);
-        void        setrequestline(std::string requestline);
-        // void        seturi(std::string uri);
 
-        // void setUri(const std::string &uri);
-
-        // const std::string &getUri() const;
-
-        const std::string &getRequestline() const;
-
-        void setRequestline(std::string &requestline);
-
-        //getters
-        std::string	 get_key();
-        std:: string  request();
-        void                getrequestline(std::string requestline);
-        std::string         getmethod();
-
-        std::string &getMethod() ;
-
-        void setMethod(const std::string &method);
-
+            /* assignment opperator */
+            re_HTTP& operator=(const re_HTTP& x);
+    
+            /* setters */
+            int         set_request_line(std::string &requestline);
+            void        set_headers(std::string body);
 
     };
 
