@@ -7,7 +7,7 @@
 #include "CGI.hpp"
 #include "../Servers/select_server.hpp"
 #include "../utils/req_n_conf.hpp"
-#include "../Colors.hpp"
+#include "../utils/colors.hpp"
 
 namespace HTTP{
     class respond  {

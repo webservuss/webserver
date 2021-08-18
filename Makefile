@@ -9,7 +9,6 @@ SRCS =		networking/Servers/test.cpp \
 			networking/utils/utils.cpp \
 			networking/Request/re_HTTP.cpp \
 			networking/Servers/parser_conf.cpp \
-			networking/Request/split.cpp  \
 			networking/Servers/select_server.cpp\
 			networking/Respond/respond.cpp \
 			networking/Respond/CGI.cpp
@@ -17,7 +16,7 @@ SRCS =		networking/Servers/test.cpp \
 OFILES =	$(SRCS:.cpp=.o)
 
 FLAGS = -std=c++98 -g -Wall -Werror -Wextra
- -fsanitize=address
+#  -fsanitize=address
 # -Wall -Werror -Wextra
 # -fsanitize=address
 # -Wall -Werror -Wextra

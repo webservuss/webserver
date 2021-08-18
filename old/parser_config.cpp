@@ -14,9 +14,6 @@ HDE::parser_config::parser_config(std::ifstream &file)
     int j=0;
 
     int f;
-
-
-  
     if(file)
         std::cout<< RED<< "file is open lets read" << RESET << std::endl;
     std:size_t len = line.size();

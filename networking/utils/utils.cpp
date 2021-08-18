@@ -3,14 +3,14 @@
 //
 #include "../../all_libs.hpp"
 
-void dbe(std::string s)
-{
-	std::cout << s << std::endl;
-}
-void db(std::string s)
-{
-	std::cout << s;
-}
+// void dbe(std::string s)
+// {
+// 	std::cout << s << std::endl;
+// }
+// void db(std::string s)
+// {
+// 	std::cout << s;
+// }
 
 // https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string/39359311
 /*

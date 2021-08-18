@@ -3,9 +3,8 @@
 #define re_HTTP_hpp
 
 #include "../../http.hpp"
-#include "../Colors.hpp"
-#include "makeMap.hpp"
-// #include "utils_countspace.hpp"
+#include "../utils/colors.hpp"
+// #include "makeMap.hpp"
 
 namespace HTTP{
     class re_HTTP
