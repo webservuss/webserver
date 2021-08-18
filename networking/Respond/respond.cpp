@@ -1,64 +1,80 @@
 #include "respond.hpp"
-
-#include <iostream>
-#include <map>
-#include <time.h>
-#include <sys/time.h>
 #include <sys/stat.h>
-#include <cstring>
-#include <iterator>
-#include <sys/wait.h>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-// TODO :
-// check if its redirection -> if in de config file url location block is a redirection 1 change it to redirection
-// and then continue.
 
-//yes also notes, we need to implement the following status codes: for redirect 301 (moved permenantely),
-
-//307 (temporary redirect) and 405(method not allowed e.g. if method not same as config) and
-
-//413 (request entity is larger than limits defined by server
-//(I think this is what you are talking about)) after that status codes should be done
+// TODO : 413 (request entity is larger than limits defined by server
 
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
-    std::string findKey;
 
-    startres();
-}
-
-HTTP::respond::~respond()
-{
-}
-
-void HTTP::respond::startres()
-{
-    std::cout << RED << "***************************  WE Will check what the getter is and depending on that the respond will react" << std::endl;
-    
-    // limits 414 request entity
-    // check if the methods are allowed?
     if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
-        return set_status_code(405);
-    if (_map_req["METHOD"].compare("GET") == 0)
-        return getmethod();
-    if (_map_req["METHOD"].compare("POST") == 0)
-        return postmethod();
-    if (_map_req["METHOD"].compare("DELETE") == 0)
-        return deletemethod();
+        set_status_code(405);
+    else if (_map_req["METHOD"].compare("GET") == 0)
+        getmethod();
+    else if (_map_req["METHOD"].compare("POST") == 0)
+        postmethod();
+    else if (_map_req["METHOD"].compare("DELETE") == 0)
+        deletemethod();
     else
-        return set_status_code(405);
+        set_status_code(405);
+}
+
+HTTP::respond::~respond()   {}
+
+// CAN SOMEONE CHECK COPY CONSTRUCTOR AND ASSIGNMENT OPPERATOR
+/*copy constructor */
+HTTP::respond::respond(const respond& x)
+{ // TEST THIS // change
+        std::cout << "IN" << std::endl;
+
+        _statusline = x._statusline;
+        _contentlen = x._contentlen;
+        _lastmodified = x._lastmodified;
+        _connection = x._connection;
+        _contentype = x._contentype;
+        _date = x._date;
+        _host = x._host;
+        _language = x._language;
+        _body = x._body;
+        _pars_server = x._pars_server;
+        _status_code = x._status_code;
+        _totalpath = x._totalpath;
+        _relativepath = x._relativepath;
+        _totalheader = x._totalheader;
+        _totalrespond = x._totalrespond;
+        _map_req = x._map_req;
+        filefd = x.filefd; // think this will go
+}
+
+/*assignment operator */
+HTTP::respond& HTTP::respond::operator=(const respond& x)
+{ // TEST THIS
+        _statusline = x._statusline;
+        _contentlen = x._contentlen;
+        _lastmodified = x._lastmodified;
+        _connection = x._connection;
+        _contentype = x._contentype;
+        _date = x._date;
+        _host = x._host;
+        _language = x._language;
+        _body = x._body;
+        _pars_server = x._pars_server;
+        _status_code = x._status_code;
+        _totalpath = x._totalpath;
+        _relativepath = x._relativepath;
+        _totalheader = x._totalheader;
+        _totalrespond = x._totalrespond;
+        _map_req = x._map_req;
+        filefd = x.filefd; // think this will go
+        return *this;
 }
 
 void HTTP::respond::getmethod()
 {
     std::string findKey;
 
-    std::cout << GREEN << "IN GET METHOD" << R <<std::endl;
     find_total_file_path();
     setDate();
     setmodified();
@@ -66,8 +82,8 @@ void HTTP::respond::getmethod()
     setHost(_map_req["Host"]);
     setLanguage(_map_req["Accept-Language"]);
     setbody();
-    status_line();
-    appendheader();
+    set_status_line();
+    set_total_response();
 }
 
 void HTTP::respond::postmethod()
@@ -92,7 +108,7 @@ void HTTP::respond::postmethod()
             _body = total_body;
             std::cout << RED <<  "POST =" << _body << R <<  std::endl;
         }
-    if (this->filefd == -1 && _status == 200)
+    if (this->filefd == -1 && _status_code == 200)
         // this->setstatus(403);
         std::cout << "status code 403 " << std::endl;
     //struct stat statBuf;
@@ -110,21 +126,20 @@ void HTTP::respond::postmethod()
 
 void HTTP::respond::deletemethod()
 {
-    _postheader = _totalheader;
+    // _postheader = _totalheader;
     // int ret  = remove(file.c_str());
     // if( ret != 0)
     // set statuscode notfound
 
 }
 
-//  TODO also add a bad request if we dont find HTTP/1.1 !!!
-void HTTP::respond::status_line()
+void HTTP::respond::set_status_line()
 {
     _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
         _statusline.append("200 OK");
     else if (_status_code == 404)
-    { // error  in 404 as will make server fuck up for some reason atm
+    {
         _statusline.append("404 Not Found");
         // if (_pars_server._error_page)
         //_body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body></html>";
@@ -189,19 +204,14 @@ void ::HTTP::respond::setmodified()
     struct stat stats;
     struct tm *info;
     char timestamp[1000];
-    // int fileFD = 1; // change this to right thing
 
-    // fstat(fileFD, &stats);
     if (stat(_totalpath.c_str(), &stats) == 0)
     {
         info = gmtime(&stats.st_mtime);
         strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
         _lastmodified = timestamp;
+        _lastmodified.append("\r\n");
     }
-    // info = localtime(&stats.st_mtime);
-    // strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
-    // _lastmodified.append(timestamp);
-    _lastmodified.append("\r\n");
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
 
@@ -223,11 +233,6 @@ void HTTP::respond::setLanguage(std::string contentlanguage)
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Language", _language));
 }
 
-//const std::string &HTTP::respond::getStatusline() const
-//{
-//    return _statusline;
-//}
-
 void HTTP::respond::setContentlen(std::string body)
 {
     int size;
@@ -239,11 +244,12 @@ void HTTP::respond::setContentlen(std::string body)
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
 }
 
-void HTTP::respond::appendheader()
+void HTTP::respond::set_total_response()
 {
+    std::map<std::string, std::string>::iterator it;
     _totalheader.append(_statusline);
     _totalheader.append("\r\n");
-    std::map<std::string, std::string>::iterator it = _totalrespond.begin();
+    it = _totalrespond.begin();
     for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it)
     {
         if ((it->first != "Content-Length" || it->second != "0") && (!it->second.empty()))
@@ -254,17 +260,15 @@ void HTTP::respond::appendheader()
             _totalheader.append("\r\n");
         }
     }
-
     _totalheader.append(_body);
 }
 
-// add the root to the path . and maybe append html maybe... 
 void HTTP::respond::find_total_file_path()
 {
     std::string key;
-    
+    std::string redir;
+
     _relativepath = _map_req["URI"].c_str();
-    std::cout << "_relativepath" << _relativepath << std::endl;
     key = "/";
     key = key.append(_relativepath);
     while (key != "/")
@@ -275,34 +279,18 @@ void HTTP::respond::find_total_file_path()
         if (key[key.size()] == '/')
             key = key.substr(0, key.size() - 1);
     }
-    std::cout << "11key[" << key << "]"<< std::endl;
     if (_pars_server._location_map[key]._redir != "")
     {
         _status_code = 301;
-        std::cout << "1relativepath is [" << _relativepath << "]" <<std::endl;
         _relativepath = _relativepath.substr(key.size() - 1, _relativepath.size() - key.size() + 1);
-        std::cout << "2relativepath is [" << _relativepath << "]" <<std::endl;
-        std::string redir = _pars_server._location_map[key]._redir;
-        std::cout << "_redir is [" << _pars_server._location_map[key]._redir << "]" <<std::endl;
-        std::cout << "key is [" << key << "]" <<std::endl;
+        redir = _pars_server._location_map[key]._redir;
         _relativepath = _pars_server._location_map[key]._redir.append(_relativepath);
         if (_relativepath[_relativepath.size()] == '/')
             _relativepath = _relativepath.substr(0, _relativepath.size() - 1);
-        std::cout << "3relativepath is [" << _relativepath << "]" <<std::endl;
-        std::cout << "_redir is [" << _pars_server._location_map[key]._redir << "]" <<std::endl;
         key = redir;
-        std::cout << "key is [" << key << "]" <<std::endl;
-        // exit(1);
     }
-    std::cout << "2key[" << key << "]"<< std::endl;
-    std::cout << "_relativepath[" << _relativepath << "]"<< std::endl;
-    // exit(1);
     if (_pars_server._location_map.count(key) == 1)
     {
-        std::cout << "method found server loaction block found" << std::endl;
-        std::cout << "method found server loaction block found" << std::endl;
-        std::cout << YELLOW << "_pars_server._location_map[key]._method" << _pars_server._location_map[key]._method << std::endl;
-        std::cout << YELLOW << "_pars_server._location_map[key]._redir[" << _pars_server._location_map[key]._redir << "]"<< std::endl;
         if (_map_req["METHOD"].compare(_pars_server._location_map[key]._method) != 0)
             return (set_status_code(405));
         else
@@ -318,6 +306,7 @@ void HTTP::respond::find_total_file_path()
 void HTTP::respond::set_status_code(int code)
 {
     _status_code = code;
+    return;
 }
 
 void HTTP::respond::setbody()
@@ -341,10 +330,7 @@ void HTTP::respond::setbody()
 		if(file.is_open())
             _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         else
-		{
-			file.close();
 			return (set_status_code(403)); // forbidden no access rights
-		}
 		file.close();
 	}
     setContentlen(_body);
