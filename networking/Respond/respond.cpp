@@ -264,25 +264,53 @@ void HTTP::respond::find_total_file_path()
     std::string key;
     
     _relativepath = _map_req["URI"].c_str();
+    std::cout << "_relativepath" << _relativepath << std::endl;
     key = "/";
     key = key.append(_relativepath);
-    std::cout << "1key[" << key << "]"<< std::endl;
-    if (key != "/")
-    {   
-        std::cout << "in" << key.find_last_of('/')<< std::endl; 
+    while (key != "/")
+    {
         key = key.substr(0, key.find_last_of('/') + 1);
+        if (_pars_server._location_map.count(key) == 1)
+            break;
+        if (key[key.size()] == '/')
+            key = key.substr(0, key.size() - 1);
+    }
+    std::cout << "11key[" << key << "]"<< std::endl;
+    if (_pars_server._location_map[key]._redir != "")
+    {
+        _status_code = 301;
+        std::cout << "1relativepath is [" << _relativepath << "]" <<std::endl;
+        _relativepath = _relativepath.substr(key.size() - 1, _relativepath.size() - key.size() + 1);
+        std::cout << "2relativepath is [" << _relativepath << "]" <<std::endl;
+        std::string redir = _pars_server._location_map[key]._redir;
+        std::cout << "_redir is [" << _pars_server._location_map[key]._redir << "]" <<std::endl;
+        std::cout << "key is [" << key << "]" <<std::endl;
+        _relativepath = _pars_server._location_map[key]._redir.append(_relativepath);
+        if (_relativepath[_relativepath.size()] == '/')
+            _relativepath = _relativepath.substr(0, _relativepath.size() - 1);
+        std::cout << "3relativepath is [" << _relativepath << "]" <<std::endl;
+        std::cout << "_redir is [" << _pars_server._location_map[key]._redir << "]" <<std::endl;
+        key = redir;
+        std::cout << "key is [" << key << "]" <<std::endl;
+        // exit(1);
     }
     std::cout << "2key[" << key << "]"<< std::endl;
-    if (_pars_server._location_map[key]._method != "")
+    std::cout << "_relativepath[" << _relativepath << "]"<< std::endl;
+    // exit(1);
+    if (_pars_server._location_map.count(key) == 1)
     {
         std::cout << "method found server loaction block found" << std::endl;
         std::cout << "method found server loaction block found" << std::endl;
         std::cout << YELLOW << "_pars_server._location_map[key]._method" << _pars_server._location_map[key]._method << std::endl;
+        std::cout << YELLOW << "_pars_server._location_map[key]._redir[" << _pars_server._location_map[key]._redir << "]"<< std::endl;
         if (_map_req["METHOD"].compare(_pars_server._location_map[key]._method) != 0)
             return (set_status_code(405));
         else
+        {
+            if (_relativepath == "" || _relativepath == "/")
+                _relativepath = _pars_server._location_map[key]._index;
             _totalpath = _pars_server._location_map[key]._root.append(_relativepath);
-        std::cout << "successful method" << std::endl;
+        }
     }
     return ;
 }
