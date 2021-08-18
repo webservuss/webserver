@@ -83,12 +83,10 @@ void HTTP::re_HTTP::set_value(std::string value)
          
 }
 
-void HTTP::re_HTTP::split_line(std::string line){
-
+void HTTP::re_HTTP::split_line(std::string line)
+{
     set_key(line.substr(0, line.find(" ")));
     set_value(line.substr(line.find(" "), line.find('\r')));
-
-
 }
 
 
@@ -135,7 +133,7 @@ void re_HTTP::setRequestline(std::string &requestline) {
             _uri = _uri.substr(1, _uri.size() - 1);
             std::cout << "_method : [" <<  _method << "]" << std::endl;
             std::cout << "_uri : [" <<  _uri << "]" << std::endl;
-            _protocol = tmp.substr(_uri.size() + 1, tmp.size() - _uri.size());
+            _protocol = tmp.substr(_uri.size() + 2, tmp.size() - _uri.size());
             std::cout << "_protocol : [" <<  _protocol << "]" << std::endl;
             break;
         }
