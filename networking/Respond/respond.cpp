@@ -144,47 +144,51 @@ void HTTP::respond::deletemethod()
 
 }
 
-void HTTP::respond::set404(std::string root)
+void HTTP::respond::setnoconfig404(std::string root)
 {
-    std::cout << YELLOW << "HERE" <<  R << std::endl;
-    std::cout << YELLOW << _relativepath << R<<  std::endl;
-    std::ifstream file(root);
-      std::string total_body;
-          if (file.is_open())
-        {
-            // total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            // _body = total_body;
-            _body = total_body = ("hallo is this working");
-        }
+    
+    std::ifstream file ("html_pages/auto_error.html");
+    std::string total_body;
+    if(root != "auto_error.html;" )
+    {   
+        _statusline.append("404 no 404 line ");
+        _body = "<h1>404: not present in config file</h1>\0";
+        setContentlen(_body);
+    }
+    else if(file.is_open())
+            _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 }
 
-//  TODO also add a bad request if we dont find HTTP/1.1 !!!
+
 void HTTP::respond::status_line()
 {
-    //find first 404;
-
+    std::string total_body;
     std::cout << YELLOW << "last modified : " << _pars_server._error_page[1] << R<< std::endl;
     _statusline = "HTTP/1.1 ";
     if (_status_code == 200)
         _statusline.append("200 OK");
+    // if (_pars_server._auto_index == 1)
+    // {
+    //     std::cout << RED << "AUTO INDEX" << R << std::endl;
+    //     std::ifstream file("downloads/index.php");
+    //     if (file.is_open())
+    //     {
+    //          total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    //         _body = total_body;
+    //     }
+    // }
 
     else if (_status_code == 404)
     { 
         _statusline.append("404 Not Found");
-        //404 auto error page go what is in config file if there isnt then go to default. 
         std::ifstream file("html_pages/auto_error.html");
-        std::string total_body;
-        if ( _pars_server._error_page[0] == "404")
+        if ( _pars_server._error_page[0] == "404" || _pars_server._error_page[0] == "404;")
         {
-            std::cout << YELLOW << "404" <<  R << std::endl;
             std::string root = _pars_server._error_page[1];
-            set404(root);
+            setnoconfig404(root);
         }
-            //_body = "<html><head><title>404 Not found</title></head><body><h1>404 Not found</h1></body></html>";
-
         else if (file.is_open())
         {
-
             total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
             _body = total_body;
         }
@@ -193,12 +197,6 @@ void HTTP::respond::status_line()
             std::cout << YELLOW << "404 NOT OPEN" << RESET << std::endl;
             exit(10);
         }
-            // else
-        // {
-        //     _statusline.append("403 Forbidden");
-        //      _body = "<h1>403: You can't do that!</h1>\0";
-        //     setContentlen(_body);
-        // }
         file.close();
         setcontenttype("text/html");
         setContentlen(_body);

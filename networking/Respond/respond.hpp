@@ -105,7 +105,7 @@ namespace HTTP{
         void                        deletemethod();
         void                        getmethod();
         void                        setcontenttype(const std::string &contentype);
-        void                        set404(std::string root);
+        void                        setnoconfig404(std::string root);
         int         setstatus;
 void    check_methods_same();
 
