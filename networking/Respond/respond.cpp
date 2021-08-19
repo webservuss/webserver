@@ -88,37 +88,37 @@ void HTTP::respond::getmethod()
 void HTTP::respond::postmethod()
 {
     std::cout << "ik ben in en post method" << std::endl;
-    //    int serverMaximum = _body.size();
-    //    if( serverMaximum > _body.length())
-    //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
-    //if (maxbodysize < _body.length()[]
-    //  int fd;
-   
-    std::string     total_path = _totalpath;
-    std::ifstream file("html_pages/welcome.php");
-    std::cout << GREEN << "file :: " << file << R << std::endl;
-   // std::ifstream file("html_pages/index.html");
-    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
-       // std::ifstream file("html_pages/auto_error.html");
-        std::string total_body;
-        if (file.is_open())
-        {
-            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _body = total_body;
-            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
-        }
-    if (this->filefd == -1 && _status_code == 200)
-        // this->setstatus(403);
-        std::cout << "status code 403 " << std::endl;
-    //struct stat statBuf;
-   // if (stat(file, &statBuf) < 0 && _status == 200)
-      //  std::cout << "status code 201 " << std::endl;
-    // this->setstatus(201);
-    std::cout << RED << "BODY =" <<_body << R <<std::endl;
-    if (write(filefd, _body.c_str(),_body.length()) == -1)
-        std::cout<< "WRITE " << std::endl;
-    close(filefd);
-    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
+//    //    int serverMaximum = _body.size();
+//    //    if( serverMaximum > _body.length())
+//    //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
+//    //if (maxbodysize < _body.length()[]
+//    //  int fd;
+//
+//    std::string     total_path = _totalpath;
+//    std::ifstream file("html_pages/welcome.php");
+//    std::cout << GREEN << "file :: " << file << R << std::endl;
+//   // std::ifstream file("html_pages/index.html");
+//    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
+//       // std::ifstream file("html_pages/auto_error.html");
+//        std::string total_body;
+//        if (file.is_open())
+//        {
+//            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+//            _body = total_body;
+//            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
+//        }
+//    if (this->filefd == -1 && _status_code == 200)
+//        // this->setstatus(403);
+//        std::cout << "status code 403 " << std::endl;
+//    //struct stat statBuf;
+//   // if (stat(file, &statBuf) < 0 && _status == 200)
+//      //  std::cout << "status code 201 " << std::endl;
+//    // this->setstatus(201);
+//    std::cout << RED << "BODY =" <<_body << R <<std::endl;
+//    if (write(filefd, _body.c_str(),_body.length()) == -1)
+//        std::cout<< "WRITE " << std::endl;
+//    close(filefd);
+//    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
 }
 
 
@@ -372,8 +372,8 @@ void HTTP::respond::set_body()
     if (_status_code == 405)
         return;
     _path = _totalpath.c_str();
-    if (stat(_path, &sb) == -1)
-        return (set_status_code(404)); // file doesnt exist
+	if (stat(_path, &sb) == -1)
+		return (set_status_code(404)); // file doesnt exist
 	if (_totalpath.find(".php") != std::string::npos)// _body will be filled by php_cgi()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);

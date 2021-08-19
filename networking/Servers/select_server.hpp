@@ -20,6 +20,12 @@ namespace HTTP
             struct timeval      _last_active;
             bool                _active;
             std::string         _header;
+
+            /* variables needed for POST method */
+            bool 				_expect_body;
+            std::string			_filename;
+            int					_content_length;
+            int					_total_body_length;
         }   t_client_select;
 
         typedef struct t_server_select {

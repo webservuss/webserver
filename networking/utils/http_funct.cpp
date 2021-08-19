@@ -11,15 +11,22 @@ void                HTTP::set_non_blocking(int sock)
 		exit(1);
 	else
 		return;
-//	opts = fcntl(sock,F_GETFL);
-//	if (opts < 0) {
-//		perror("fcntl(F_GETFL)");
-//		exit(EXIT_FAILURE);
-//	}
-//	opts = (opts | O_NONBLOCK);
-//	if (fcntl(sock,F_SETFL,opts) < 0) {
-//		perror("fcntl(F_SETFL)");
-//		exit(EXIT_FAILURE);
-//	}
-//	return;
 }
+
+int HTTP::post_expected_body(const t_client_select &client, char * &buffer, int &length)
+{
+	std::cout << "filename: " << client._filename << std::endl;
+	std::cout << "cont_length: " << client._content_length << std::endl;
+	std::cout << "valread: " << length << std::endl;
+	std::cout << "tot body lenght: " << client._total_body_length << std::endl;
+	//std::cout << "i and j: " << i << " " << j << std::endl;
+	std::cout << "c_sock: " << client._c_sock << std::endl;
+
+	std::ofstream existing_file;
+	existing_file.open(client._filename.c_str(), std::ios::binary | std::ios::app);
+	existing_file.write(&buffer[0], length);
+
+
+	return 0;
+}
+
