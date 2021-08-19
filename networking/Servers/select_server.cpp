@@ -122,7 +122,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-
     std::cout << "read from client" << std::endl;
 
 	buffer[valread] = '\0';
