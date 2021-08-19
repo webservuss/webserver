@@ -3,24 +3,18 @@
 
 // TODO : 413 (request entity is larger than limits defined by server
 
-HTTP::respond::respond(t_req_n_config req_n_conf, int fd)
+HTTP::respond::respond(t_req_n_config req_n_conf)
 {
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
-<<<<<<< HEAD
-    std::string findKey;
-    std::cout << YELLOW << fd << R << std::cout;
-    _fd = fd;
-=======
->>>>>>> main
 
     if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
         set_status_code(405);
     else if (_map_req["METHOD"].compare("GET") == 0)
         getmethod();
-    else if (_map_req["METHOD"].compare("POST") == 0)
-        postmethod();
+    // else if (_map_req["METHOD"].compare("POST") == 0)
+    //     postmethod();
     else if (_map_req["METHOD"].compare("DELETE") == 0)
         deletemethod();
     else
@@ -81,7 +75,7 @@ void HTTP::respond::getmethod()
 
     find_total_file_path();
     setDate();
-    setmodified(_fd);
+    setmodified();
     setconnection(_map_req["Connection"]);
     setHost(_map_req["Host"]);
     setLanguage(_map_req["Accept-Language"]);
@@ -90,72 +84,7 @@ void HTTP::respond::getmethod()
     set_total_response();
 }
 
-void HTTP::respond::postmethod()
-{
-    std::cout << "ik ben in en post method" << std::endl;
-    //    int serverMaximum = _body.size();
-    //    if( serverMaximum > _body.length())
-    //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
-    //if (maxbodysize < _body.length()[]
-<<<<<<< HEAD
-//     int fd;
-   
-//     std::string     total_path = find_total_file_path();
-//     std::ifstream file("html_pages/welcome.php");
-//     std::cout << GREEN << "file :: " << file << R << std::endl;
-//    // std::ifstream file("html_pages/index.html");
-//    // fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
-//        // std::ifstream file("html_pages/auto_error.html");
-//         std::string total_body;
-//         if (file.is_open())
-//         {
-//             total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-//             _body = total_body;
-//             std::cout << RED <<  "POST =" << _body << R <<  std::endl;
-//         }
-//     if (this->filefd == -1 && _status == 200)
-//         // this->setstatus(403);
-//         std::cout << "status code 403 " << std::endl;
-//     //struct stat statBuf;
-//    // if (stat(file, &statBuf) < 0 && _status == 200)
-//       //  std::cout << "status code 201 " << std::endl;
-//     // this->setstatus(201);
-    
-//     std::cout << RED << "BODY =" <<_body << R <<std::endl;
-//     if (write(filefd, _body.c_str(),_body.length()) == -1)
-//         std::cout<< "WRITE " << std::endl;
-//     close(filefd);
-//     std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
-=======
-    //  int fd;
-   
-    std::string     total_path = _totalpath;
-    std::ifstream file("html_pages/welcome.php");
-    std::cout << GREEN << "file :: " << file << R << std::endl;
-   // std::ifstream file("html_pages/index.html");
-    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
-       // std::ifstream file("html_pages/auto_error.html");
-        std::string total_body;
-        if (file.is_open())
-        {
-            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _body = total_body;
-            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
-        }
-    if (this->filefd == -1 && _status_code == 200)
-        // this->setstatus(403);
-        std::cout << "status code 403 " << std::endl;
-    //struct stat statBuf;
-   // if (stat(file, &statBuf) < 0 && _status == 200)
-      //  std::cout << "status code 201 " << std::endl;
-    // this->setstatus(201);
-    std::cout << RED << "BODY =" <<_body << R <<std::endl;
-    if (write(filefd, _body.c_str(),_body.length()) == -1)
-        std::cout<< "WRITE " << std::endl;
-    close(filefd);
-    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
->>>>>>> main
-}
+
 
 
 
@@ -170,77 +99,18 @@ void HTTP::respond::deletemethod()
 
 void HTTP::respond::set_no_config404(std::string root)
 {
-    
-    std::ifstream file ("html_pages/auto_error.html");
-    std::string total_body;
-    if(root != "auto_error.html;" )
+    std::cout << "set no config" << std::endl;
+   // std::ifstream file ("html_pages/auto_error.html");
+  //  std::string total_body;
+    std::cout << "root: " << root << std::endl;
+    if(root != "error_page.html;" )
     {   
         _statusline.append("404 no 404 line ");
         _body = "<h1>404: not present in config file</h1>\0";
         setContentlen(_body);
     }
-    else if(file.is_open())
-            _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-}
-
-
-void HTTP::respond::set_status_line()
-{
-    std::string total_body;
-    std::cout << YELLOW << "last modified : " << _pars_server._error_page[1] << R<< std::endl;
-    _statusline = "HTTP/1.1 ";
-    if (_status_code == 200)
-        _statusline.append("200 OK");
-    // if (_pars_server._auto_index == 1)
-    // {
-    //     std::cout << RED << "AUTO INDEX" << R << std::endl;
-    //     std::ifstream file("downloads/index.php");
-    //     if (file.is_open())
-    //     {
-    //          total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    //         _body = total_body;
-    //     }
-    // }
-
-    else if (_status_code == 404)
-    {
-        _statusline.append("404 Not Found");
-        std::ifstream file("html_pages/auto_error.html");
-        if ( _pars_server._error_page[0] == "404" || _pars_server._error_page[0] == "404;")
-        {
-            std::string root = _pars_server._error_page[1];
-            set_no_config404(root);
-        }
-        else if (file.is_open())
-        {
-            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _body = total_body;
-        }
-        else
-        {
-            std::cout << YELLOW << "404 NOT OPEN" << RESET << std::endl;
-            exit(10);
-        }
-        file.close();
-        setcontenttype("text/html");
-        setContentlen(_body);
-    }
-    else if (_status_code == 403)
-    {
-        _statusline.append("403 Forbidden");
-        _body = "<h1>403: You can't do that!</h1>\0";
-        setContentlen(_body);
-    }
-    else if (_status_code == 405)
-    {
-        _statusline.append("405 Method not Allowed");
-        _body = "<h1>405: Try another method!</h1>\0";
-        setContentlen(_body);
-    }
-    else if (_status_code == 204)
-        _statusline.append("204 No Content");
-    else if (_status_code == 301)
-        _statusline.append("301 Moved Permanently");
+    //else if(file.is_open())
+          //  _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 }
 
 void HTTP::respond::setcontenttype(const std::string &contentype)
@@ -264,21 +134,10 @@ void HTTP::respond::setDate()
     _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
 }
 
-void ::HTTP::respond::setmodified(int fd)
+void ::HTTP::respond::setmodified()
 {
     struct stat stats;
     struct tm *info;
-<<<<<<< HEAD
-    char timestamp[36];
-    //int fileFD = 1; // change this to right thing
-
-    fstat(fd, &stat);
-    info = localtime(&stat.st_mtime);
-    strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
-    _lastmodified.append(timestamp);
-    _lastmodified.append("\r\n");
-    //std::cout << "last modified : " << _lastmodified << std::endl;
-=======
     char timestamp[1000];
 
     if (stat(_totalpath.c_str(), &stats) == 0)
@@ -288,7 +147,6 @@ void ::HTTP::respond::setmodified(int fd)
         _lastmodified = timestamp;
         // _lastmodified.append("\r\n");
     }
->>>>>>> main
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
 
@@ -353,6 +211,37 @@ void HTTP::respond::find_total_file_path()
         _relativepath = _relativepath.append("/");
     key = "/";
     key = key.append(_relativepath);
+    std::cout << "RELATIVE PATH IS[" << _relativepath  <<"]"<< std::endl;
+    // if (_pars_server._auto_index == 1)
+    // {
+    //     // check if its a directory. 
+    //     struct stat buffer;
+    //     int ret;
+
+    //     ret = stat(_relativepath, &buffer);
+    //     std::cout << YELLOW << "RET " << ret << std::endl;
+        
+    //     std::cout << RED << "AUTO INDEX" << R << std::endl;
+    //     std::ifstream file("downloads/index.php");
+    //     if (file.is_open())
+    //          _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    // }
+    if (_pars_server._auto_index == 1)
+    {
+        // check if its a directory. 
+        struct stat buffer;
+        int ret;
+
+        ret = lstat(_relativepath.c_str(), &buffer);
+        std::cout << YELLOW << "RET " << ret << std::endl;
+        if(ret == 0)
+        {
+            std::cout << RED << "AUTO INDEX" << R << std::endl;
+            std::ifstream file("downloads/index.php");
+            if (file.is_open())
+             _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        }
+    }
     while (key != "/")
     {
         std::cout << "in loop" << key << std::endl;
@@ -390,7 +279,24 @@ void HTTP::respond::find_total_file_path()
             std::cout << "relative path is end[" << _relativepath << "]" << std::endl;
             std::cout << "_totalpath path is end[" << _totalpath << "]" << std::endl;
         }
+    // if (_pars_server._auto_index == 1)
+    // {
+    //     // check if its a directory. 
+    //     struct stat buffer;
+    //     int ret;
+
+    //     ret = stat(_relativepath.c_str(), &buffer);
+    //     std::cout << YELLOW << "RET " << ret << std::endl;
+    //     if(ret == 0)
+    //     {
+    //         std::cout << RED << "AUTO INDEX" << R << std::endl;
+    //         std::ifstream file("downloads/index.php");
+    //         if (file.is_open())
+    //          _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    //     }
+    // }
     }
+
     return ;
 }
 
@@ -408,8 +314,8 @@ void HTTP::respond::setbody()
     if (_status_code == 405)
         return;
     _path = _totalpath.c_str();
-    if (stat(_path, &sb) == -1)
-        return (set_status_code(404)); // file doesnt exist
+   if (stat(_path, &sb) == -1)
+       return (set_status_code(404)); // file doesnt exist
 	if (_totalpath.find(".php") != std::string::npos)// _body will be filled by php_cgi()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
