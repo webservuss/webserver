@@ -28,6 +28,7 @@ namespace HTTP{
         std::string _totalheader;
         std::map<std::string, std::string> _totalrespond;
         std::map <std::string, std::string> _map_req;
+        char const * _stat_cha;
         // std::string _postheader;
         // std::string _deleteheader;
         // std::string _postbodylen;

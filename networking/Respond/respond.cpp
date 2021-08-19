@@ -99,18 +99,72 @@ void HTTP::respond::deletemethod()
 
 void HTTP::respond::set_no_config404(std::string root)
 {
-    std::cout << "set no config" << std::endl;
-   // std::ifstream file ("html_pages/auto_error.html");
-  //  std::string total_body;
-    std::cout << "root: " << root << std::endl;
     if(root != "error_page.html;" )
     {   
-        _statusline.append("404 no 404 line ");
-        _body = "<h1>404: not present in config file</h1>\0";
+        std::cout << YELLOW << "THER IS NO CONFIG" << R << std::endl;
+        _statusline.append(_stat_cha);
+        _body.append(_stat_cha);
+        _body = "<h1>status code is not present in config file</h1>\0";
+        std::cout << _body  << "BODY"<< std::endl;
         setContentlen(_body);
     }
-    //else if(file.is_open())
-          //  _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+}
+
+
+void HTTP::respond::set_status_line()
+{
+    std::cout <<"ERROR"<< std::endl;
+    std::string tmp = std::to_string(_status_code);
+    _stat_cha = tmp.c_str();
+    std::string total_body;
+    std::string root = _pars_server._error_page[1];
+    std::ifstream file("html_pages/auto_error.html");
+    _statusline = "HTTP/1.1 ";
+    std::string _stat_cha_s = _stat_cha;
+    _stat_cha_s.append(";");
+    if ( _pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
+         set_no_config404(root);
+    else if (_status_code == 404)
+    {
+        std::cout <<"ERROR"<< std::endl;
+         _statusline.append("404 Not Found");
+        _body = "<h1>404: You can't do that!</h1>\0";
+    }
+    else if (_status_code == 200)
+        _statusline.append("200 OK");
+    else if (_status_code == 403)
+    {
+        _statusline.append("403 Forbidden");
+        _body = "<h1>403: You can't do that!</h1>\0";
+    }
+    else if (_status_code == 405)
+    {
+        _statusline.append("405 Method not Allowed");
+        _body = "<h1>405: Try another method!</h1>\0";
+    }
+    else if (_status_code == 204)
+        _statusline.append("204 No Content");
+    else if (_status_code == 301)
+        _statusline.append("301 Moved Permanently");
+    else if(_status_code == 400)
+    {
+        _statusline.append("400 ");
+        _body = "<h1> 400 :Bad Request The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request without modifications. </h1> \0";
+    }
+    else if(_status_code == 413)
+    {
+        _statusline.append("113");
+        _body = "<h1> 400 : Request Entity Too Large \0";
+    }
+    else if (file.is_open())
+        {
+            std::cout << " THERE IS A CONFIG " << std::endl;
+            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            _body = total_body;
+        }
+    file.close();
+    setcontenttype("text/html");
+    setContentlen(_body);
 }
 
 void HTTP::respond::setcontenttype(const std::string &contentype)
