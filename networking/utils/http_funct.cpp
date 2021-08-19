@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <fcntl.h>
+#include <fstream>
 #include "http_funct.hpp"
 
 /* set non-blocking: to set a specific flag and leave the other flags as-is, 

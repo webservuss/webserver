@@ -1,13 +1,8 @@
 #ifndef respond_hpp
 #define respond_hpp
 
-#include "../../http.hpp"
-#include "../Request/re_HTTP.hpp"
-#include "../utils/utils.hpp"
-#include "CGI.hpp"
-#include "../Servers/select_server.hpp"
+#include <iostream>
 #include "../utils/req_n_conf.hpp"
-#include "../utils/colors.hpp"
 
 namespace HTTP{
     class respond  {
@@ -33,11 +28,11 @@ namespace HTTP{
         // std::string _deleteheader;
         // std::string _postbodylen;
         // std::string _deletefile;
-        int         filefd; /// i think we can take out
+        int         filefd; // TODO i (amber) think we can take out
 
     public:
         /* constructors & destructors */
-        respond(s_req_n_config req_n_conf);
+        respond(t_req_n_config req_n_conf);
         respond(const respond& x);
         ~respond();
 
@@ -48,7 +43,7 @@ namespace HTTP{
         void                getmethod();
         void                postmethod();
         void                deletemethod();
-		void                cgi_php();
+		//void                cgi_php(); // TODO not implemented, do we need it?
 
         /* setters */
         void                set_content_type(const std::string &contentype);

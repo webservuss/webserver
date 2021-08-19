@@ -1,11 +1,7 @@
 #ifndef http_funct_hpp
 #define http_funct_hpp
 
-#include <stdio.h>
-#include <iostream>
-#include <fcntl.h>
-#include "../../all_libs.hpp"
-#include "../Respond/respond.hpp"
+#include "../Servers/select_server.hpp"
 
 namespace HTTP
 {

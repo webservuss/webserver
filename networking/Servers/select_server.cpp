@@ -1,4 +1,13 @@
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "select_server.hpp"
+#include "../Request/re_HTTP.hpp"
+#include "../utils/http_funct.hpp"
+#include "../utils/req_n_conf.hpp"
+#include "../Respond/respond.hpp"
 
 #define BUFFER_SIZE (1024 * 1024) // 1Mb
 // /* constructor calls simple_server and launches */ // need to add in parser_servers here too
@@ -155,7 +164,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	stringbuff = std::string(buffer);
 	std::cout << stringbuff << std::endl;
 
-	s_req_n_config							r_n_c;
+	t_req_n_config							r_n_c;
 	re_HTTP									requestinfo (stringbuff);
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;

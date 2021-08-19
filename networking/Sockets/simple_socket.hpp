@@ -1,12 +1,7 @@
 #ifndef simple_socket_hpp
 #define simple_socket_hpp
 
-#include <stdio.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <iostream>
-#include <fcntl.h>
-#include "../utils/http_funct.hpp"
 
 namespace HTTP {
     class simple_socket

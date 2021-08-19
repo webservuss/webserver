@@ -1,5 +1,11 @@
-#include "respond.hpp"
 #include <sys/stat.h>
+#include <fstream>
+#include <sstream>
+#include <sys/time.h>
+#include <stdlib.h>
+#include "respond.hpp"
+#include "../utils/colors.hpp"
+#include "../Respond/CGI.hpp"
 
 // TODO : 413 (request entity is larger than limits defined by server
 

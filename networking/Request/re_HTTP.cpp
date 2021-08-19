@@ -1,4 +1,5 @@
 #include "re_HTTP.hpp"
+#include <sstream>
 
 std::string methods[3] = {
         "GET",
