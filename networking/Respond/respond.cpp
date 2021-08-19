@@ -27,48 +27,46 @@ HTTP::respond::~respond()   {}
 /*copy constructor */
 HTTP::respond::respond(const respond& x)
 { // TEST THIS // change
-        std::cout << "IN" << std::endl;
-
-        _statusline = x._statusline;
-        _contentlen = x._contentlen;
-        _lastmodified = x._lastmodified;
-        _connection = x._connection;
-        _contentype = x._contentype;
-        _date = x._date;
-        _host = x._host;
-        _language = x._language;
-        _body = x._body;
-        _pars_server = x._pars_server;
-        _status_code = x._status_code;
-        _totalpath = x._totalpath;
-        _relativepath = x._relativepath;
-        _totalheader = x._totalheader;
-        _totalrespond = x._totalrespond;
-        _map_req = x._map_req;
-        filefd = x.filefd; // think this will go
+    _statusline = x._statusline;
+    _contentlen = x._contentlen;
+    _lastmodified = x._lastmodified;
+    _connection = x._connection;
+    _contentype = x._contentype;
+    _date = x._date;
+    _host = x._host;
+    _language = x._language;
+    _body = x._body;
+    _pars_server = x._pars_server;
+    _status_code = x._status_code;
+    _totalpath = x._totalpath;
+    _relativepath = x._relativepath;
+    _totalheader = x._totalheader;
+    _totalrespond = x._totalrespond;
+    _map_req = x._map_req;
+    filefd = x.filefd; // think this will go
 }
 
 /*assignment operator */
 HTTP::respond& HTTP::respond::operator=(const respond& x)
 { // TEST THIS
-        _statusline = x._statusline;
-        _contentlen = x._contentlen;
-        _lastmodified = x._lastmodified;
-        _connection = x._connection;
-        _contentype = x._contentype;
-        _date = x._date;
-        _host = x._host;
-        _language = x._language;
-        _body = x._body;
-        _pars_server = x._pars_server;
-        _status_code = x._status_code;
-        _totalpath = x._totalpath;
-        _relativepath = x._relativepath;
-        _totalheader = x._totalheader;
-        _totalrespond = x._totalrespond;
-        _map_req = x._map_req;
-        filefd = x.filefd; // think this will go
-        return *this;
+    _statusline = x._statusline;
+    _contentlen = x._contentlen;
+    _lastmodified = x._lastmodified;
+    _connection = x._connection;
+    _contentype = x._contentype;
+    _date = x._date;
+    _host = x._host;
+    _language = x._language;
+    _body = x._body;
+    _pars_server = x._pars_server;
+    _status_code = x._status_code;
+    _totalpath = x._totalpath;
+    _relativepath = x._relativepath;
+    _totalheader = x._totalheader;
+    _totalrespond = x._totalrespond;
+    _map_req = x._map_req;
+    filefd = x.filefd; // think this will go
+    return *this;
 }
 
 void HTTP::respond::getmethod()
@@ -240,7 +238,7 @@ void ::HTTP::respond::setmodified()
         info = gmtime(&stats.st_mtime);
         strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
         _lastmodified = timestamp;
-        _lastmodified.append("\r\n");
+        // _lastmodified.append("\r\n");
     }
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
@@ -290,6 +288,7 @@ void HTTP::respond::set_total_response()
             _totalheader.append("\r\n");
         }
     }
+    _totalheader.append("\r\n");
     _totalheader.append(_body);
 }
 
@@ -299,18 +298,25 @@ void HTTP::respond::find_total_file_path()
     std::string redir;
 
     _relativepath = _map_req["URI"].c_str();
+    std::cout << "RELATIVE PATH IS[" << _relativepath  <<"]"<< std::endl;
+    std::cout << "RELATIVE PATH IS[" << _relativepath[_relativepath.size() - 1]<<"]"  << std::endl;
+    if (_relativepath[_relativepath.size() - 1] != '/')
+        _relativepath = _relativepath.append("/");
     key = "/";
     key = key.append(_relativepath);
     while (key != "/")
     {
+        std::cout << "in loop" << key << std::endl;
         key = key.substr(0, key.find_last_of('/') + 1);
         if (_pars_server._location_map.count(key) == 1)
             break;
-        if (key[key.size()] == '/')
+        if (key[key.size() - 1] == '/')
             key = key.substr(0, key.size() - 1);
     }
+     std::cout << "in HERE block" << std::endl;
     if (_pars_server._location_map[key]._redir != "")
     {
+        std::cout << "in redir block" << std::endl;
         _status_code = 301;
         _relativepath = _relativepath.substr(key.size() - 1, _relativepath.size() - key.size() + 1);
         redir = _pars_server._location_map[key]._redir;
@@ -319,8 +325,12 @@ void HTTP::respond::find_total_file_path()
             _relativepath = _relativepath.substr(0, _relativepath.size() - 1);
         key = redir;
     }
+    if (_relativepath[_relativepath.size() - 1] == '/')
+        _relativepath = _relativepath.substr(0, _relativepath.size() -1);
     if (_pars_server._location_map.count(key) == 1)
     {
+        std::cout << "in method block" << std::endl;
+
         if (_map_req["METHOD"].compare(_pars_server._location_map[key]._method) != 0)
             return (set_status_code(405));
         else
@@ -328,6 +338,8 @@ void HTTP::respond::find_total_file_path()
             if (_relativepath == "" || _relativepath == "/")
                 _relativepath = _pars_server._location_map[key]._index;
             _totalpath = _pars_server._location_map[key]._root.append(_relativepath);
+            std::cout << "relative path is end[" << _relativepath << "]" << std::endl;
+            std::cout << "_totalpath path is end[" << _totalpath << "]" << std::endl;
         }
     }
     return ;
