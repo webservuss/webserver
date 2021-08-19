@@ -20,6 +20,7 @@ namespace HTTP{
         std::string _date;
         std::string _host;
         std::string _language;
+        std::string _servername;
         std::string _body;
         t_server    _pars_server;
         int         _status_code;
@@ -62,6 +63,7 @@ namespace HTTP{
         void                set_status_line();
         void                set_total_response();
         void                set_no_config404(std::string root);
+        void                setServerName();
 
         /* getters */
         const std::string   &getTotalheader() const;

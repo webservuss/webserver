@@ -5,7 +5,7 @@ void HTTP::parse_conf::set_values_server(std::string s, t_server &server)
 	std::string key = s.substr(0, s.find(' '));
 	std::string value = s.substr(s.find(' ') + 1, s.length() - s.find(' ') - 2);
 	if (key == "server_name")
-		server._server_name = s.substr(s.find(' ') + 1, s.size());
+		server._server_name = value;
 	if (key == "listen")
 		server._port = ft_stoi((s.substr(s.find(' ') + 1, s.size())));
 	if (key == "host")

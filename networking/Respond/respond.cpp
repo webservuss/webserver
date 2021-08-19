@@ -79,6 +79,7 @@ void HTTP::respond::getmethod()
     setconnection(_map_req["Connection"]);
     setHost(_map_req["Host"]);
     setLanguage(_map_req["Accept-Language"]);
+    setServerName();
     setbody();
     set_status_line();
     set_total_response();
@@ -225,6 +226,13 @@ void HTTP::respond::setDate()
     _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z", info);
     _date = buffer;
     _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
+}
+
+void HTTP::respond::setServerName()
+{
+    _servername = _pars_server._server_name;
+    std::cout <<RED << "servername is[" << _servername << "]"<< R << std::endl;
+    _totalrespond.insert(std::pair<std::string, std::string>("Server", _servername));
 }
 
 void ::HTTP::respond::setmodified()
