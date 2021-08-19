@@ -21,11 +21,11 @@ FLAGS = -std=c++98 -g -Wall -Werror -Wextra
 # -fsanitize=address
 # -Wall -Werror -Wextra
 
-INCLUDES =	*.hpp
+#INCLUDES =	*.hpp
 
 all:		$(NAME)
 
-$(NAME):	$(OFILES) $(INCLUDES)
+$(NAME):	$(OFILES)
 	$(CC) -o $(NAME) $(SRCS) $(FLAGS)
 
 %.o: %.cpp $(INCLUDE)
