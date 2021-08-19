@@ -1,5 +1,15 @@
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "select_server.hpp"
+#include "../Request/re_HTTP.hpp"
+#include "../utils/http_funct.hpp"
+#include "../utils/req_n_conf.hpp"
+#include "../Respond/respond.hpp"
 
+#define BUFFER_SIZE (1024 * 1024) // 1Mb
 // /* constructor calls simple_server and launches */ // need to add in parser_servers here too
 // HTTP:: select_server::select_server()
 // {
@@ -108,13 +118,20 @@ void    HTTP::select_server::accepter(int i)
 /* else send correct to browser */
 int    HTTP::select_server::read_from_client(int i, int j)
 {
-    int			valread;
-    char		buffer[30000];
-	std::string	stringbuff;
-	struct timeval now;
+    int				valread;
+    char 			*buffer;
+	std::string		stringbuff;
+	struct timeval	now;
 
-	// read from correct client
-	if ((valread = recv(_servers[i]._clients[j]._c_sock, buffer, 3000, 0)) < 0) 
+	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
+	if (!buffer) {
+		perror("Malloc error");
+		exit(1);
+	}
+	bzero(buffer, BUFFER_SIZE + 1);
+
+	/* read from client */
+	if ((valread = recv(_servers[i]._clients[j]._c_sock, &buffer[0], BUFFER_SIZE, 0)) < 0)
 	{
 		std::cout << "\nConnection lost: FD=" << _servers[i]._clients[j]._c_sock << " Slot" << i  << "error " << strerror(errno)<< std::endl;
 		close(_servers[i]._clients[j]._c_sock);
@@ -122,27 +139,37 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-    std::cout << "read from client" << std::endl;
+	/* Check if we are expecting a body */
+	if (_servers[i]._clients[j]._expect_body)
+	{
+		_servers[i]._clients[j]._total_body_length += valread;
+		HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread);
+		if (valread == 0 || (_servers[i]._clients[j]._total_body_length == _servers[i]._clients[j]._content_length))
+		{
+			_servers[i]._clients[j]._expect_body = false;
+			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+			free(buffer);
+			/* send a response to client POST is done */
+			return 0;
+		}
+		//sleep(1);
+		free(buffer);
+		return valread;
+	}
 
-	buffer[valread] = '\0';
-	std::cout << "ALL MY BUFFER IS:" << buffer << std::endl;
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-	// parse buffer into reuqest
-	stringbuff = char_string(buffer);
+	// parse buffer into request
+	stringbuff = std::string(buffer);
 	std::cout << stringbuff << std::endl;
-	
-	if (stringbuff == "")
-		return 1;
-	s_req_n_config		r_n_c;
-	re_HTTP requestinfo (stringbuff);
-	std::map <std::string, std::string > reqmap = requestinfo._map_header;
+
+	t_req_n_config							r_n_c;
+	re_HTTP									requestinfo (stringbuff);
+	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
 	respond m (r_n_c);
-	respond b(r_n_c);
-	b = m;
 	_servers[i]._clients[j]._header = m.getTotalheader();
 	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
