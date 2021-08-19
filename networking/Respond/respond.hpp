@@ -20,6 +20,7 @@ namespace HTTP{
         std::string _date;
         std::string _host;
         std::string _language;
+        std::string _servername;
         std::string _body;
         t_server    _pars_server;
         int         _status_code;
@@ -50,18 +51,19 @@ namespace HTTP{
 		void                cgi_php();
 
         /* setters */
-        void                setcontenttype(const std::string &contentype);
+        void                set_content_type(const std::string &contentype);
         void                set_status_code(int code);
-        void                setbody();
-        void                setLanguage(std::string contentlanguage);
-        void                setHost(std::string host);
-        void                setContentlen(std::string s);
-        void                setDate();
-        void                setmodified();
-        void                setconnection(const std::string connection);
+        void                set_body();
+        void                set_language(std::string contentlanguage);
+        void                set_host(std::string host);
+        void                set_content_len(std::string s);
+        void                set_date();
+        void                set_modified();
+        void                set_connection(const std::string connection);
         void                set_status_line();
         void                set_total_response();
         void                set_no_config404(std::string root);
+        void                set_server_name();
 
         /* getters */
         const std::string   &getTotalheader() const;

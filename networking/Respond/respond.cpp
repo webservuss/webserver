@@ -74,12 +74,13 @@ void HTTP::respond::getmethod()
     std::string findKey;
 
     find_total_file_path();
-    setDate();
-    setmodified();
-    setconnection(_map_req["Connection"]);
-    setHost(_map_req["Host"]);
-    setLanguage(_map_req["Accept-Language"]);
-    setbody();
+    set_date();
+    set_modified();
+    set_connection(_map_req["Connection:"]);
+    set_host(_map_req["Host:"]);
+    set_language(_map_req["Accept-Language:"]);
+    set_server_name();
+    set_body();
     set_status_line();
     set_total_response();
 }
@@ -140,7 +141,7 @@ void HTTP::respond::set_no_config404(std::string root)
     {   
         _statusline.append("404 no 404 line ");
         _body = "<h1>404: not present in config file</h1>\0";
-        setContentlen(_body);
+        set_content_len(_body);
     }
     else if(file.is_open())
             _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -185,20 +186,20 @@ void HTTP::respond::set_status_line()
             exit(10);
         }
         file.close();
-        setcontenttype("text/html");
-        setContentlen(_body);
+        set_content_type("text/html");
+        set_content_len(_body);
     }
     else if (_status_code == 403)
     {
         _statusline.append("403 Forbidden");
         _body = "<h1>403: You can't do that!</h1>\0";
-        setContentlen(_body);
+        set_content_len(_body);
     }
     else if (_status_code == 405)
     {
         _statusline.append("405 Method not Allowed");
         _body = "<h1>405: Try another method!</h1>\0";
-        setContentlen(_body);
+        set_content_len(_body);
     }
     else if (_status_code == 204)
         _statusline.append("204 No Content");
@@ -206,13 +207,13 @@ void HTTP::respond::set_status_line()
         _statusline.append("301 Moved Permanently");
 }
 
-void HTTP::respond::setcontenttype(const std::string &contentype)
+void HTTP::respond::set_content_type(const std::string &contentype)
 {
     _contentype = contentype;
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Type", _contentype));
 }
 
-void HTTP::respond::setDate()
+void HTTP::respond::set_date()
 {
     struct timeval tv;
     time_t t;
@@ -227,7 +228,13 @@ void HTTP::respond::setDate()
     _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
 }
 
-void ::HTTP::respond::setmodified()
+void HTTP::respond::set_server_name()
+{
+    _servername = _pars_server._server_name;
+    _totalrespond.insert(std::pair<std::string, std::string>("Server", _servername));
+}
+
+void ::HTTP::respond::set_modified()
 {
     struct stat stats;
     struct tm *info;
@@ -243,25 +250,31 @@ void ::HTTP::respond::setmodified()
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
 
-void HTTP::respond::setconnection(std::string connection)
+void HTTP::respond::set_connection(std::string connection)
 {
     _connection = connection;
     _totalrespond.insert(std::pair<std::string, std::string>("Connection", _connection));
 }
 
-void HTTP::respond::setHost(std::string host)
+void HTTP::respond::set_host(std::string host)
 {
+    std::string host_cmp;
+
+    host = host.substr(1, host.size() - 1);
+    host_cmp = host.substr(0, host.find(':'));
+    if (host_cmp != _pars_server._host)
+        return (set_status_code(400));
     _host = host;
     _totalrespond.insert(std::pair<std::string, std::string>("Host", _host));
 }
 
-void HTTP::respond::setLanguage(std::string contentlanguage)
+void HTTP::respond::set_language(std::string contentlanguage)
 {
     _language = contentlanguage;
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Language", _language));
 }
 
-void HTTP::respond::setContentlen(std::string body)
+void HTTP::respond::set_content_len(std::string body)
 {
     int size;
 
@@ -351,7 +364,7 @@ void HTTP::respond::set_status_code(int code)
     return;
 }
 
-void HTTP::respond::setbody()
+void HTTP::respond::set_body()
 {
     const char      *_path;
     struct stat     sb;
@@ -375,7 +388,7 @@ void HTTP::respond::setbody()
 			return (set_status_code(403)); // forbidden no access rights
 		file.close();
 	}
-    setContentlen(_body);
+    set_content_len(_body);
     if (_contentlen == "0" && _status_code == 0)
         _status_code = 204;
     else if (_status_code == 0)
