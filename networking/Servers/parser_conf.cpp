@@ -1,4 +1,7 @@
 #include "parser_conf.hpp"
+#include "../utils/utils.hpp"
+#include <fstream>
+#include <stdlib.h>
 
 HTTP::parse_conf::parse_conf(const char *path)
 {

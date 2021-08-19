@@ -1,9 +1,10 @@
 #ifndef __PARSER_CONF_HPP__
 #define __PARSER_CONF_HPP__
 
-#include "../../all_libs.hpp"
-#include "../../http.hpp"
-#include "../utils/colors.hpp"
+#include <iostream>
+#include <vector>
+#include <map>
+
 namespace HTTP {
 
 	typedef struct s_location {

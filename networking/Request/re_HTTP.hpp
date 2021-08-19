@@ -2,9 +2,8 @@
 #ifndef re_HTTP_hpp
 #define re_HTTP_hpp
 
-#include "../../http.hpp"
-#include "../utils/colors.hpp"
-// #include "makeMap.hpp"
+#include <iostream>
+#include <map>
 
 namespace HTTP{
     class re_HTTP

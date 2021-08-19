@@ -1,4 +1,9 @@
+
+#include <string.h>
+#include <stdio.h>
+#include <cstdlib>
 #include "simple_socket.hpp"
+#include "../utils/http_funct.hpp"
 
 /* default constructor??*/
 // HTTP::simple_socket::simple_socket()
