@@ -122,7 +122,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-
     std::cout << "read from client" << std::endl;
 
 	buffer[valread] = '\0';
@@ -136,13 +135,18 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	
 	if (stringbuff == "")
 		return 1;
-	
 	s_req_n_config		r_n_c;
 	re_HTTP requestinfo (stringbuff);
-	std::map <std::string, std::string > reqmap = requestinfo.mapHeader;
+	std::map <std::string, std::string > reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
+<<<<<<< HEAD
 	respond m (r_n_c, i);
+=======
+	respond m (r_n_c);
+	respond b(r_n_c);
+	b = m;
+>>>>>>> main
 	_servers[i]._clients[j]._header = m.getTotalheader();
 	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);

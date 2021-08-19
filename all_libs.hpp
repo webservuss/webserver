@@ -1,9 +1,5 @@
-//
-// Created by ruben on 07-07-21.
-//
-
-#ifndef WEB_6JULI_ALL_LIBS_HPP
-#define WEB_6JULI_ALL_LIBS_HPP
+#ifndef all_libs_hpp
+#define all_libs_hpp
 
 #include <stdio.h>
 #include <unistd.h>
@@ -21,4 +17,5 @@
 #include <fcntl.h>
 
 #include "networking/utils/utils.hpp"
-#endif //WEB_6JULI_ALL_LIBS_HPP
+
+#endif 

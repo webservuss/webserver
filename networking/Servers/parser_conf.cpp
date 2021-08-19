@@ -40,18 +40,26 @@ void	HTTP::parse_conf::set_values_location(std::string s, t_location &location)
 
 	std::string key = s.substr(0, s.find(' '));
 	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
-	if (key == "method") {
-		std::cout << "...." << std::endl;
+	if (key == "method")
 		location._method= value;
-	}
 	if (key == "root")
 		location._root = value;
 	if (key == "cgi")
 		location._cgi = value;
 	if (key == "autoindex")
 		location._autoindex= value;
+	if (key == "index")
+		location._index= value;
 	if (key == "client_body_size")
 		location._client_body_size = ft_stoi(value);
+	if (key == "return")
+	{	
+		if (value.substr(0, value.find(' ')) == "301")
+		{
+			value = value.substr(value.find_last_of(' ') + 1, value.size() - value.find_last_of(' '));
+			location._redir = value;
+		}
+	}
 }
 
 	HTTP::parse_conf::parse_conf(std::ifstream &file)
