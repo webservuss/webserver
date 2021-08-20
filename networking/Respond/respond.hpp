@@ -22,6 +22,7 @@ namespace HTTP{
         std::string _totalpath;
         std::string _relativepath;
         std::string _totalheader;
+        std::string _stat_cha;
         std::map<std::string, std::string> _totalrespond;
         std::map <std::string, std::string> _map_req;
         // std::string _postheader;
@@ -57,7 +58,7 @@ namespace HTTP{
         void                set_connection(const std::string connection);
         void                set_status_line();
         void                set_total_response();
-        void                set_no_config404(std::string root);
+        void                set_no_config(std::string root);
         void                set_server_name();
 
         /* getters */

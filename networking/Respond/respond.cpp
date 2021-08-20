@@ -6,6 +6,8 @@
 #include "respond.hpp"
 #include "../utils/colors.hpp"
 #include "../Respond/CGI.hpp"
+#include <sys/types.h>
+#include <dirent.h>
 
 // TODO : 413 (request entity is larger than limits defined by server
 
@@ -138,79 +140,73 @@ void HTTP::respond::deletemethod()
 
 }
 
-void HTTP::respond::set_no_config404(std::string root)
+void HTTP::respond::set_no_config(std::string root)
 {
-    
-    std::ifstream file ("html_pages/auto_error.html");
-    std::string total_body;
-    if(root != "auto_error.html;" )
+    std::cout << "no config" << std::endl;
+    if(root != "error_page.html;" )
     {   
-        _statusline.append("404 no 404 line ");
-        _body = "<h1>404: not present in config file</h1>\0";
+        std::cout << YELLOW << "THER IS NO CONFIG" << R << std::endl;
+        _statusline.append(_stat_cha);
+        _body.append(_stat_cha);
+        _body = "<h1>status code is not present in config file</h1>\0";
+        std::cout << _body  << "BODY"<< std::endl;
         set_content_len(_body);
     }
-    else if(file.is_open())
-            _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 }
 
 
 void HTTP::respond::set_status_line()
 {
+    std::string tmp = std::to_string(_status_code);
+    _stat_cha = tmp.c_str();
     std::string total_body;
-    std::cout << YELLOW << "last modified : " << _pars_server._error_page[1] << R<< std::endl;
+    std::string root = _pars_server._error_page[1];
+    std::ifstream file("html_pages/auto_error.html");
     _statusline = "HTTP/1.1 ";
-    if (_status_code == 200)
-        _statusline.append("200 OK");
-    // if (_pars_server._auto_index == 1)
-    // {
-    //     std::cout << RED << "AUTO INDEX" << R << std::endl;
-    //     std::ifstream file("downloads/index.php");
-    //     if (file.is_open())
-    //     {
-    //          total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    //         _body = total_body;
-    //     }
-    // }
-
+    std::string _stat_cha_s = _stat_cha;
+    _stat_cha_s.append(";");
+    if ( _pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
+         set_no_config(root);
     else if (_status_code == 404)
     {
-        _statusline.append("404 Not Found");
-        std::ifstream file("html_pages/auto_error.html");
-        if ( _pars_server._error_page[0] == "404" || _pars_server._error_page[0] == "404;")
-        {
-            std::string root = _pars_server._error_page[1];
-            set_no_config404(root);
-        }
-        else if (file.is_open())
-        {
-            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _body = total_body;
-        }
-        else
-        {
-            std::cout << YELLOW << "404 NOT OPEN" << RESET << std::endl;
-            exit(10);
-        }
-        file.close();
-        set_content_type("text/html");
-        set_content_len(_body);
+         _statusline.append("404 Not Found");
+        _body = "<h1>404: You can't do that!</h1>\0";
     }
+    else if (_status_code == 200)
+        _statusline.append("200 OK");
     else if (_status_code == 403)
     {
         _statusline.append("403 Forbidden");
         _body = "<h1>403: You can't do that!</h1>\0";
-        set_content_len(_body);
     }
     else if (_status_code == 405)
     {
         _statusline.append("405 Method not Allowed");
         _body = "<h1>405: Try another method!</h1>\0";
-        set_content_len(_body);
     }
     else if (_status_code == 204)
         _statusline.append("204 No Content");
     else if (_status_code == 301)
         _statusline.append("301 Moved Permanently");
+    else if(_status_code == 301)
+    {
+        _statusline.append("4 ");
+        _body = "<h1> 4 :Bad Request The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request without modifications. </h1> \0";
+    }
+    else if(_status_code == 413)
+    {
+        _statusline.append("113 ");
+        _body = "<h1> 400 : Request Entity Too Large \0";
+    }
+    else if (file.is_open())
+        {
+            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            _body = total_body;
+        }
+    file.close();
+    set_content_type("text/html");
+    set_content_len(_body);
+
 }
 
 void HTTP::respond::set_content_type(const std::string &contentype)
@@ -251,7 +247,7 @@ void ::HTTP::respond::set_modified()
         info = gmtime(&stats.st_mtime);
         strftime(timestamp, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
         _lastmodified = timestamp;
-        // _lastmodified.append("\r\n");
+       
     }
     _totalrespond.insert(std::pair<std::string, std::string>("Last-Modified", _lastmodified));
 }
@@ -331,6 +327,7 @@ void HTTP::respond::find_total_file_path()
             break;
         if (key[key.size() - 1] == '/')
             key = key.substr(0, key.size() - 1);
+        
     }
      std::cout << "in HERE block" << std::endl;
     if (_pars_server._location_map[key]._redir != "")
@@ -360,6 +357,7 @@ void HTTP::respond::find_total_file_path()
             std::cout << "relative path is end[" << _relativepath << "]" << std::endl;
             std::cout << "_totalpath path is end[" << _totalpath << "]" << std::endl;
         }
+ 
     }
     return ;
 }
@@ -375,11 +373,31 @@ void HTTP::respond::set_body()
     const char      *_path;
     struct stat     sb;
 
+    _path = _totalpath.c_str();
     if (_status_code == 405)
         return;
-    _path = _totalpath.c_str();
+    if (_pars_server._auto_index == 1)
+    {
+        if (opendir(_path) != NULL)
+        {
+                std::cout << RED << "AUTO INDEX" << R << std::endl;
+                std::ifstream file("www/html_pages/downloads/index.php");
+                if (file.is_open())
+                {
+                    std::cout << "in downloads" <<std::endl;
+                    _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+                }
+                set_content_len(_body);
+                _status_code = 200;
+                return ;
+        }
+    }
+    std::cout << YELLOW << "path" << _path << std::endl;
 	if (stat(_path, &sb) == -1)
+    {
+        std::cout<< YELLOW << "file" << R << std::endl;
 		return (set_status_code(404)); // file doesnt exist
+    }
 	if (_totalpath.find(".php") != std::string::npos)// _body will be filled by php_cgi()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
@@ -391,7 +409,7 @@ void HTTP::respond::set_body()
 		if(file.is_open())
             _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         else
-			return (set_status_code(403)); // forbidden no access rights
+			return (set_status_code(403)); 
 		file.close();
 	}
     set_content_len(_body);
@@ -399,6 +417,7 @@ void HTTP::respond::set_body()
         _status_code = 204;
     else if (_status_code == 0)
         _status_code = 200;
+    
 }
 
 const std::string &HTTP::respond::getTotalheader() const
