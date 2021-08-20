@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "respond.hpp"
 #include "../utils/colors.hpp"
+#include "../utils/utils.hpp"
 #include "../Respond/CGI.hpp"
 
 // TODO : 413 (request entity is larger than limits defined by server
@@ -94,6 +95,7 @@ void HTTP::respond::getmethod()
 void HTTP::respond::postmethod()
 {
     std::cout << "ik ben in en post method" << std::endl;
+	//FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 //    //    int serverMaximum = _body.size();
 //    //    if( serverMaximum > _body.length())
 //    //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
@@ -127,6 +129,18 @@ void HTTP::respond::postmethod()
 //    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
 }
 
+void HTTP::respond::post_response(t_client_select &client, const int &total_body_length)
+{
+
+	client._header = "HTTP/1.1 201 Created\r\n";
+	client._header.append("Connection: keep-alive\r\n");
+	client._header.append("Content-Length: " + ft_numtos(total_body_length) + "\r\n");
+	client._header.append("Content-Type: image/jpeg\r\n");
+	client._header.append("Cookie:\r\n");
+	//gettimeofday(&now, NULL);
+	//_servers[i]._clients[j]._header.append("Date: " + std::string(now)");
+	client._header.append("Server: een naam\r\n");
+}
 
 
 void HTTP::respond::deletemethod()

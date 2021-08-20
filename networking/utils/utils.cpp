@@ -25,6 +25,8 @@ int ft_stoi(std::string s)
 	return i;
 }
 
+
+
 // TODO not needed, use std::string(buffer)
 std::string char_string(char * buffer)
 {

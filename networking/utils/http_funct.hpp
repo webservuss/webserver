@@ -7,7 +7,7 @@ namespace HTTP
 {
     /* test non-blocking */
     void    set_non_blocking(int sock);
-	int 	post_expected_body(const t_client_select &client, char * &buffer, int &length);
+	int 	post_expected_body(t_client_select &client, char * &buffer, int &length);
 }
 
 #endif

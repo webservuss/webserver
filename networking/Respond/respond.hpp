@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "../utils/req_n_conf.hpp"
+#include "../Servers/select_server.hpp"
 
 namespace HTTP{
     class respond  {
@@ -44,6 +45,9 @@ namespace HTTP{
         void                postmethod();
         void                deletemethod();
 		//void                cgi_php(); // TODO not implemented, do we need it?
+
+		/* static method */
+		static void 		post_response(t_client_select &client, const int &total_body_length);
 
         /* setters */
         void                set_content_type(const std::string &contentype);

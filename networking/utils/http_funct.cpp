@@ -16,7 +16,7 @@ void                HTTP::set_non_blocking(int sock)
 		return;
 }
 
-int HTTP::post_expected_body(const t_client_select &client, char * &buffer, int &length)
+int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &length)
 {
 	std::cout << "filename: " << client._filename << std::endl;
 	std::cout << "cont_length: " << client._content_length << std::endl;
@@ -28,8 +28,13 @@ int HTTP::post_expected_body(const t_client_select &client, char * &buffer, int 
 	std::ofstream existing_file;
 	existing_file.open(client._filename.c_str(), std::ios::binary | std::ios::app);
 	existing_file.write(&buffer[0], length);
+	client._total_body_length += length;
 
-
-	return 0;
+	if (length == 0 || (client._total_body_length == client._content_length)) {
+		client._expect_body = false;
+		client._post_done = true;
+		return 0;
+	}
+	return 1;
 }
 
