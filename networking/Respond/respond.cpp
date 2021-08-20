@@ -315,7 +315,9 @@ void HTTP::respond::find_total_file_path()
 {
     std::string key;
     std::string redir;
+    int found;
 
+    found = -1;
     _relativepath = _map_req["URI"].c_str();
     std::cout << "RELATIVE PATH IS[" << _relativepath  <<"]"<< std::endl;
     std::cout << "RELATIVE PATH IS[" << _relativepath[_relativepath.size() - 1]<<"]"  << std::endl;
@@ -348,18 +350,16 @@ void HTTP::respond::find_total_file_path()
         _relativepath = _relativepath.substr(0, _relativepath.size() -1);
     if (_pars_server._location_map.count(key) == 1)
     {
-        std::cout << "in method block" << std::endl;
-
-        if (_map_req["METHOD"].compare(_pars_server._location_map[key]._method) != 0)
+		for (unsigned int i = 0; i < _pars_server._location_map[key]._methods.size(); i++)
+		{
+            if (_map_req["METHOD"].compare(_pars_server._location_map[key]._methods[i]) == 0)
+                found = 1;
+		}
+        if (found == -1)
             return (set_status_code(405));
-        else
-        {
-            if (_relativepath == "" || _relativepath == "/")
-                _relativepath = _pars_server._location_map[key]._index;
-            _totalpath = _pars_server._location_map[key]._root.append(_relativepath);
-            std::cout << "relative path is end[" << _relativepath << "]" << std::endl;
-            std::cout << "_totalpath path is end[" << _totalpath << "]" << std::endl;
-        }
+        if (_relativepath == "" || _relativepath == "/")
+            _relativepath = _pars_server._location_map[key]._index;
+        _totalpath = _pars_server._location_map[key]._root.append(_relativepath);
     }
     return ;
 }
