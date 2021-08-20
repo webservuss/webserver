@@ -142,7 +142,7 @@ void HTTP::respond::deletemethod()
 
 void HTTP::respond::set_no_config(std::string root)
 {
-    std::cout << "no config" << std::endl;
+    std::cout << "no config ?" << std::endl;
     if(root != "error_page.html;" )
     {   
         std::cout << YELLOW << "THER IS NO CONFIG" << R << std::endl;
@@ -152,6 +152,7 @@ void HTTP::respond::set_no_config(std::string root)
         std::cout << _body  << "BODY"<< std::endl;
         set_content_len(_body);
     }
+    return ;
 }
 
 
@@ -165,15 +166,24 @@ void HTTP::respond::set_status_line()
     _statusline = "HTTP/1.1 ";
     std::string _stat_cha_s = _stat_cha;
     _stat_cha_s.append(";");
+    std::cout <<"status code: " << _status_code << std::endl;
     if ( _pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
-         set_no_config(root);
-    else if (_status_code == 404)
     {
+         set_no_config(root);
+         std::cout << "out of config" << std::endl;
+    }
+
+    if (_status_code == 404)
+    {
+        std::cout << "404" << std::endl;
          _statusline.append("404 Not Found");
         _body = "<h1>404: You can't do that!</h1>\0";
     }
     else if (_status_code == 200)
+    {
         _statusline.append("200 OK");
+        return;
+    }
     else if (_status_code == 403)
     {
         _statusline.append("403 Forbidden");
@@ -185,7 +195,10 @@ void HTTP::respond::set_status_line()
         _body = "<h1>405: Try another method!</h1>\0";
     }
     else if (_status_code == 204)
+    {
         _statusline.append("204 No Content");
+        _body = "<h1>204: no content</h1>\0";
+    }
     else if (_status_code == 301)
         _statusline.append("301 Moved Permanently");
     else if(_status_code == 301)
@@ -198,8 +211,9 @@ void HTTP::respond::set_status_line()
         _statusline.append("113 ");
         _body = "<h1> 400 : Request Entity Too Large \0";
     }
-    else if (file.is_open())
+    if(file.is_open())
         {
+            std::cout << "file open " << std::endl;
             total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
             _body = total_body;
         }
@@ -311,7 +325,9 @@ void HTTP::respond::find_total_file_path()
 {
     std::string key;
     std::string redir;
+    int found;
 
+    found = -1;
     _relativepath = _map_req["URI"].c_str();
     std::cout << "RELATIVE PATH IS[" << _relativepath  <<"]"<< std::endl;
     std::cout << "RELATIVE PATH IS[" << _relativepath[_relativepath.size() - 1]<<"]"  << std::endl;
@@ -345,19 +361,16 @@ void HTTP::respond::find_total_file_path()
         _relativepath = _relativepath.substr(0, _relativepath.size() -1);
     if (_pars_server._location_map.count(key) == 1)
     {
-        std::cout << "in method block" << std::endl;
-
-        if (_map_req["METHOD"].compare(_pars_server._location_map[key]._method) != 0)
+		for (unsigned int i = 0; i < _pars_server._location_map[key]._methods.size(); i++)
+		{
+            if (_map_req["METHOD"].compare(_pars_server._location_map[key]._methods[i]) == 0)
+                found = 1;
+		}
+        if (found == -1)
             return (set_status_code(405));
-        else
-        {
-            if (_relativepath == "" || _relativepath == "/")
-                _relativepath = _pars_server._location_map[key]._index;
-            _totalpath = _pars_server._location_map[key]._root.append(_relativepath);
-            std::cout << "relative path is end[" << _relativepath << "]" << std::endl;
-            std::cout << "_totalpath path is end[" << _totalpath << "]" << std::endl;
-        }
- 
+        if (_relativepath == "" || _relativepath == "/")
+            _relativepath = _pars_server._location_map[key]._index;
+        _totalpath = _pars_server._location_map[key]._root.append(_relativepath);
     }
     return ;
 }

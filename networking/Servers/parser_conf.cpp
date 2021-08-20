@@ -73,8 +73,11 @@ HTTP::parse_conf& HTTP::parse_conf::operator=(const parse_conf& x)
 
 void HTTP::parse_conf::set_values_server(std::string s, t_server &server)
 {
-	std::string key = s.substr(0, s.find(' '));
-	std::string value = s.substr(s.find(' ') + 1, s.length() - s.find(' ') - 2);
+	std::string key;
+	std::string value;
+
+	key = s.substr(0, s.find(' '));
+	value = s.substr(s.find(' ') + 1, s.length() - s.find(' ') - 2);
 	if (key == "server_name")
 		server._server_name = value;
 	if (key == "listen")
@@ -104,10 +107,19 @@ void HTTP::parse_conf::set_values_server(std::string s, t_server &server)
 // This function gets the whole line and a struct (t_location)
 void	HTTP::parse_conf::set_values_location(std::string s, t_location &location)
 {
-	std::string key = s.substr(0, s.find(' '));
-	std::string value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
+	std::string last_meth;
+	std::string key;
+	std::string value;
+
+	key = s.substr(0, s.find(' '));
+	value = s.substr(s.find(' ') + 1,s.find(';') - s.find(' ') - 1);
 	if (key == "method")
-		location._method= value;
+	{
+		location._methods = split(s.substr(s.find(' ') + 1, s.size()), ' ');
+		last_meth = location._methods[location._methods.size() - 1];
+		if (last_meth[last_meth.size() - 1] == ';')
+			location._methods[location._methods.size() - 1] = last_meth.substr(0, last_meth.size() - 1);
+	}
 	if (key == "root")
 		location._root = value;
 	if (key == "cgi")
