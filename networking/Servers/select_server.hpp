@@ -25,7 +25,7 @@ namespace HTTP
 		std::string			_filename;
 		int					_content_length;
 		int					_total_body_length;
-	}   t_client_select;
+	}   					t_client_select;
 
 	typedef struct t_server_select {
 		sockaddr_in                     _servers_addr;

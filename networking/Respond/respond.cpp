@@ -140,6 +140,7 @@ void HTTP::respond::post_response(t_client_select &client, const int &total_body
 	//gettimeofday(&now, NULL);
 	//_servers[i]._clients[j]._header.append("Date: " + std::string(now)");
 	client._header.append("Server: een naam\r\n");
+	client._header.append("\r\n");
 }
 
 
