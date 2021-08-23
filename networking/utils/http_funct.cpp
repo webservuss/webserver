@@ -41,34 +41,35 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 	return 0;
 }
 
-int HTTP::post_handle_request(t_client_select &client, std::map <std::string, std::string> reqmap, std::string stringbuff, char * &buffer, int valread)
+int HTTP::post_handle_request(t_client_select &client, t_req_n_config r_n_c, std::string stringbuff, char * &buffer, int valread)
 {
-	std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
+	(void)valread;
 	// TODO directory has to be taken from config file? Also: ofstream does not create a directory
-	client._filename = "uploads/" + reqmap["URI"]; // relative path of the server executable (don't start with a '/' !)
+	client._filename = "uploads/" + r_n_c._req_map["URI"]; // relative path of the server executable (don't start with a '/' !)
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
-	client._content_length = ft_stoi(reqmap["Content-Length:"]);
-	std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
-	if (!(reqmap.count("Expect:")))
+	client._content_length = ft_stoi(r_n_c._req_map["Content-Length:"]);
+	// TODO: request method valid?
+
+	// TODO: client body size valid?
+
+	if (!(r_n_c._req_map.count("Expect:")))
 	{
-		std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
 		int position_of_body = stringbuff.find("\r\n\r\n") + 4;
-		std::cout << "phr ..? content_length: " << client._content_length << std::endl;
 		out_file.write(&buffer[position_of_body], client._content_length);
 		out_file.close();
 		client._expect_body = false;
 		client._post_done = true;
-		HTTP::respond::post_response(client, valread);
+		HTTP::respond::post_response(client, client._content_length);
 		return 0;
 	}
 	else
 	{
-		std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
 		out_file.close();
+
 		/* send a brief response to the client */
 		client._header = "HTTP/1.1 100 Continue\r\n";
 		client._expect_body = true;
-		client._post_done= false; // seems to be necessary.. are clients really removed? because this holds the previous value.
+		client._post_done= false;
 		return 1;
 	}
 }

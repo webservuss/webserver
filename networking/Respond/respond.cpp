@@ -132,15 +132,20 @@ void HTTP::respond::postmethod()
 void HTTP::respond::post_response(t_client_select &client, const int &total_body_length)
 {
 
-	client._header = "HTTP/1.1 201 Created\r\n";
-	client._header.append("Connection: keep-alive\r\n");
+	(void)total_body_length;
+	client._header = "HTTP/1.1 200 OK\r\n";
+	client._header.append("Connection: close\r\n");
 	client._header.append("Content-Length: " + ft_numtos(total_body_length) + "\r\n");
-	client._header.append("Content-Type: image/jpeg\r\n");
+	client._header.append("Content-Type: text/html; charset=utf-8\r\n");
 	client._header.append("Cookie:\r\n");
-	//gettimeofday(&now, NULL);
-	//_servers[i]._clients[j]._header.append("Date: " + std::string(now)");
 	client._header.append("Server: een naam\r\n");
+	client._header.append("Status:\r\n");
 	client._header.append("\r\n");
+
+
+
+
+
 }
 
 

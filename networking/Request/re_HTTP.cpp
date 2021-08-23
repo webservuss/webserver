@@ -25,23 +25,15 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     set_headers(dataparser);
     while(std::getline(request_data, data ) && !request_data.eof())
     {
-		std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
         line = data.substr(0, data.find('\r'));
-		std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
         if (i == 0)
             i = set_request_line(line);
-		std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
         if(line.size() != 0)
         {
-			std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
             key = (line.substr(0, line.find(" ")));
-			std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
             value = (line.substr(line.find(" "), line.find('\r')));
-			std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
             _map_header.insert(std::pair<std::string, std::string>(key, value));
-			std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
         }
-		std::cout << __FILE_NAME__ << ", line: " << __LINE__ << std::endl;
         j++;
     }
 }
