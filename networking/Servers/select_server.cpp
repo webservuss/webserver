@@ -8,7 +8,7 @@
 #include "../utils/http_funct.hpp"
 #include "../utils/req_n_conf.hpp"
 #include "../Respond/respond.hpp"
-
+#include "../utils/colors.hpp"
 #define BUFFER_SIZE (1024 * 1024) // 1Mb
 // /* constructor calls simple_server and launches */ // need to add in parser_servers here too
 // HTTP:: select_server::select_server()
@@ -170,7 +170,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
 	respond m (r_n_c);
+	std::cout << YELLOW << _servers[i]._clients[j]._header << "HEADER 0 " << R<< std::endl;
 	_servers[i]._clients[j]._header = m.getTotalheader();
+	std::cout << YELLOW << _servers[i]._clients[j]._header << "HEADER 1 " << R<< std::endl;
 	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 	return valread;
@@ -178,7 +180,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 void HTTP::select_server::send_response(int i, int j)
 {
+	
     std::cout << "in send response" << std::endl;
+	std::cout << _servers[i]._clients[j]._header << "HEADER 2" << std::endl;
 	std::cout << "_servers[i]._clients[j]._header: " << _servers[i]._clients[j]._header << std::endl;
 	struct timeval now;
 

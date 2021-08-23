@@ -176,7 +176,7 @@ void HTTP::respond::set_status_line()
     if (_status_code == 404)
     {
         std::cout << "404" << std::endl;
-         _statusline.append("404 Not Found");
+         _statusline.append("Not Found");
         _body = "<h1>404: You can't do that!</h1>\0";
     }
     else if (_status_code == 200)
@@ -198,6 +198,14 @@ void HTTP::respond::set_status_line()
     {
         _statusline.append("204 No Content");
         _body = "<h1>204: no content</h1>\0";
+        //     if(file.is_open())
+        // {
+        //     std::cout << "file open " << std::endl;
+        //     total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        //     _body = total_body;
+        // }
+        // file.close();
+        // return;
     }
     else if (_status_code == 301)
         _statusline.append("301 Moved Permanently");
@@ -220,6 +228,7 @@ void HTTP::respond::set_status_line()
     file.close();
     set_content_type("text/html");
     set_content_len(_body);
+   
 
 }
 
@@ -295,10 +304,12 @@ void HTTP::respond::set_content_len(std::string body)
     int size;
 
     size = body.size();
+    std::cout << size << " SIZE"<< std::endl;
     std::stringstream ss;
     ss << size;
     ss >> _contentlen;
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
+    std::cout << _contentlen << " CONTENTLEN" << std::endl;
 }
 
 void HTTP::respond::set_total_response()
@@ -395,10 +406,14 @@ void HTTP::respond::set_body()
         {
                 std::cout << RED << "AUTO INDEX" << R << std::endl;
                 std::ifstream file("www/html_pages/downloads/index.php");
+               
+
                 if (file.is_open())
-                {
+                {   
+                    //opendir(file);
                     std::cout << "in downloads" <<std::endl;
                     _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
                 }
                 set_content_len(_body);
                 _status_code = 200;
@@ -426,8 +441,14 @@ void HTTP::respond::set_body()
 		file.close();
 	}
     set_content_len(_body);
+   //if(status_code = 204 )
     if (_contentlen == "0" && _status_code == 0)
+    {   
+        std::cout << "here " <<std::cout;
         _status_code = 204;
+       // set_status_line();
+        //set_content_len(_body);
+    }
     else if (_status_code == 0)
         _status_code = 200;
     
@@ -435,5 +456,6 @@ void HTTP::respond::set_body()
 
 const std::string &HTTP::respond::getTotalheader() const
 {
+    std::cout << _totalheader << "TOTAL HEADER"<< std::endl;
     return _totalheader;
 }
