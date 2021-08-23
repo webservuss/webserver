@@ -175,7 +175,7 @@ void HTTP::respond::set_status_line()
 
     if (_status_code == 404)
     {
-        std::cout << "404" << std::endl;
+       
          _statusline.append("Not Found");
         _body = "<h1>404: You can't do that!</h1>\0";
     }
