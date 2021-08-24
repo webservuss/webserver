@@ -3,13 +3,17 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <fstream>
 #include "select_server.hpp"
 #include "../Request/re_HTTP.hpp"
 #include "../utils/http_funct.hpp"
 #include "../utils/req_n_conf.hpp"
-#include "../Respond/respond.hpp"
+#include "../utils/utils.hpp"
 #include "../utils/colors.hpp"
+#include "../Respond/respond.hpp"
 #define BUFFER_SIZE (1024 * 1024) // 1Mb
+
+//#define BUFFER_SIZE (1024) // 1Mb
 // /* constructor calls simple_server and launches */ // need to add in parser_servers here too
 // HTTP:: select_server::select_server()
 // {
@@ -120,8 +124,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 {
     int				valread;
     char 			*buffer;
-	std::string		stringbuff;
 	struct timeval	now;
+
 
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
@@ -139,37 +143,51 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
-	/* Check if we are expecting a body */
-	if (_servers[i]._clients[j]._expect_body)
+	/* TODO check valread == 0 here; FD_SET as well? */
+	if (valread == 0)
 	{
-		_servers[i]._clients[j]._total_body_length += valread;
-		HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread);
-		if (valread == 0 || (_servers[i]._clients[j]._total_body_length == _servers[i]._clients[j]._content_length))
-		{
-			_servers[i]._clients[j]._expect_body = false;
-			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-			free(buffer);
-			/* send a response to client POST is done */
-			return 0;
-		}
-		//sleep(1);
+		FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		free(buffer);
-		return valread;
+		_servers[i]._clients[j]._active = false;
+		return 0;
 	}
 
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
+	_servers[i]._clients[j]._header = "";
+	/* Check if we are expecting a body */
+	if (_servers[i]._clients[j]._expect_body)
+	{
+		//_servers[i]._clients[j]._total_body_length += valread;
+		if (HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread))
+		{
+			HTTP::respond::post_response(_servers[i]._clients[j], _servers[i]._clients[j]._total_body_length);
+			std::cout << RED << _servers[i]._clients[j]._header << std::endl;
+			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+		}
+		free(buffer);
+		return valread;
+	}
 	// parse buffer into request
-	stringbuff = std::string(buffer);
-	std::cout << stringbuff << std::endl;
-
+	std::string stringbuff = std::string(buffer);
 	t_req_n_config							r_n_c;
-	re_HTTP									requestinfo (stringbuff);
+	re_HTTP									requestinfo (stringbuff.substr(0, stringbuff.find("\r\n\r\n") + 2));
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
-	respond m (r_n_c);	
+
+	/* Check if POST and(!) contains a body	*/
+	if (stringbuff.substr(0, 4) == "POST")
+	{
+
+			HTTP::post_handle_request(_servers[i]._clients[j], r_n_c, stringbuff, buffer, valread);
+			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+			std::cout << _servers[i]._clients[j]._post_done << std::endl;
+			free(buffer);
+			return valread;
+	}
+	respond m (r_n_c);
 	_servers[i]._clients[j]._header = m.getTotalheader();
 	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
@@ -178,14 +196,16 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 void HTTP::select_server::send_response(int i, int j)
 {
-
 	struct timeval now;
 
+	std::cout << __LINE__ << std::endl;
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );  
-    FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
+	int a = send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
+	std::cout << MAGENTA << a << std::endl;
+
+	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
 }
 
 int              HTTP::select_server::erase_client(int i, int j)
@@ -222,6 +242,7 @@ void    HTTP::select_server::launch()
 	    for (unsigned long i = 0; i < _servers.size(); i++) 
         {
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
+            	std::cout << "ACCEPTER" << std::endl;
                 accepter(i);
             }
             for (unsigned long j = 0; j < _servers[i]._clients.size(); j++)
@@ -229,21 +250,36 @@ void    HTTP::select_server::launch()
 				check_client_active(_servers[i]._clients[j]);
 				if (_servers[i]._clients[j]._active == false)
 				{
+					std::cout << "_ACTIVE == FALSE" << std::endl;
+					//close(_servers[i]._clients[j]._c_sock);
 					j = erase_client(i, j);
 					if (_servers[i]._clients.size() == 0)
 						break;
 				}
                 if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_read_fds)) {
+					std::cout << "FD_ISSET, &_read_fds" << std::endl;
+					std::cout << "i and j: " << i << " " << j << std::endl;
+
                     if (read_from_client(i, j) == 0)
 					{
+						//close(_servers[i]._clients[j]._c_sock);
 						j = erase_client(i, j);
 						if (_servers[i]._clients.size() == 0)
 							break;
 					}
                 }
                 if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_write_fds)) {
+					std::cout << "FD_ISSET, &_write_fds" << std::endl;
                     send_response(i, j);
 					FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
+
+					if (_servers[i]._clients[j]._post_done) {
+						std::cout << GREEN << "_post_done" << RESET << std::endl;
+						close(_servers[i]._clients[j]._c_sock);
+						j = erase_client(i, j);
+						if (_servers[i]._clients.size() == 0)
+							break;
+					}
                 }
             }
 		}

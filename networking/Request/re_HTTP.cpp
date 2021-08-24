@@ -27,10 +27,10 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     while(std::getline(request_data, data ) && !request_data.eof())
     {
         line = data.substr(0, data.find('\r'));
-        if (i == 0) 
+        if (i == 0)
             i = set_request_line(line);
         if(line.size() != 0)
-        {    
+        {
             key = (line.substr(0, line.find(" ")));
             value = (line.substr(line.find(" "), line.find('\r')));
             _map_header.insert(std::pair<std::string, std::string>(key, value));

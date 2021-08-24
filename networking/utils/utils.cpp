@@ -24,4 +24,3 @@ int ft_stoi(std::string s)
 	std::istringstream(s) >> i;
 	return i;
 }
-

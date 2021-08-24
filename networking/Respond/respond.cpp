@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "respond.hpp"
 #include "../utils/colors.hpp"
+#include "../utils/utils.hpp"
 #include "../Respond/CGI.hpp"
 #include <sys/types.h>
 #include <dirent.h>
@@ -88,6 +89,72 @@ void HTTP::respond::getmethod()
     set_body();
     set_status_line();
     set_total_response();
+}
+
+void HTTP::respond::postmethod()
+{
+    std::cout << "ik ben in en post method" << std::endl;
+	//FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+//    //    int serverMaximum = _body.size();
+//    //    if( serverMaximum > _body.length())
+//    //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
+//    //if (maxbodysize < _body.length()[]
+//    //  int fd;
+//
+//    std::string     total_path = _totalpath;
+//    std::ifstream file("html_pages/welcome.php");
+//    std::cout << GREEN << "file :: " << file << R << std::endl;
+//   // std::ifstream file("html_pages/index.html");
+//    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
+//       // std::ifstream file("html_pages/auto_error.html");
+//        std::string total_body;
+//        if (file.is_open())
+//        {
+//            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+//            _body = total_body;
+//            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
+//        }
+//    if (this->filefd == -1 && _status_code == 200)
+//        // this->setstatus(403);
+//        std::cout << "status code 403 " << std::endl;
+//    //struct stat statBuf;
+//   // if (stat(file, &statBuf) < 0 && _status == 200)
+//      //  std::cout << "status code 201 " << std::endl;
+//    // this->setstatus(201);
+//    std::cout << RED << "BODY =" <<_body << R <<std::endl;
+//    if (write(filefd, _body.c_str(),_body.length()) == -1)
+//        std::cout<< "WRITE " << std::endl;
+//    close(filefd);
+//    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
+}
+
+void HTTP::respond::post_response(t_client_select &client, const int &total_body_length)
+{
+
+	(void)total_body_length;
+	client._header = "HTTP/1.1 200 OK\r\n";
+	client._header.append("Connection: close\r\n");
+	client._header.append("Content-Length: " + ft_numtos(total_body_length) + "\r\n");
+	client._header.append("Content-Type: text/html; charset=utf-8\r\n");
+	client._header.append("Cookie:\r\n");
+	client._header.append("Server: een naam\r\n");
+	client._header.append("Status:\r\n");
+	client._header.append("\r\n");
+
+
+
+
+
+}
+
+
+void HTTP::respond::deletemethod()
+{
+    // _postheader = _totalheader;
+    // int ret  = remove(file.c_str());
+    // if( ret != 0)
+    // set statuscode notfound
+
 }
 
 void HTTP::respond::set_no_config(std::string root)
@@ -341,10 +408,15 @@ void HTTP::respond::set_body()
         {
                 std::ifstream file("www/html_pages/downloads/index.php");
                 if (file.is_open())
-                    _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-                set_content_len(_body);
-                _status_code = 200;
-                return ;
+                {
+                    _totalpath = "www/html_pages/downloads/index.php";
+                    HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
+		            _body = cgi.get_cgi_body();
+                    set_content_len(_body);
+                    _status_code = 200;
+                    file.close();
+                    return ;
+                }
         }
     }
 	if (stat(_path, &sb) == -1)

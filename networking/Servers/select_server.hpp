@@ -21,10 +21,11 @@ namespace HTTP
 
 		/* variables needed for POST method */
 		bool 				_expect_body;
+		bool 				_post_done;
 		std::string			_filename;
 		int					_content_length;
 		int					_total_body_length;
-	}   t_client_select;
+	}   					t_client_select;
 
 	typedef struct t_server_select {
 		sockaddr_in                     _servers_addr;
