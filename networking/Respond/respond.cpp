@@ -9,8 +9,6 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-// TODO : 413 (request entity is larger than limits defined by server
-
 HTTP::respond::respond(t_req_n_config req_n_conf)
 {
     _status_code = 0;
@@ -21,20 +19,19 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
         set_status_code(405);
     else if (_map_req["METHOD"].compare("GET") == 0)
         getmethod();
-    else if (_map_req["METHOD"].compare("POST") == 0)
-        postmethod();
-    else if (_map_req["METHOD"].compare("DELETE") == 0)
-        deletemethod();
+    // else if (_map_req["METHOD"].compare("POST") == 0)
+    //     postmethod();
+    // else if (_map_req["METHOD"].compare("DELETE") == 0)
+    //     deletemethod();
     else
         set_status_code(405);
 }
 
 HTTP::respond::~respond()   {}
 
-// CAN SOMEONE CHECK COPY CONSTRUCTOR AND ASSIGNMENT OPPERATOR
-/*copy constructor */
+
 HTTP::respond::respond(const respond& x)
-{ // TEST THIS // change
+{ 
     _statusline = x._statusline;
     _contentlen = x._contentlen;
     _lastmodified = x._lastmodified;
@@ -56,7 +53,7 @@ HTTP::respond::respond(const respond& x)
 
 /*assignment operator */
 HTTP::respond& HTTP::respond::operator=(const respond& x)
-{ // TEST THIS
+{ 
     _statusline = x._statusline;
     _contentlen = x._contentlen;
     _lastmodified = x._lastmodified;
@@ -91,53 +88,6 @@ void HTTP::respond::getmethod()
     set_body();
     set_status_line();
     set_total_response();
-}
-
-void HTTP::respond::postmethod()
-{
-    std::cout << "ik ben in en post method" << std::endl;
-//    //    int serverMaximum = _body.size();
-//    //    if( serverMaximum > _body.length())
-//    //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
-//    //if (maxbodysize < _body.length()[]
-//    //  int fd;
-//
-//    std::string     total_path = _totalpath;
-//    std::ifstream file("html_pages/welcome.php");
-//    std::cout << GREEN << "file :: " << file << R << std::endl;
-//   // std::ifstream file("html_pages/index.html");
-//    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
-//       // std::ifstream file("html_pages/auto_error.html");
-//        std::string total_body;
-//        if (file.is_open())
-//        {
-//            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-//            _body = total_body;
-//            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
-//        }
-//    if (this->filefd == -1 && _status_code == 200)
-//        // this->setstatus(403);
-//        std::cout << "status code 403 " << std::endl;
-//    //struct stat statBuf;
-//   // if (stat(file, &statBuf) < 0 && _status == 200)
-//      //  std::cout << "status code 201 " << std::endl;
-//    // this->setstatus(201);
-//    std::cout << RED << "BODY =" <<_body << R <<std::endl;
-//    if (write(filefd, _body.c_str(),_body.length()) == -1)
-//        std::cout<< "WRITE " << std::endl;
-//    close(filefd);
-//    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
-}
-
-
-
-void HTTP::respond::deletemethod()
-{
-    // _postheader = _totalheader;
-    // int ret  = remove(file.c_str());
-    // if( ret != 0)
-    // set statuscode notfound
-
 }
 
 void HTTP::respond::set_no_config(std::string root)
@@ -197,14 +147,6 @@ void HTTP::respond::set_status_line()
     {
         _statusline.append("204 No Content");
         _body = "<h1>204: no content</h1>\0";
-        //     if(file.is_open())
-        // {
-        //     std::cout << "file open " << std::endl;
-        //     total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        //     _body = total_body;
-        // }
-        // file.close();
-        // return;
     }
     else if (_status_code == 301)
         _statusline.append("301 Moved Permanently");
@@ -303,7 +245,6 @@ void HTTP::respond::set_content_len(std::string body)
     int size;
 
     size = body.size();
-    std::cout << size << " SIZE"<< std::endl;
     std::stringstream ss;
     ss << size;
     ss >> _contentlen;
@@ -339,15 +280,12 @@ void HTTP::respond::find_total_file_path()
 
     found = -1;
     _relativepath = _map_req["URI"].c_str();
-    std::cout << "RELATIVE PATH IS[" << _relativepath  <<"]"<< std::endl;
-    std::cout << "RELATIVE PATH IS[" << _relativepath[_relativepath.size() - 1]<<"]"  << std::endl;
     if (_relativepath[_relativepath.size() - 1] != '/')
         _relativepath = _relativepath.append("/");
     key = "/";
     key = key.append(_relativepath);
     while (key != "/")
     {
-        std::cout << "in loop" << key << std::endl;
         key = key.substr(0, key.find_last_of('/') + 1);
         if (_pars_server._location_map.count(key) == 1)
             break;
@@ -355,10 +293,8 @@ void HTTP::respond::find_total_file_path()
             key = key.substr(0, key.size() - 1);
         
     }
-     std::cout << "in HERE block" << std::endl;
     if (_pars_server._location_map[key]._redir != "")
     {
-        std::cout << "in redir block" << std::endl;
         _status_code = 301;
         _relativepath = _relativepath.substr(key.size() - 1, _relativepath.size() - key.size() + 1);
         redir = _pars_server._location_map[key]._redir;
@@ -403,28 +339,16 @@ void HTTP::respond::set_body()
     {
         if (opendir(_path) != NULL)
         {
-                std::cout << RED << "AUTO INDEX" << R << std::endl;
                 std::ifstream file("www/html_pages/downloads/index.php");
-               
-
                 if (file.is_open())
-                {   
-                    //opendir(file);
-                    std::cout << "in downloads" <<std::endl;
                     _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-                }
                 set_content_len(_body);
                 _status_code = 200;
                 return ;
         }
     }
-    std::cout << YELLOW << "path" << _path << std::endl;
 	if (stat(_path, &sb) == -1)
-    {
-        std::cout<< YELLOW << "file" << R << std::endl;
 		return (set_status_code(404)); // file doesnt exist
-    }
 	if (_totalpath.find(".php") != std::string::npos)// _body will be filled by php_cgi()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
@@ -443,10 +367,7 @@ void HTTP::respond::set_body()
    //if(status_code = 204 )
     if (_contentlen == "0" && _status_code == 0)
     {   
-        std::cout << YELLOW  "here " <<  R<<std::cout;
         _status_code = 204;
-       // set_status_line();
-        //set_content_len(_body);
     }
     else if (_status_code == 0)
         _status_code = 200;

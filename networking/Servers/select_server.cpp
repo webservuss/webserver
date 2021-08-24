@@ -166,7 +166,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 	t_req_n_config							r_n_c;
 	re_HTTP									requestinfo (stringbuff);
-	std::cout << "out of requst" << std::endl;
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
