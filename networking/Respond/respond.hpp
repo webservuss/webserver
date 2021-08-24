@@ -25,11 +25,6 @@ namespace HTTP{
         std::string _stat_cha;
         std::map<std::string, std::string> _totalrespond;
         std::map <std::string, std::string> _map_req;
-        // std::string _postheader;
-        // std::string _deleteheader;
-        // std::string _postbodylen;
-        // std::string _deletefile;
-        int         filefd; // TODO i (amber) think we can take out
 
     public:
         /* constructors & destructors */
