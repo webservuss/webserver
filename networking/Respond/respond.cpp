@@ -175,7 +175,7 @@ void HTTP::respond::set_no_config(std::string root)
 
 void HTTP::respond::set_status_line()
 {
-    std::string tmp = std::to_string(_status_code);
+    std::string tmp = ft_numtos(_status_code);
     _stat_cha = tmp.c_str();
     std::string total_body;
     std::string root = _pars_server._error_page[1];
