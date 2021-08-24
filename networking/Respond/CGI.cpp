@@ -148,7 +148,7 @@ void HTTP::CGI::set_cgi_body()
 	char *argv[] = {(char *)cgi_location.c_str(), _path, NULL };
 	char *env[] = {(char *)"SERVER_PORT=1000", (char *)"environment", NULL};
 	pid_t pid;
-	char buffer[4096];
+	char *buffer;
 	int p[2];
 
 	pipe(p);
@@ -157,17 +157,28 @@ void HTTP::CGI::set_cgi_body()
 		dup2(p[1], 1);
 		close(p[0]);
 		close(p[1]);
-		if (execve(argv[0], argv, env) == -1)
+		if (execve(argv[0], argv, env) == -1) {
 			perror("Could not execve");
+		}
 	}
 	else {
 		wait(NULL);
+		buffer = (char *)malloc(sizeof(char *) * 4096 * 4096);
 		close(p[1]);
-		read(p[0], buffer, sizeof(buffer));
-		std::string tmp = buffer;
+		int bytes_read = read(p[0], buffer, 4096 *4096);
+		std::cout << "BR: " << bytes_read << std::endl;
+		for (int i = 0; i < bytes_read; ++i) {
+			std::cout << buffer[i];
+		}
+		buffer[bytes_read] = 0;
+		std::string tmp = std::string(buffer);
+
+		std::cout << std::endl;
+		std::cout << tmp << std::endl;
 		int start = tmp.find("<html>");
 		tmp = tmp.substr(start, tmp.length());
 		_cgi_body = tmp;
+		free(buffer);
 	}
 
 }
