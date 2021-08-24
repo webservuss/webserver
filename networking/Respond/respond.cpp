@@ -49,7 +49,7 @@ HTTP::respond::respond(const respond& x)
     _totalheader = x._totalheader;
     _totalrespond = x._totalrespond;
     _map_req = x._map_req;
-    filefd = x.filefd; // think this will go
+ 
 }
 
 /*assignment operator */
@@ -71,7 +71,7 @@ HTTP::respond& HTTP::respond::operator=(const respond& x)
     _totalheader = x._totalheader;
     _totalrespond = x._totalrespond;
     _map_req = x._map_req;
-    filefd = x.filefd; // think this will go
+    
     return *this;
 }
 
