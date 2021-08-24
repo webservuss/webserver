@@ -175,8 +175,7 @@ void HTTP::respond::set_status_line()
 
     if (_status_code == 404)
     {
-       
-         _statusline.append("Not Found");
+         _statusline.append(" Not Found");
         _body = "<h1>404: You can't do that!</h1>\0";
     }
     else if (_status_code == 200)
@@ -309,7 +308,7 @@ void HTTP::respond::set_content_len(std::string body)
     ss << size;
     ss >> _contentlen;
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
-    std::cout << _contentlen << " CONTENTLEN" << std::endl;
+    
 }
 
 void HTTP::respond::set_total_response()
@@ -444,7 +443,7 @@ void HTTP::respond::set_body()
    //if(status_code = 204 )
     if (_contentlen == "0" && _status_code == 0)
     {   
-        std::cout << "here " <<std::cout;
+        std::cout << YELLOW  "here " <<  R<<std::cout;
         _status_code = 204;
        // set_status_line();
         //set_content_len(_body);
@@ -456,6 +455,5 @@ void HTTP::respond::set_body()
 
 const std::string &HTTP::respond::getTotalheader() const
 {
-    std::cout << _totalheader << "TOTAL HEADER"<< std::endl;
     return _totalheader;
 }
