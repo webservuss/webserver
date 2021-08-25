@@ -45,7 +45,7 @@ int HTTP::post_handle_request(t_client_select &client, t_req_n_config r_n_c, std
 {
 	(void)valread;
 	// TODO directory has to be taken from config file? Also: ofstream does not create a directory
-	client._filename = "uploads/" + r_n_c._req_map["URI"]; // relative path of the server executable (don't start with a '/' !)
+	client._filename = "www/html_pages/uploads/" + r_n_c._req_map["URI"]; // relative path of the server executable (don't start with a '/' !)
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
 	client._content_length = ft_stoi(r_n_c._req_map["Content-Length:"]);
 	// TODO: request method valid?
@@ -59,15 +59,16 @@ int HTTP::post_handle_request(t_client_select &client, t_req_n_config r_n_c, std
 		out_file.close();
 		client._expect_body = false;
 		client._post_done = true;
-		HTTP::respond::post_response(client, client._content_length);
+		std::string body(&buffer[position_of_body]);
+
+		HTTP::respond::post_response(client, client._content_length, body);
 		return 0;
 	}
 	else
 	{
 		out_file.close();
-
 		/* send a brief response to the client */
-		client._header = "HTTP/1.1 100 Continue\r\n";
+		client._header = "HTTP/1.1 100 Continue\r\n\r\n";
 		client._expect_body = true;
 		client._post_done= false;
 		return 1;

@@ -143,8 +143,12 @@ void HTTP::CGI::set_cgi_env()
 
 void HTTP::CGI::set_cgi_body()
 {
-	// std::string cgi_location = "/usr/bin/php";
-	std::string cgi_location = "/usr/local/bin/php-cgi";
+//<<<<<<< HEAD
+//	// std::string cgi_location = "/usr/bin/php";
+//	std::string cgi_location = "/usr/local/bin/php-cgi";
+//=======
+	std::string cgi_location = "/usr/bin/php-cgi";
+//>>>>>>> ourmergingsucks
 
 	char *argv[] = {(char *)cgi_location.c_str(), _path, NULL };
 	char *env[] = {(char *)"SERVER_PORT=1000", (char *)"environment", NULL};

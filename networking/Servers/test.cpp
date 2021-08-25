@@ -3,6 +3,7 @@
 #include "test.hpp"
 #include "test.hpp"
 #include <dirent.h>
+#include <stdlib.h>
 
 
 int main(int argc, char **argv)

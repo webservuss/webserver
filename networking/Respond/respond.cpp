@@ -128,23 +128,63 @@ void HTTP::respond::postmethod()
 //    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
 }
 
-void HTTP::respond::post_response(t_client_select &client, const int &total_body_length)
+void HTTP::respond::post_response(t_client_select &client, const int &total_body_length, std::string &body)
 {
 
+	(void)body;
+	client._header = "HTTP/1.1 204 No Content\r\n\r\n";
+
+
+//	client._header = "HTTP/1.1 200 OK\r\nContent-Type: text/markdown\r\nContent-Length: " + ft_numtos(total_body_length) + "\r\nabc\r\n";
+
+
+
 	(void)total_body_length;
-	client._header = "HTTP/1.1 200 OK\r\n";
-	client._header.append("Connection: close\r\n");
+//	client._header = "HTTP/1.1 200 OK\r\n";
+//	client._header.append("Content-Length: " + ft_numtos(total_body_length) + "\r\n");
+//	client._header.append("Connection: keep-alive\r\n");
+//	client._header.append("Location: /uploads/a.txt\r\n");
+//	client._header.append("Content-Type: text/html; charset=utf-8\r\n");
+//	client._header.append("Host: localhost:8080\r\n");
+//	client._header.append( "Date: " +d + "\r\n");
+//	client._header.append("Server: localhost\r\n");
+//	client._header.append("\r\n");
+//
+//	client._header.append(body + "\r\n");
+////	client._header.append("\r\n");
+//	char a[2];
+//	a[0]='a';
+//	a[1]=0;
+//	std::string b(a);
+//	client._header.append(b+"\r\n");
+//	client._header.append("\r\n");
+//
+}
+void HTTP::respond::post_response_nonstatic(t_client_select &client, const int &total_body_length, std::string &body)
+{
+
+
+
+	(void)body;
+//	(void)total_body_length;
+	client._header = "HTTP/1.1 201 Created\r\n";
+	client._header.append("Connection: keep-alive\r\n");
+	client._header.append("Location: /uploads/a.txt\r\n");
 	client._header.append("Content-Length: " + ft_numtos(total_body_length) + "\r\n");
 	client._header.append("Content-Type: text/html; charset=utf-8\r\n");
-	client._header.append("Cookie:\r\n");
-	client._header.append("Server: een naam\r\n");
-	client._header.append("Status:\r\n");
+	client._header.append("Host: localhost:8080\r\n");
+	client._header.append( "Date: " + _date + "\r\n");
+	client._header.append("Server: localhost\r\n");
 	client._header.append("\r\n");
-
-
-
-
-
+//	client._header.append(body + "\r\n");
+//	client._header.append("\r\n");
+//	char a[2];
+//	a[0]='a';
+//	a[1]=0;
+//	std::string b(a);
+//	client._header.append(b+"\r\n");
+//	client._header.append("\r\n");
+//
 }
 
 
@@ -432,18 +472,18 @@ void HTTP::respond::set_body()
 		if(file.is_open())
             _body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         else
-			return (set_status_code(403)); 
+			return (set_status_code(403));
 		file.close();
 	}
     set_content_len(_body);
    //if(status_code = 204 )
     if (_contentlen == "0" && _status_code == 0)
-    {   
+    {
         _status_code = 204;
     }
     else if (_status_code == 0)
         _status_code = 200;
-    
+
 }
 
 const std::string &HTTP::respond::getTotalheader() const

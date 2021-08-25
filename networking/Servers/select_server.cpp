@@ -162,7 +162,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 		//_servers[i]._clients[j]._total_body_length += valread;
 		if (HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread))
 		{
-			HTTP::respond::post_response(_servers[i]._clients[j], _servers[i]._clients[j]._total_body_length);
+			std::string body(buffer);
+			HTTP::respond::post_response(_servers[i]._clients[j], _servers[i]._clients[j]._total_body_length, body);
 			std::cout << RED << _servers[i]._clients[j]._header << std::endl;
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		}
@@ -176,6 +177,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
+	respond m (r_n_c);
+
 
 	/* Check if POST and(!) contains a body	*/
 	if (stringbuff.substr(0, 4) == "POST")
@@ -187,10 +190,10 @@ int    HTTP::select_server::read_from_client(int i, int j)
 			free(buffer);
 			return valread;
 	}
-	respond m (r_n_c);
 	_servers[i]._clients[j]._header = m.getTotalheader();
 	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+    free(buffer);
 	return valread;
 }
 
@@ -202,6 +205,7 @@ void HTTP::select_server::send_response(int i, int j)
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
+	std::cout << _servers[i]._clients[j]._header << std::endl << 	"size: " << _servers[i]._clients[j]._header.size()  << std::endl;
 	int a = send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
 	std::cout << MAGENTA << a << std::endl;
 
@@ -273,13 +277,13 @@ void    HTTP::select_server::launch()
                     send_response(i, j);
 					FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
 
-					if (_servers[i]._clients[j]._post_done) {
-						std::cout << GREEN << "_post_done" << RESET << std::endl;
-						close(_servers[i]._clients[j]._c_sock);
-						j = erase_client(i, j);
-						if (_servers[i]._clients.size() == 0)
-							break;
-					}
+//					if (_servers[i]._clients[j]._post_done) {
+//						std::cout << GREEN << "_post_done" << RESET << std::endl;
+//						close(_servers[i]._clients[j]._c_sock);
+//						j = erase_client(i, j);
+//						if (_servers[i]._clients.size() == 0)
+//							break;
+//					}
                 }
             }
 		}
