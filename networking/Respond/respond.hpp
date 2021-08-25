@@ -43,9 +43,11 @@ namespace HTTP{
 		//void                cgi_php(); // TODO not implemented, do we need it?
 
 		/* static method */
-		static void 		post_response(t_client_select &client, const int &total_body_length);
+		static void 		post_response(t_client_select &client, const int &total_body_length, std::string &body);
+		void 		post_response_nonstatic(t_client_select &client, const int &total_body_length, std::string &body);
 
-        /* setters */
+
+		/* setters */
         void                set_content_type(const std::string &contentype);
         void                set_status_code(int code);
         void                set_body();
