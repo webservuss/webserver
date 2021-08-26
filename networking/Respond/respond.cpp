@@ -1,6 +1,7 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include <sys/time.h>
 #include <stdlib.h>
 #include "respond.hpp"
@@ -9,8 +10,11 @@
 #include "../Respond/CGI.hpp"
 #include <sys/types.h>
 #include <dirent.h>
+#include <stdint.h>
 
-HTTP::respond::respond(t_req_n_config req_n_conf)
+#define DEFAULT_CLIENT_BODY_SIZE 1024*1024
+
+HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char * &buffer, int valread)
 {
     _status_code = 0;
     _map_req = req_n_conf._req_map;
@@ -20,10 +24,10 @@ HTTP::respond::respond(t_req_n_config req_n_conf)
         set_status_code(405);
     else if (_map_req["METHOD"].compare("GET") == 0)
         getmethod();
-    // else if (_map_req["METHOD"].compare("POST") == 0)
-    //     postmethod();
-    // else if (_map_req["METHOD"].compare("DELETE") == 0)
-    //     deletemethod();
+     else if (_map_req["METHOD"].compare("POST") == 0)
+         postmethod(client, buffer, valread);
+     else if (_map_req["METHOD"].compare("DELETE") == 0)
+         deletemethod();
     else
         set_status_code(405);
 }
@@ -91,42 +95,146 @@ void HTTP::respond::getmethod()
     set_total_response();
 }
 
-void HTTP::respond::postmethod()
+void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valread)
 {
-    std::cout << "ik ben in en post method" << std::endl;
-	//FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-//    //    int serverMaximum = _body.size();
-//    //    if( serverMaximum > _body.length())
-//    //        std::cout << " TO BIG MAXIMUM SIZE REACHED" << std::endl;
-//    //if (maxbodysize < _body.length()[]
-//    //  int fd;
-//
-//    std::string     total_path = _totalpath;
-//    std::ifstream file("html_pages/welcome.php");
-//    std::cout << GREEN << "file :: " << file << R << std::endl;
-//   // std::ifstream file("html_pages/index.html");
-//    //fd = open(&file[0], O_RDWR | O_TRUNC | O_CREAT, S_IRWXU);
-//       // std::ifstream file("html_pages/auto_error.html");
-//        std::string total_body;
-//        if (file.is_open())
-//        {
-//            total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-//            _body = total_body;
-//            std::cout << RED <<  "POST =" << _body << R <<  std::endl;
-//        }
-//    if (this->filefd == -1 && _status_code == 200)
-//        // this->setstatus(403);
-//        std::cout << "status code 403 " << std::endl;
-//    //struct stat statBuf;
-//   // if (stat(file, &statBuf) < 0 && _status == 200)
-//      //  std::cout << "status code 201 " << std::endl;
-//    // this->setstatus(201);
-//    std::cout << RED << "BODY =" <<_body << R <<std::endl;
-//    if (write(filefd, _body.c_str(),_body.length()) == -1)
-//        std::cout<< "WRITE " << std::endl;
-//    close(filefd);
-//    std::cout << GREEN << "BEN JE HIER  " << file << R << std::endl;
+
+	// TODO: is this enough?
+	client._filename = "www/html_pages/uploads/" + _map_req["URI"];
+	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
+	client._content_length = ft_stoi(_map_req["Content-Length:"]);
+
+
+	// TODO: request method invalid? */
+	find_total_file_path();
+	if (_status_code == 405) {
+		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
+		client._expect_body = false;
+		return;
+	}
+
+	// TODO: client body size valid?
+	if (find_client_body_size() < (uint64_t)client._content_length)
+		_status_code = 413;
+
+
+	if (_status_code == 413) {
+		//client._header = "HTTP/1.1 413 Request Entity Too Large\r\nConnection: keep-alive\r\nContent-Length: 334\r\n\r\n<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Plebbin reeee</title></head><body style='background-color: #f72d49; padding: 50px 10vw 0 10vw; color: #3f3f3f;'><h1>Error: 413</h1><p style='size: 15px;'>Request Entity Too Large</p></body></html>\r\n";
+		std::string payload = "Max upload-size: " + ft_numtos(find_client_body_size());
+
+		client._header = "HTTP/1.1 413 Request Entity Too Large\r\nConnection: keep-alive\r\nContent-Length: " + ft_numtos(payload.length() + 2) + "\r\n\r\n" + payload + "\r\n";
+
+		client._expect_body = false;
+		return;
+	}
+
+
+	if (!(_map_req.count("Expect:")))
+	{
+		std::string tmp(buffer);
+		int position_of_body = tmp.find("\r\n\r\n") + 4;
+		out_file.write(&buffer[position_of_body], client._content_length);
+		out_file.close();
+		client._expect_body = false;
+		client._post_done = true;
+
+		// TODO: check if length of body is comp with Content-Length
+		(void)valread;
+
+
+		client._header = "HTTP/1.1 204 No Content\r\n\r\n";
+		//HTTP::respond::post_response(client, client._content_length, body);
+		//return 0;
+		return ;
+	}
+	else
+	{
+		out_file.close();
+		/* send a brief response to the client */
+		client._header = "HTTP/1.1 100 Continue\r\n\r\n";
+		client._expect_body = true;
+		client._post_done= false;
+		//return 1;
+		return;
+	}
 }
+
+uint64_t HTTP::respond::find_client_body_size()
+{
+	/*
+	 * location /uploads/
+	 * 		client_body_size 1000
+	 *
+	 * 	location /uploads/new
+	 * 		client_body_size inherited from /uploads/ unless stated otherwise
+	 */
+
+
+	std::string path;
+	size_t found_slash = _map_req["URI"].rfind('/');
+	if (found_slash == std::string::npos) {
+		path = "/";
+	}
+	else
+	{
+		std::string tmp = _map_req["URI"].substr(0, found_slash+1);
+		path = "/" + tmp;
+	}
+
+
+	while (true)
+	{
+		if (_pars_server._location_map.count(path) &&
+			_pars_server._location_map[path]._client_body_size)
+		{
+			return (_pars_server._location_map[path]._client_body_size);
+		}
+		else if (path.length() > 1)
+		{
+			path = path.substr(0, path.rfind('/'));
+			path = path.substr(0, path.rfind('/') + 1);
+		}
+		else
+		{
+			return (DEFAULT_CLIENT_BODY_SIZE);
+		}
+	}
+}
+
+/*
+void HTTP::respond::post_handle_request(t_client_select &client, char * &buffer, int valread)
+{
+	(void)valread;
+	// TODO directory has to be taken from config file? Also: ofstream does not create a directory
+	client._filename = "www/html_pages/uploads/" + .r_n_c._req_map["URI"]; // relative path of the server executable (don't start with a '/' !)
+	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
+	client._content_length = ft_stoi(r_n_c._req_map["Content-Length:"]);
+	// TODO: request method valid?
+
+	// TODO: client body size valid?
+
+	if (!(r_n_c._req_map.count("Expect:")))
+	{
+		int position_of_body = stringbuff.find("\r\n\r\n") + 4;
+		out_file.write(&buffer[position_of_body], client._content_length);
+		out_file.close();
+		client._expect_body = false;
+		client._post_done = true;
+		std::string body(&buffer[position_of_body]);
+
+		HTTP::respond::post_response(client, client._content_length, body);
+		return 0;
+	}
+	else
+	{
+		out_file.close();
+		// send a brief response to the client
+		client._header = "HTTP/1.1 100 Continue\r\n\r\n";
+		client._expect_body = true;
+		client._post_done= false;
+		return 1;
+	}
+}
+*/
 
 void HTTP::respond::post_response(t_client_select &client, const int &total_body_length, std::string &body)
 {
@@ -160,32 +268,7 @@ void HTTP::respond::post_response(t_client_select &client, const int &total_body
 //	client._header.append("\r\n");
 //
 }
-void HTTP::respond::post_response_nonstatic(t_client_select &client, const int &total_body_length, std::string &body)
-{
 
-
-
-	(void)body;
-//	(void)total_body_length;
-	client._header = "HTTP/1.1 201 Created\r\n";
-	client._header.append("Connection: keep-alive\r\n");
-	client._header.append("Location: /uploads/a.txt\r\n");
-	client._header.append("Content-Length: " + ft_numtos(total_body_length) + "\r\n");
-	client._header.append("Content-Type: text/html; charset=utf-8\r\n");
-	client._header.append("Host: localhost:8080\r\n");
-	client._header.append( "Date: " + _date + "\r\n");
-	client._header.append("Server: localhost\r\n");
-	client._header.append("\r\n");
-//	client._header.append(body + "\r\n");
-//	client._header.append("\r\n");
-//	char a[2];
-//	a[0]='a';
-//	a[1]=0;
-//	std::string b(a);
-//	client._header.append(b+"\r\n");
-//	client._header.append("\r\n");
-//
-}
 
 
 void HTTP::respond::deletemethod()

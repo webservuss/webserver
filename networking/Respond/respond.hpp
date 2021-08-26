@@ -29,7 +29,7 @@ namespace HTTP{
 
     public:
         /* constructors & destructors */
-        respond(t_req_n_config req_n_conf);
+        respond(t_req_n_config req_n_conf, t_client_select &client, char * &buffer, int valread);
         respond(const respond& x);
         ~respond();
 
@@ -38,13 +38,14 @@ namespace HTTP{
 
         /* methods */
         void                getmethod();
-        void                postmethod();
+        void                postmethod(t_client_select &client, char * &buffer, int valread);
         void                deletemethod();
 		//void                cgi_php(); // TODO not implemented, do we need it?
 
+		uint64_t find_client_body_size();
+		void 				post_handle_request(t_client_select &client, char * &buffer, int valread);
 		/* static method */
 		static void 		post_response(t_client_select &client, const int &total_body_length, std::string &body);
-		void 		post_response_nonstatic(t_client_select &client, const int &total_body_length, std::string &body);
 
 
 		/* setters */

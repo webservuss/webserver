@@ -162,11 +162,11 @@ int    HTTP::select_server::read_from_client(int i, int j)
 		//_servers[i]._clients[j]._total_body_length += valread;
 		if (HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread))
 		{
-			std::string body(buffer);
+			std::string body = "";
 			HTTP::respond::post_response(_servers[i]._clients[j], _servers[i]._clients[j]._total_body_length, body);
-			std::cout << RED << _servers[i]._clients[j]._header << std::endl;
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		}
+		sleep(1);
 		free(buffer);
 		return valread;
 	}
@@ -177,20 +177,21 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
-	respond m (r_n_c);
+	respond m (r_n_c, _servers[i]._clients[j], buffer, valread);
 
 
-	/* Check if POST and(!) contains a body	*/
+//	/* Check if POST and(!) contains a body	*/
 	if (stringbuff.substr(0, 4) == "POST")
 	{
 
-			HTTP::post_handle_request(_servers[i]._clients[j], r_n_c, stringbuff, buffer, valread);
+			//m.post_handle_request(_servers[i]._clients[j], r_n_c, stringbuff, buffer, valread);
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 			std::cout << _servers[i]._clients[j]._post_done << std::endl;
 			free(buffer);
 			return valread;
 	}
-	_servers[i]._clients[j]._header = m.getTotalheader();
+	if (stringbuff.substr(0, 3) == "GET")
+		_servers[i]._clients[j]._header = m.getTotalheader();
 	// add client to write backups so next loop correct thing will be written
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);

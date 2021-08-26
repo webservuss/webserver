@@ -10,7 +10,7 @@ namespace HTTP
     /* test non-blocking */
     void    set_non_blocking(int sock);
 	int 	post_expected_body(t_client_select &client, char * &buffer, int &length);
-	int		post_handle_request(t_client_select &client, t_req_n_config r_n_c, std::string stringbuff, char * &buffer, int valread);
+	int		post_handle_request2(t_client_select &client, t_req_n_config r_n_c, std::string stringbuff, char * &buffer, int valread);
 }
 
 #endif
