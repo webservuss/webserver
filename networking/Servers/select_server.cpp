@@ -87,7 +87,7 @@ int HTTP::select_server::selecter()
 	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
 	if (readsocks < 0)
 	{
-       	std::cout << "error select " << std::endl;
+		std::cout << "error in select" << strerror(errno) << std::endl;
 		exit(EXIT_FAILURE);
 	}
     std::cout << "out selecter" << std::endl;
@@ -98,14 +98,14 @@ int HTTP::select_server::selecter()
 /* We have a new connection coming in!  We'll try to find a spot for it in connectlist. */
 void    HTTP::select_server::accepter(int i)
 {
-    	int					    connection;
-		sockaddr_in				addr;
-    	int 					addrlen;
+	int					    connection;
+	sockaddr_in				addr;
+	int 					addrlen;
 
-		addr = _servers[i]._servers_addr;
-		addrlen = sizeof(_servers[i]._servers_addr);
-        connection = accept(_servers[i]._servers_socket, (struct sockaddr *)&addr, (socklen_t * )&addrlen);
-        if (connection < 0) 
+	addr = _servers[i]._servers_addr;
+	addrlen = sizeof(_servers[i]._servers_addr);
+	connection = accept(_servers[i]._servers_socket, (struct sockaddr *)&addr, (socklen_t * )&addrlen);
+	if (connection < 0)
 		{
 			std::cout << "error in accept" << strerror(errno) << std::endl;
 			exit(EXIT_FAILURE);
@@ -145,9 +145,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	/* TODO check valread == 0 here; FD_SET as well? */
 	if (valread == 0)
 	{
-		FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+//		FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		free(buffer);
-		_servers[i]._clients[j]._active = false;
+//		_servers[i]._clients[j]._active = false;
 		return 0;
 	}
 
@@ -190,7 +190,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	}
 	if (stringbuff.substr(0, 3) == "GET")
 		_servers[i]._clients[j]._header = m.getTotalheader();
+	//_servers[i]._clients[j]._header = "HTTP/1.1 204 No Content\r\n\r\n";
 	// add client to write backups so next loop correct thing will be written
+	std::cout << YELLOW << _servers[i]._clients[j]._header << RESET << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
 	return valread;
@@ -214,7 +216,17 @@ int              HTTP::select_server::erase_client(int i, int j)
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_read_fds);
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_fds);
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
-	_servers[i]._clients.erase(_servers[i]._clients.begin() + j);
+	std::vector<t_client_select>::iterator it;
+	it = _servers[i]._clients.begin();
+	it = it + j;
+	//_servers[i]._clients.erase(_servers[i]._clients.begin() + j);
+	std::cout << RED << j << " " << _servers[i]._clients.size() << "value: " << _servers[i]._clients[j]._c_sock << std::endl;
+//	_servers[i]._clients[j]._c_sock = 0;
+	close(_servers[i]._clients[j]._c_sock);
+	_servers[i]._clients.erase(it);
+	std::cout << _servers[i]._clients.size() << "value: " << _servers[i]._clients[j]._c_sock << RESET << std::endl;
+	std::cout << RED << "erase client?" << std::endl;
+	std::cout << BLUE << _servers[i]._clients[j]._c_sock << RESET << std::endl;
 	j = 0;
 	return (j);
 }
@@ -241,6 +253,8 @@ void    HTTP::select_server::launch()
         selecter();
 	    for (unsigned long i = 0; i < _servers.size(); i++) 
         {
+	    	if (i == 0)
+	    		std::cout << MAGENTA << _servers[0]._clients.size() << RESET << std::endl;
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
             	std::cout << "ACCEPTER" << std::endl;
                 accepter(i);
@@ -253,10 +267,10 @@ void    HTTP::select_server::launch()
 					std::cout << "_ACTIVE == FALSE" << std::endl;
 					//close(_servers[i]._clients[j]._c_sock);
 					j = erase_client(i, j);
-					if (_servers[i]._clients.size() == 0)
+					//if (_servers[i]._clients.size() == 0)
 						break;
 				}
-                if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_read_fds)) {
+                else if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_read_fds)) {
 					std::cout << "FD_ISSET, &_read_fds" << std::endl;
 					std::cout << "i and j: " << i << " " << j << std::endl;
 
@@ -264,11 +278,11 @@ void    HTTP::select_server::launch()
 					{
 						//close(_servers[i]._clients[j]._c_sock);
 						j = erase_client(i, j);
-						if (_servers[i]._clients.size() == 0)
+//						if (_servers[i]._clients.size() == 0)
 							break;
 					}
-                }
-                if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_write_fds)) {
+				}
+                else if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_write_fds)) {
 					std::cout << "FD_ISSET, &_write_fds" << std::endl;
                     send_response(i, j);
 					FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);

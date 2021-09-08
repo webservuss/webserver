@@ -318,7 +318,7 @@ void HTTP::respond::set_status_line()
     _statusline = "HTTP/1.1 ";
     std::string _stat_cha_s = _stat_cha;
     _stat_cha_s.append(";");
-    std::cout <<"status code: " << _status_code << std::endl;
+    std::cout <<GREEN << "status code: " << _status_code << RESET<< std::endl;
     if ( _pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
     {
          set_no_config(root);
@@ -328,7 +328,7 @@ void HTTP::respond::set_status_line()
     if (_status_code == 404)
     {
          _statusline.append(" Not Found");
-        _body = "<h1>404: You can't do that!</h1>\0";
+        _body = "<html><h1>404: You can't do that!</h1></html>";
     }
     else if (_status_code == 200)
     {
@@ -338,29 +338,29 @@ void HTTP::respond::set_status_line()
     else if (_status_code == 403)
     {
         _statusline.append("403 Forbidden");
-        _body = "<h1>403: You can't do that!</h1>\0";
+        _body = "<html><h1>403: You can't do that!</h1></html>";
     }
     else if (_status_code == 405)
     {
         _statusline.append("405 Method not Allowed");
-        _body = "<h1>405: Try another method!</h1>\0";
+        _body = "<html><h1>405: Try another method!</h1></html>";
     }
     else if (_status_code == 204)
     {
         _statusline.append("204 No Content");
-        _body = "<h1>204: no content</h1>\0";
+        _body = "<html><h1>204: no content</h1></html>";
     }
     else if (_status_code == 301)
         _statusline.append("301 Moved Permanently");
     else if(_status_code == 301)
     {
         _statusline.append("4 ");
-        _body = "<h1> 4 :Bad Request The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request without modifications. </h1> \0";
+        _body = "<html><h1> 4 :Bad Request The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request without modifications. </h1></html>";
     }
     else if(_status_code == 413)
     {
-        _statusline.append("113 ");
-        _body = "<h1> 400 : Request Entity Too Large \0";
+        _statusline.append("413 ");
+        _body = "<html><h1> 400 : Request Entity Too Large</h1></html>";
     }
     if(file.is_open())
         {
@@ -386,12 +386,13 @@ void HTTP::respond::set_date()
     struct timeval tv;
     time_t t;
     struct tm *info;
-    char buffer[64];
+    char buffer[164];
 
     gettimeofday(&tv, NULL);
     t = tv.tv_sec;
     info = localtime(&t);
-    _date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z", info);
+    //_date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z", info);
+	strftime(buffer, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
     _date = buffer;
     _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
 }
@@ -421,6 +422,7 @@ void ::HTTP::respond::set_modified()
 void HTTP::respond::set_connection(std::string connection)
 {
     _connection = connection;
+	_connection = _connection.substr(1, _connection.size() - 1);
     _totalrespond.insert(std::pair<std::string, std::string>("Connection", _connection));
 }
 
@@ -430,8 +432,9 @@ void HTTP::respond::set_host(std::string host)
 
     host = host.substr(1, host.size() - 1);
     host_cmp = host.substr(0, host.find(':'));
-    if (host_cmp != _pars_server._host)
-        return (set_status_code(400));
+    // TODO get rid of this
+//    if (host_cmp != _pars_server._host)
+//        return (set_status_code(400));
     _host = host;
     _totalrespond.insert(std::pair<std::string, std::string>("Host", _host));
 }
@@ -471,7 +474,8 @@ void HTTP::respond::set_total_response()
         }
     }
     _totalheader.append("\r\n");
-    _totalheader.append(_body);
+	_totalheader.append(_body);
+	_totalheader.append("\r\n");
 }
 
 void HTTP::respond::find_total_file_path()
