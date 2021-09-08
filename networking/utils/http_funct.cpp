@@ -26,16 +26,9 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 	existing_file.write(&buffer[0], length);
 	client._total_body_length += length;
 
-	std::cout << "filename: " << client._filename << std::endl;
-	std::cout << "cont_length: " << client._content_length << std::endl;
-	std::cout << "valread: " << length << std::endl;
-	std::cout << "tot body lenght: " << client._total_body_length << std::endl;
-	//std::cout << "i and j: " << i << " " << j << std::endl;
-	std::cout << "c_sock: " << client._c_sock << std::endl;
 	if (length == 0 || (client._total_body_length == client._content_length)) {
 		client._expect_body = false;
 		client._post_done = true;
-		std::cout << __FILE_NAME__ << "ook hier?" << std::endl;
 		return 1;
 	}
 	return 0;

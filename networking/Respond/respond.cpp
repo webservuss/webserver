@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -95,11 +96,21 @@ void HTTP::respond::getmethod()
     set_total_response();
 }
 
+//static void make_directory(std::string dir)
+//{
+//
+//}
+
 void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valread)
 {
 
 	// TODO: is this enough?
 	client._filename = "www/html_pages/uploads/" + _map_req["URI"];
+//	struct stat stat_buffer;
+
+//	std::cout << stat("www/html_pageploads/", &stat_buffer) << std::endl;
+//	mkdir("/Users/rvan-sch/webservuss_7sep/www/html_pages/uploads/test/test2", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+//	exit(1);
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
 	client._content_length = ft_stoi(_map_req["Content-Length:"]);
 
@@ -132,12 +143,12 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 	{
 		std::string tmp(buffer);
 		int position_of_body = tmp.find("\r\n\r\n") + 4;
+		// TODO: check if length of body is comp with Content-Length
 		out_file.write(&buffer[position_of_body], client._content_length);
 		out_file.close();
 		client._expect_body = false;
 		client._post_done = true;
 
-		// TODO: check if length of body is comp with Content-Length
 		(void)valread;
 
 
@@ -151,6 +162,7 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 		out_file.close();
 		/* send a brief response to the client */
 		client._header = "HTTP/1.1 100 Continue\r\n\r\n";
+		client._total_body_length = 0;
 		client._expect_body = true;
 		client._post_done= false;
 		//return 1;

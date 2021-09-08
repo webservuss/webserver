@@ -11,7 +11,7 @@
 #include "../utils/utils.hpp"
 #include "../utils/colors.hpp"
 #include "../Respond/respond.hpp"
-#define BUFFER_SIZE (1024 * 1024) // 1Mb
+#define BUFFER_SIZE (104 * 104) // 1Mb
 
 //#define BUFFER_SIZE (1024) // 1Mb
 // /* constructor calls simple_server and launches */ // need to add in parser_servers here too
@@ -126,7 +126,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
     char 			*buffer;
 	struct timeval	now;
 
-
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
 		perror("Malloc error");
@@ -166,7 +165,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 			HTTP::respond::post_response(_servers[i]._clients[j], _servers[i]._clients[j]._total_body_length, body);
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		}
-		sleep(1);
 		free(buffer);
 		return valread;
 	}
@@ -202,13 +200,10 @@ void HTTP::select_server::send_response(int i, int j)
 {
 	struct timeval now;
 
-	std::cout << __LINE__ << std::endl;
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-	std::cout << _servers[i]._clients[j]._header << std::endl << 	"size: " << _servers[i]._clients[j]._header.size()  << std::endl;
-	int a = send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
-	std::cout << MAGENTA << a << std::endl;
+	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
 
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
 }
