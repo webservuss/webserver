@@ -22,7 +22,6 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     j = 0;
     i = 0;
     len = _totalBody.length();
-	std::cout << "HERE IN rehttp" << std::endl;
     set_headers(dataparser);
     while(std::getline(request_data, data ) && !request_data.eof())
     {
