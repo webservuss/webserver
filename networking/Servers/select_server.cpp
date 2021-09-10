@@ -98,7 +98,7 @@ int HTTP::select_server::selecter()
 
 		std::cerr << "error in select" << std::endl;
 		throw select_server::inputErrorException();
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
 	}
     std::cout << "out selecter" << std::endl;
 	return (readsocks);

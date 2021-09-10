@@ -26,15 +26,6 @@ namespace HTTP{
         std::string _stat_cha;
         std::map<std::string, std::string> _totalrespond;
         std::map <std::string, std::string> _map_req;
-<<<<<<< HEAD
-        char const * _stat_cha;
-        // std::string _postheader;
-        // std::string _deleteheader;
-        // std::string _postbodylen;
-        // std::string _deletefile;
-        int         filefd; /// i think we can take out
-=======
->>>>>>> main
 
     public:
         /* constructors & destructors */
