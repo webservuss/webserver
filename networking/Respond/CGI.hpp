@@ -5,10 +5,8 @@
 #ifndef INC_12AUG_CGI_HPP
 #define INC_12AUG_CGI_HPP
 
-#include "../../all_libs.hpp"
-#include "../../http.hpp"
-#include "../Request/re_HTTP.hpp"
-#include "../utils/utils.hpp"
+#include <map>
+#include <iostream>
 #include "../Servers/parser_conf.hpp"
 
 namespace HTTP

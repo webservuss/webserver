@@ -1,4 +1,5 @@
 #include "re_HTTP.hpp"
+#include <sstream>
 
 std::string methods[3] = {
         "GET",
@@ -21,14 +22,15 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     j = 0;
     i = 0;
     len = _totalBody.length();
+	std::cout << "HERE IN rehttp" << std::endl;
     set_headers(dataparser);
     while(std::getline(request_data, data ) && !request_data.eof())
     {
         line = data.substr(0, data.find('\r'));
-        if (i == 0) 
+        if (i == 0)
             i = set_request_line(line);
         if(line.size() != 0)
-        {    
+        {
             key = (line.substr(0, line.find(" ")));
             value = (line.substr(line.find(" "), line.find('\r')));
             _map_header.insert(std::pair<std::string, std::string>(key, value));
@@ -65,6 +67,8 @@ void HTTP::re_HTTP::set_headers(std::string header) {
     int i;
 
     i = 0;
+    if (header == "")
+        return;
     while (header[i] != '\r')
         i++;
     _totalBody = header.substr(i, header.size() - i);

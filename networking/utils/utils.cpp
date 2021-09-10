@@ -1,17 +1,6 @@
-//
-// Created by ruben on 14-07-21.
-//
-#include "../../all_libs.hpp"
-
-// void dbe(std::string s)
-// {
-// 	std::cout << s << std::endl;
-// }
-// void db(std::string s)
-// {
-// 	std::cout << s;
-// }
-
+#include <iostream>
+#include <vector>
+#include <sstream>
 // https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string/39359311
 /*
  * Splits a string by a delimiter, for instance a space (' ')
@@ -34,16 +23,4 @@ int ft_stoi(std::string s)
 	int i;
 	std::istringstream(s) >> i;
 	return i;
-}
-
-
-std::string char_string(char * buffer)
-{
-    std::string s;
-
-    s = "";
-    for( int k = 0;buffer[k] != '\0'; k++){
-        s = s + buffer[k];
-    }
-    return s;
 }

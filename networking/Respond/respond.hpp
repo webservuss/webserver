@@ -1,13 +1,9 @@
 #ifndef respond_hpp
 #define respond_hpp
 
-#include "../../http.hpp"
-#include "../Request/re_HTTP.hpp"
-#include "../utils/utils.hpp"
-#include "CGI.hpp"
-#include "../Servers/select_server.hpp"
+#include <iostream>
 #include "../utils/req_n_conf.hpp"
-#include "../utils/colors.hpp"
+#include "../Servers/select_server.hpp"
 
 namespace HTTP{
     class respond  {
@@ -20,24 +16,29 @@ namespace HTTP{
         std::string _date;
         std::string _host;
         std::string _language;
+        std::string _servername;
         std::string _body;
         t_server    _pars_server;
         int         _status_code;
         std::string _totalpath;
         std::string _relativepath;
         std::string _totalheader;
+        std::string _stat_cha;
         std::map<std::string, std::string> _totalrespond;
         std::map <std::string, std::string> _map_req;
+<<<<<<< HEAD
         char const * _stat_cha;
         // std::string _postheader;
         // std::string _deleteheader;
         // std::string _postbodylen;
         // std::string _deletefile;
         int         filefd; /// i think we can take out
+=======
+>>>>>>> main
 
     public:
         /* constructors & destructors */
-        respond(s_req_n_config req_n_conf);
+        respond(t_req_n_config req_n_conf, t_client_select &client, char * &buffer, int valread);
         respond(const respond& x);
         ~respond();
 
@@ -46,23 +47,30 @@ namespace HTTP{
 
         /* methods */
         void                getmethod();
-        void                postmethod();
+        void                postmethod(t_client_select &client, char * &buffer, int valread);
         void                deletemethod();
-		void                cgi_php();
+		//void                cgi_php(); // TODO not implemented, do we need it?
 
-        /* setters */
-        void                setcontenttype(const std::string &contentype);
+		uint64_t find_client_body_size();
+		void 				post_handle_request(t_client_select &client, char * &buffer, int valread);
+		/* static method */
+		static void 		post_response(t_client_select &client, const int &total_body_length, std::string &body);
+
+
+		/* setters */
+        void                set_content_type(const std::string &contentype);
         void                set_status_code(int code);
-        void                setbody();
-        void                setLanguage(std::string contentlanguage);
-        void                setHost(std::string host);
-        void                setContentlen(std::string s);
-        void                setDate();
-        void                setmodified();
-        void                setconnection(const std::string connection);
+        void                set_body();
+        void                set_language(std::string contentlanguage);
+        void                set_host(std::string host);
+        void                set_content_len(std::string s);
+        void                set_date();
+        void                set_modified();
+        void                set_connection(const std::string connection);
         void                set_status_line();
         void                set_total_response();
-        void                set_no_config404(std::string root);
+        void                set_no_config(std::string root);
+        void                set_server_name();
 
         /* getters */
         const std::string   &getTotalheader() const;
