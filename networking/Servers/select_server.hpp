@@ -50,7 +50,7 @@ namespace HTTP
 
 
 	public:
-		class	inputErrorException : public std::exception {
+		class	select_error_ex : public std::exception {
 		public:
 		virtual const char*	what() const throw();
 		};
