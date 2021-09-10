@@ -46,7 +46,14 @@ namespace HTTP
 		std::vector<t_server_select>    _servers;
 		std::vector<t_server>           _parser_servers;
 		// std::string                     _totalheader;
+
+
+
 	public:
+		class	inputErrorException : public std::exception {
+		public:
+		virtual const char*	what() const throw();
+		};
 		/* constructor */
 		// select_server();
 		// constructor for multiple ports */

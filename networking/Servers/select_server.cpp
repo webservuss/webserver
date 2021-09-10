@@ -24,6 +24,14 @@
 // 	launch();
 // }
 
+
+
+const char  *HTTP::select_server::inputErrorException::what() const  throw()
+{
+	return ("Error in select server");
+}
+
+
 HTTP:: select_server::select_server(std::vector<int> ports, std::vector<t_server> parser_servers)
 {
 	_parser_servers = parser_servers;
@@ -87,7 +95,9 @@ int HTTP::select_server::selecter()
 	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
 	if (readsocks < 0)
 	{
-		std::cout << "error in select" << strerror(errno) << std::endl;
+
+		std::cerr << "error in select" << std::endl;
+		throw select_server::inputErrorException();
 		exit(EXIT_FAILURE);
 	}
     std::cout << "out selecter" << std::endl;
