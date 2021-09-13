@@ -6,19 +6,15 @@
 #include <stdlib.h>
 
 
+void	errMsgAndExit(const std::string &errMsg, int code)
+{
+	std::cerr << "error: " << errMsg << std::endl;
+	exit(code);
+}
+
+
 int main(int argc, char **argv)
 {
-
-
-
-
-
-
-
-
-
-
-
 
     // implement so it can handle different configs.
    
@@ -30,7 +26,7 @@ int main(int argc, char **argv)
         std::cout << "choos a config in configs"<<std::endl;
         exit(10);
     }
-	HTTP::parse_conf ex(pathname.c_str());
+	HTTP::parse_conf ex(pathname.c_str(), argv);
     std::vector<HTTP::t_server> parser_servers = ex.get_server();
     HTTP::select_server t(ex.get_ports(), parser_servers) ;
 }

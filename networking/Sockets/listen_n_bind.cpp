@@ -23,7 +23,8 @@ HTTP::listen_n_bind::listen_n_bind(int domain, int service, int protocol, int po
     }
     catch(std::exception &e ){
         std::cerr << e.what() << std::endl;
-       return ;
+        std::cerr << BLUE << "failed to listen  " << RESET << std::endl;
+    }
     
 }
 

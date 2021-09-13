@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stdlib.h>
 
-HTTP::parse_conf::parse_conf(const char *path)
+HTTP::parse_conf::parse_conf(const char *path, char **argv)
 {
 	std::string 	line;
 	bool			is_acc;
@@ -18,8 +18,9 @@ HTTP::parse_conf::parse_conf(const char *path)
 	server_count = 0;
     if(!file || !file.is_open())
 	{
-        std::cout << " ERROR no configfile" << std::endl;
-		exit(1);
+        std::string err = "no configfile";
+		err.insert(13, argv[1]);
+		errMsgAndExit(err, 1);
 	}
 	while(std::getline(file, line, '\n'))
 	{
@@ -49,7 +50,7 @@ HTTP::parse_conf::parse_conf(const char *path)
 			continue;
 		}
 		if (!is_acc)
-			set_values_server(s1, _server[server_count - 1]);
+			set_values_server(s1, _server[server_count - 1], argv);
 		if (is_acc)
 			set_values_location(s1, _server[server_count - 1]._location_map[map_key]);
 	}
@@ -60,6 +61,7 @@ HTTP::parse_conf::parse_conf(const char *path)
 /*copy constructor */
 HTTP::parse_conf::parse_conf(const parse_conf& x)
 { // TEST THIS // change
+
     _server = x._server;
 }
 
@@ -71,7 +73,7 @@ HTTP::parse_conf& HTTP::parse_conf::operator=(const parse_conf& x)
 	return *this;
 }
 
-void HTTP::parse_conf::set_values_server(std::string s, t_server &server)
+void HTTP::parse_conf::set_values_server(std::string s, t_server &server, char **argv)
 {
 	std::string key;
 	std::string value;
@@ -98,8 +100,9 @@ void HTTP::parse_conf::set_values_server(std::string s, t_server &server)
 		else if (value == "off")
 			server._auto_index = 0;
 		else {
-			perror("Config file: auto_index incorrect value");
-			exit(1);
+			    std::string err = " auto_index incorrect value";
+				err.insert(13, argv[1]);
+				errMsgAndExit(err, 1);
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include "../utils/utils.hpp"
 
 namespace HTTP {
 
@@ -35,12 +36,12 @@ namespace HTTP {
 		std::vector<t_server>	_server;
 
 		/* setters */
-		void set_values_server(std::string s, t_server &server);
+		void set_values_server(std::string s, t_server &server, char **argv);
 		void set_values_location(std::string s, t_location &location);
 
 	public:
 		/* constructors and destructors */
-		parse_conf(const char *path);
+		parse_conf(const char *path, char **argv);
 		parse_conf(const parse_conf& x);
 		~parse_conf();
 
