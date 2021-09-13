@@ -151,9 +151,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
 
-		throw select_server::select_error_ex();
-		//perror("Malloc error");
-		//exit(1);
+		//throw select_server::select_error_ex();
+		std::string err =  "Malloc error "; 
+    	error_exit(err, 1);
 	}
 	bzero(buffer, BUFFER_SIZE + 1);
 
