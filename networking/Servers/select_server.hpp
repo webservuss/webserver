@@ -8,7 +8,7 @@
 #include "../Sockets/listen_n_bind.hpp"
 #include "parser_conf.hpp"
 
-#define BACKLOG 1000
+#define BACKLOG 100000
 
 namespace HTTP
 {

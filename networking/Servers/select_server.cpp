@@ -30,7 +30,7 @@
 const char  *HTTP::select_server::select_error_ex::what() const  throw()
 {
 
-	    std::cout <<BLUE <<  "ERROR in select server " << RESET << std::endl;
+	std::cout <<BLUE <<  "ERROR in select server " << RESET << std::endl;
 	return ("Error in select_server");
 }
 
@@ -91,7 +91,7 @@ int HTTP::select_server::selecter()
 	int 			readsocks;
     struct timeval  timeout;
 	
-    std::cout << "in selecter " << std::endl;
+    // std::cout << "in selecter " << std::endl;
 	std::cout << std::endl;
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
@@ -106,6 +106,7 @@ int HTTP::select_server::selecter()
 			}
 		
 	}
+    // std::cout << "out selecter" << std::endl;
 	return (readsocks);
 }
 
@@ -116,6 +117,7 @@ void    HTTP::select_server::accepter(int i)
 	int					    connection;
 	sockaddr_in				addr;
 	int 					addrlen;
+    std::cout << "in accepter" << std::endl;
 
 	addr = _servers[i]._servers_addr;
 	addrlen = sizeof(_servers[i]._servers_addr);
@@ -147,6 +149,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
     int				valread;
     char 			*buffer;
 	struct timeval	now;
+    std::cout << "in rd client " << std::endl;
 
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
@@ -156,25 +159,31 @@ int    HTTP::select_server::read_from_client(int i, int j)
     	error_exit(err, 1);
 	}
 	bzero(buffer, BUFFER_SIZE + 1);
-
 	/* read from client */
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, &buffer[0], BUFFER_SIZE, 0)) < 0)
 	{
 		std::cout << "\nConnection lost: FD=" << _servers[i]._clients[j]._c_sock << " Slot" << i  << "error " << strerror(errno)<< std::endl;
-		close(_servers[i]._clients[j]._c_sock);
-		_servers[i]._clients.erase(_servers[i]._clients.begin() + j);
-	    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
+		erase_client(i, j);
+		// close(_servers[i]._clients[j]._c_sock);
+		// _servers[i]._clients.erase(_servers[i]._clients.begin() + j);
+	    // FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
+	// std::cout << "val read" << valread << std::endl;
 	/* TODO check valread == 0 here; FD_SET as well? */
 	if (valread == 0)
-	{
-//		FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-		free(buffer);
-//		_servers[i]._clients[j]._active = false;
-		return 0;
+	{	
+		// _servers[i]._clients[j]._active = false;
+		return (0);
 	}
-
+	// {
+	// 	// FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+	// 	free(buffer);
+	// 	// _servers[i]._clients[j]._active = false;
+	// 	return 0;
+	// }
+	// if (valread == 0)
+	// 	buffer[0] = '\0';
 	//update clients last active
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
@@ -208,17 +217,19 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 			//m.post_handle_request(_servers[i]._clients[j], r_n_c, stringbuff, buffer, valread);
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-			std::cout << _servers[i]._clients[j]._post_done << std::endl;
+			// std::cout << _servers[i]._clients[j]._post_done << std::endl;
 			free(buffer);
 			return valread;
 	}
 	if (stringbuff.substr(0, 3) == "GET")
 		_servers[i]._clients[j]._header = m.getTotalheader();
+	std::cout << BLUE << "TOTAL HEADER IS " << m.getTotalheader() << RESET << std::endl;
 	//_servers[i]._clients[j]._header = "HTTP/1.1 204 No Content\r\n\r\n";
 	// add client to write backups so next loop correct thing will be written
-	std::cout << YELLOW << _servers[i]._clients[j]._header << RESET << std::endl;
+	// std::cout << YELLOW << _servers[i]._clients[j]._header << RESET << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
+	std::cout << "out rd client " << std::endl;
 	return valread;
 }
 
@@ -227,11 +238,17 @@ void HTTP::select_server::send_response(int i, int j)
 	struct timeval now;
 
 	//update clients last active
+	// int sendval = 
+	std::cout << "GOING TO SEND THE HEADER" << _servers[i]._clients[j]._header.c_str() << std::endl;
+	// int sendval = 
+	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
+	// if (sendval == 0)
+		// _servers[i]._clients[j]._active = false;
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
-
+	_servers[i]._clients[j]._active = false;
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
+    std::cout << "out snd" << std::endl;
 }
 
 int              HTTP::select_server::erase_client(int i, int j)
@@ -240,21 +257,17 @@ int              HTTP::select_server::erase_client(int i, int j)
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_read_fds);
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_fds);
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
-	std::vector<t_client_select>::iterator it;
-	it = _servers[i]._clients.begin();
-	it = it + j;
-	//_servers[i]._clients.erase(_servers[i]._clients.begin() + j);
+	// std::vector<t_client_select>::iterator it;
+	// it = _servers[i]._clients.begin();
+	// it = it + j;
 	std::cout << RED << j << " " << _servers[i]._clients.size() << "value: " << _servers[i]._clients[j]._c_sock << std::endl;
-//	_servers[i]._clients[j]._c_sock = 0;
 	close(_servers[i]._clients[j]._c_sock);
-	_servers[i]._clients.erase(it);
-	std::cout << _servers[i]._clients.size() << "value: " << _servers[i]._clients[j]._c_sock << RESET << std::endl;
-	std::cout << RED << "erase client?" << std::endl;
-	std::cout << BLUE << _servers[i]._clients[j]._c_sock << RESET << std::endl;
-	j = 0;
-	return (j);
+	_servers[i]._clients.erase(_servers[i]._clients.begin() + j);
+	// _servers[i]._clients.erase(it);
+	// std::cout << RED << "erase client?" << std::endl;
+	// std::cout << BLUE << _servers[i]._clients[j]._c_sock << RESET << std::endl;
+	return (0);
 }
-
 
 /* launch in an endless loop */
 void    HTTP::select_server::launch()
@@ -271,16 +284,27 @@ void    HTTP::select_server::launch()
 	}
     while(true)
     {
+		std::cout << "start whole loop" << std::endl;
+	// for (unsigned long listnum = 0; listnum < _servers.size(); listnum++) {
+	// 	if (_servers[listnum]._servers_socket != 0) {
+	// 		FD_SET(_servers[listnum]._servers_socket,&_read_backup);
+	// 		if (_servers[listnum]._servers_socket > _highsock)
+	// 			_highsock = _servers[listnum]._servers_socket;
+	// 	}
+	// }
         _read_fds = _read_backup;
         _write_fds = _write_backup;
         std::cout << "...................WAITING////" << std::endl;
+		std::cout << "b4 selecter" << std::endl;
         selecter();
+		std::cout << "after selecter" << std::endl;
 	    for (unsigned long i = 0; i < _servers.size(); i++) 
         {
-	    	if (i == 0)
-	    		std::cout << MAGENTA << _servers[0]._clients.size() << RESET << std::endl;
+		std::cout << "start smaller loop" << std::endl;
+	    	// if (i == 0)
+	    		// std::cout << MAGENTA << _servers[0]._clients.size() << RESET << std::endl;
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
-            	std::cout << "ACCEPTER" << std::endl;
+            	// std::cout << "ACCEPTER" << std::endl;
                 accepter(i);
             }
             for (unsigned long j = 0; j < _servers[i]._clients.size(); j++)
@@ -288,27 +312,34 @@ void    HTTP::select_server::launch()
 				check_client_active(_servers[i]._clients[j]);
 				if (_servers[i]._clients[j]._active == false)
 				{
-					std::cout << "_ACTIVE == FALSE" << std::endl;
+					// std::cout << "i and j: " << i << " " << j << std::endl;
+					// std::cout << "IN ERASE CLIENT FROM ACTIVE TIME" << std::endl;
 					//close(_servers[i]._clients[j]._c_sock);
 					j = erase_client(i, j);
 					//if (_servers[i]._clients.size() == 0)
 						break;
 				}
-                else if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_read_fds)) {
-					std::cout << "FD_ISSET, &_read_fds" << std::endl;
-					std::cout << "i and j: " << i << " " << j << std::endl;
-
-                    if (read_from_client(i, j) == 0)
+                if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_read_fds)) {
+					// std::cout << "FD_ISSET, &_read_fds" << std::endl;
+					// std::cout << "i and j: " << i << " " << j << std::endl;
+                    read_from_client(i, j);
+					if (_servers[i]._clients[j]._active == false)
 					{
-						//close(_servers[i]._clients[j]._c_sock);
+						std::cout << "IN ERASE CLIENT FROM READ" << std::endl;
 						j = erase_client(i, j);
-//						if (_servers[i]._clients.size() == 0)
-							break;
+						break;
 					}
 				}
-                else if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_write_fds)) {
-					std::cout << "FD_ISSET, &_write_fds" << std::endl;
+                if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_write_fds)) {
+					// std::cout << "FD_ISSET, &_write_fds" << std::endl;
                     send_response(i, j);
+					if (_servers[i]._clients[j]._active == false)
+					{
+						std::cout << "IN ERASE CLIENT FROM SEND" << std::endl;
+						j = erase_client(i, j);
+						std::cout << "out ERASE CLIENT FROM SEND" << std::endl;
+						break;	
+					}
 					FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
 
 //					if (_servers[i]._clients[j]._post_done) {
@@ -318,6 +349,22 @@ void    HTTP::select_server::launch()
 //						if (_servers[i]._clients.size() == 0)
 //							break;
 //					}
+					if (_servers[i]._clients[j]._active == false)
+					{	j = erase_client(i, j);
+						break;
+					}
+    //                 if (_servers[i]._clients.size() == 1) {
+	// 					erase_client(i, j);
+	// // 						FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
+	// // FD_CLR(_servers[i]._clients[j]._c_sock, &_read_fds);
+	// // FD_CLR(_servers[i]._clients[j]._c_sock, &_write_fds);
+	// // FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
+    // //                     close(_servers[i]._clients[j]._c_sock);
+    // //                     _servers[i]._clients.clear();
+	// 					// j = 0;
+	// 					break ;
+                    // }
+std::cout << "end whole loop" << std::endl;
                 }
             }
 		}
@@ -332,7 +379,7 @@ void HTTP::select_server::check_client_active(t_client_select &client)
 
 	gettimeofday(&end, NULL);
 	float difference = (end.tv_sec - start.tv_sec) + 1e-6*(end.tv_usec - start.tv_usec);
-	if (difference > 60)
+	if (difference > 5)
 		client._active = false;
 }
 

@@ -31,6 +31,7 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
          deletemethod();
     else
         set_status_code(405);
+    std::cout << "out respond" << std::endl;
 }
 
 HTTP::respond::~respond()   {}
@@ -83,11 +84,12 @@ HTTP::respond& HTTP::respond::operator=(const respond& x)
 void HTTP::respond::getmethod()
 {
     std::string findKey;
-
     find_total_file_path();
     set_date();
     set_modified();
+    std::cout << "in get method" << std::endl;
     set_connection(_map_req["Connection:"]);
+    std::cout << "2in get method" << std::endl;
     set_host(_map_req["Host:"]);
     set_language(_map_req["Accept-Language:"]);
     set_server_name();
@@ -327,7 +329,7 @@ void HTTP::respond::set_status_line()
 
     if (_status_code == 404)
     {
-         _statusline.append(" Not Found");
+         _statusline.append("404 Not Found");
         _body = "<html><h1>404: You can't do that!</h1></html>";
     }
     else if (_status_code == 200)
@@ -348,7 +350,7 @@ void HTTP::respond::set_status_line()
     else if (_status_code == 204)
     {
         _statusline.append("204 No Content");
-        _body = "<html><h1>204: no content</h1></html>";
+        // _body = "<html><h1>204: no content</h1></html>";
     }
     else if (_status_code == 301)
         _statusline.append("301 Moved Permanently");
@@ -421,6 +423,9 @@ void ::HTTP::respond::set_modified()
 
 void HTTP::respond::set_connection(std::string connection)
 {
+    std::cout << "here[" << connection <<"]"<< std::endl;
+    if (connection == "")
+        return;
     _connection = connection;
 	_connection = _connection.substr(1, _connection.size() - 1);
     _totalrespond.insert(std::pair<std::string, std::string>("Connection", _connection));
@@ -465,7 +470,7 @@ void HTTP::respond::set_total_response()
     it = _totalrespond.begin();
     for (it = _totalrespond.begin(); it != _totalrespond.end(); ++it)
     {
-        if ((it->first != "Content-Length" || it->second != "0") && (!it->second.empty()))
+        if (!it->second.empty())
         {
             _totalheader.append(it->first);
             _totalheader.append(": ");
@@ -474,8 +479,8 @@ void HTTP::respond::set_total_response()
         }
     }
     _totalheader.append("\r\n");
-	_totalheader.append(_body);
-	_totalheader.append("\r\n");
+    _totalheader.append(_body);
+    _totalheader.append("\r\n");
 }
 
 void HTTP::respond::find_total_file_path()
@@ -576,11 +581,11 @@ void HTTP::respond::set_body()
 	}
     set_content_len(_body);
    //if(status_code = 204 )
-    if (_contentlen == "0" && _status_code == 0)
-    {
-        _status_code = 204;
-    }
-    else if (_status_code == 0)
+    // if (_contentlen == "0" && _status_code == 0)
+    // {
+    //     _status_code = 204;
+    // }
+    if (_status_code == 0)
         _status_code = 200;
 
 }
