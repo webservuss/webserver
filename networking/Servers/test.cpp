@@ -6,25 +6,15 @@
 #include <stdlib.h>
 
 
-void	errMsgAndExit(const std::string &errMsg, int code)
-{
-	std::cerr << "error: " << errMsg << std::endl;
-	exit(code);
-}
-
-
 int main(int argc, char **argv)
 {
-
-    // implement so it can handle different configs.
-   
     std::string  pathname;
     for(int i= 1; i<argc; i++) 
         pathname = (argv[i]);
     if( argc == 1)
     {
-        std::cout << "choos a config in configs"<<std::endl;
-        exit(10);
+        std::string err = "choos a config file in the config file folder : ";
+		error_exit(err, 10);
     }
 	HTTP::parse_conf ex(pathname.c_str(), argv);
     std::vector<HTTP::t_server> parser_servers = ex.get_server();

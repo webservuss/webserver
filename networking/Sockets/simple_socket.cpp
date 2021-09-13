@@ -17,7 +17,9 @@
 
 const char  *HTTP::simple_socket::socket_error_ex::what() const  throw()
 {
-    std::cout <<BLUE <<  "ERROR in simple socket " << RESET << std::endl;
+    std::cout << "ERRO"<< std::endl;
+    // std::string err =  "ERROR in simple socket "; 
+    // error_exit(err, 1);
 	return ("Error in simple_socket");
 }
 
@@ -58,16 +60,19 @@ HTTP::simple_socket::~simple_socket() {}
 /* test socket or connection has been properly established */
 void    HTTP::simple_socket::test_connection(int item_to_test)
 {
-    if (item_to_test < 1)
+    if (item_to_test < 0)
     {
-        std::cerr << YELLOW << "TEST ITEM" << RESET << std::endl;
-        //try{
-            std::cerr << BLUE << "failed to connect " << RESET << std::endl;
+        
+        //std::cerr << YELLOW << "TEST ITEM" << RESET << std::endl;
+       // throw simple_socket::socket_error_ex();
+        try{
+            std::string err =  "failed to connect  "; 
+            error_exit(err, 1);
             throw simple_socket::socket_error_ex();
-        //}
-        // catch(std::exception &e ){
-        //         //std::cerr << BLUE << "failed to connect " << RESET << std::endl;
-        // }
+        }
+        catch(std::exception &e ){
+                //std::cerr << BLUE << "failed to connect " << RESET << std::endl;
+        }
     }
 }
 

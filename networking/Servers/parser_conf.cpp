@@ -18,9 +18,9 @@ HTTP::parse_conf::parse_conf(const char *path, char **argv)
 	server_count = 0;
     if(!file || !file.is_open())
 	{
-        std::string err = "no configfile";
-		err.insert(13, argv[1]);
-		errMsgAndExit(err, 1);
+        std::string err = "There is no config file in the following path: ";
+		err.insert(47, argv[1]);
+		error_exit(err, 1);
 	}
 	while(std::getline(file, line, '\n'))
 	{
@@ -60,7 +60,7 @@ HTTP::parse_conf::parse_conf(const char *path, char **argv)
 // CAN SOMEONE CHECK COPY CONSTRUCTOR AND ASSIGNMENT OPPERATOR
 /*copy constructor */
 HTTP::parse_conf::parse_conf(const parse_conf& x)
-{ // TEST THIS // change
+{ 
 
     _server = x._server;
 }
@@ -102,12 +102,11 @@ void HTTP::parse_conf::set_values_server(std::string s, t_server &server, char *
 		else {
 			    std::string err = " auto_index incorrect value";
 				err.insert(13, argv[1]);
-				errMsgAndExit(err, 1);
+				error_exit(err, 1);
 		}
 	}
 }
 
-// This function gets the whole line and a struct (t_location)
 void	HTTP::parse_conf::set_values_location(std::string s, t_location &location)
 {
 	std::string last_meth;

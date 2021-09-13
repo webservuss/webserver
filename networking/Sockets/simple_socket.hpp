@@ -24,7 +24,7 @@ namespace HTTP {
         public:
 		    class	socket_error_ex : public std::exception {
 		    public:
-		    virtual const char*	what() const throw();
+		        virtual const char*	what() const throw();
 		    };
             /* constructors */
             simple_socket(int domain, int service, int protocol, int port, u_long interface);

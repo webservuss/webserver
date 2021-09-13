@@ -123,12 +123,13 @@ void    HTTP::select_server::accepter(int i)
 	if (connection < 0)
 		{
 			
-			try{
-				throw select_server::select_error_ex();
-			}
-			catch(std::exception &e ){
+			//try{
 				std::cout << "error in accept" << std::endl;
-			}
+				throw select_server::select_error_ex();
+			//}
+			//catch(std::exception &e ){
+				///std::cout << "error in accept" << std::endl;
+		//	}
 			
 		}
 		set_non_blocking(connection);
