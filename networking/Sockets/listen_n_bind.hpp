@@ -8,7 +8,7 @@
 #include <sys/time.h>
 #include "../Sockets/simple_socket.hpp"
 #include "../utils/colors.hpp"
-
+#include "../utils/utils.hpp"
 
 namespace HTTP 
 {

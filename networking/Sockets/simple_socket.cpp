@@ -70,8 +70,8 @@ void    HTTP::simple_socket::test_connection(int item_to_test)
             error_exit(err, 1);
             throw simple_socket::socket_error_ex();
         }
-        catch(std::exception &e ){
-                //std::cerr << BLUE << "failed to connect " << RESET << std::endl;
+            catch(std::exception &e ){
+                std::cerr << BLUE << "failed to connect " << RESET << std::endl;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace HTTP
 	public:
 		class	select_error_ex : public std::exception {
 		public:
-		virtual const char*	what() const throw();
+			virtual const char*	what() const throw();
 		};
 		/* constructor */
 		// select_server();

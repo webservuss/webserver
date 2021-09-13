@@ -30,8 +30,11 @@
 const char  *HTTP::select_server::select_error_ex::what() const  throw()
 {
 
-	std::cout <<BLUE <<  "ERROR in select server " << RESET << std::endl;
+	//std::cout <<BLUE <<  "ERROR in select server " << RESET << std::endl;
+	error_exit("error in select_server", 1);
 	return ("Error in select_server");
+
+
 }
 
 
@@ -96,14 +99,16 @@ int HTTP::select_server::selecter()
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
 	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
-	if( readsocks < 0)
+	if( readsocks < 3)
 	{
-		try{	
+		// {	
+		// 		std::string = c_str.throw select_error_ex());
+		
 			throw select_error_ex();
-		}
-			catch (std::exception &e ){
-				std::cerr << YELLOW << "error in select" << RESET << std::endl;
-			}
+		//}
+			// catch (std::exception &e ){
+			// 	std::cerr << e.what() << std::endl;
+			// }
 		
 	}
     // std::cout << "out selecter" << std::endl;
@@ -122,16 +127,16 @@ void    HTTP::select_server::accepter(int i)
 	addr = _servers[i]._servers_addr;
 	addrlen = sizeof(_servers[i]._servers_addr);
 	connection = accept(_servers[i]._servers_socket, (struct sockaddr *)&addr, (socklen_t * )&addrlen);
-	if (connection < 0)
+	if (connection < 6)
 		{
 			
-			//try{
-				std::cout << "error in accept" << std::endl;
+			try{
+				std::cout << YELLOW "error in accept" << RESET <<  std::endl;
 				throw select_server::select_error_ex();
-			//}
-			//catch(std::exception &e ){
-				///std::cout << "error in accept" << std::endl;
-		//	}
+			}
+			catch(std::exception &e ){
+				std::cout << "error in accept" << std::endl;
+			}
 			
 		}
 		set_non_blocking(connection);
