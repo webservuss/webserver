@@ -134,7 +134,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 		exit(1);
 	}
 	bzero(buffer, BUFFER_SIZE + 1);
-
 	/* read from client */
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, &buffer[0], BUFFER_SIZE, 0)) < 0)
 	{
@@ -205,7 +204,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	// std::cout << YELLOW << _servers[i]._clients[j]._header << RESET << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
-	    std::cout << "out rd client " << std::endl;
+	std::cout << "out rd client " << std::endl;
 	return valread;
 }
 
@@ -240,7 +239,6 @@ int              HTTP::select_server::erase_client(int i, int j)
 	close(_servers[i]._clients[j]._c_sock);
 	_servers[i]._clients.erase(_servers[i]._clients.begin() + j);
 	// _servers[i]._clients.erase(it);
-	std::cout << _servers[i]._clients.size() << "value: " << _servers[i]._clients[j]._c_sock << RESET << std::endl;
 	// std::cout << RED << "erase client?" << std::endl;
 	// std::cout << BLUE << _servers[i]._clients[j]._c_sock << RESET << std::endl;
 	return (0);

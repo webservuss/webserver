@@ -31,6 +31,7 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
          deletemethod();
     else
         set_status_code(405);
+    std::cout << "out respond" << std::endl;
 }
 
 HTTP::respond::~respond()   {}
@@ -83,11 +84,12 @@ HTTP::respond& HTTP::respond::operator=(const respond& x)
 void HTTP::respond::getmethod()
 {
     std::string findKey;
-
     find_total_file_path();
     set_date();
     set_modified();
+    std::cout << "in get method" << std::endl;
     set_connection(_map_req["Connection:"]);
+    std::cout << "2in get method" << std::endl;
     set_host(_map_req["Host:"]);
     set_language(_map_req["Accept-Language:"]);
     set_server_name();
@@ -421,6 +423,9 @@ void ::HTTP::respond::set_modified()
 
 void HTTP::respond::set_connection(std::string connection)
 {
+    std::cout << "here[" << connection <<"]"<< std::endl;
+    if (connection == "")
+        return;
     _connection = connection;
 	_connection = _connection.substr(1, _connection.size() - 1);
     _totalrespond.insert(std::pair<std::string, std::string>("Connection", _connection));
