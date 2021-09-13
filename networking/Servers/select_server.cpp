@@ -11,6 +11,7 @@
 #include "../utils/utils.hpp"
 #include "../utils/colors.hpp"
 #include "../Respond/respond.hpp"
+
 #define BUFFER_SIZE (104 * 104) // 1Mb
 
 //#define BUFFER_SIZE (1024) // 1Mb
@@ -28,7 +29,9 @@
 
 const char  *HTTP::select_server::select_error_ex::what() const  throw()
 {
-	return ("Error in select server");
+
+	    std::cout <<BLUE <<  "ERROR in select server " << RESET << std::endl;
+	return ("Error in select_server");
 }
 
 
@@ -93,14 +96,16 @@ int HTTP::select_server::selecter()
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
 	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
-	if (readsocks < 1)
+	if( readsocks < 0)
 	{
-
-		std::cerr << YELLOW << "error in select" << RESET << std::endl;
-		throw select_server::select_error_ex();
-		exit(EXIT_FAILURE);
+		try{	
+			throw select_error_ex();
+		}
+			catch (std::exception &e ){
+				std::cerr << YELLOW << "error in select" << RESET << std::endl;
+			}
+		
 	}
-    std::cout << "out selecter" << std::endl;
 	return (readsocks);
 }
 
@@ -117,9 +122,14 @@ void    HTTP::select_server::accepter(int i)
 	connection = accept(_servers[i]._servers_socket, (struct sockaddr *)&addr, (socklen_t * )&addrlen);
 	if (connection < 0)
 		{
-			std::cout << "error in accept" << std::endl;
-			throw select_server::select_error_ex();
-			exit(EXIT_FAILURE);
+			
+			try{
+				throw select_server::select_error_ex();
+			}
+			catch(std::exception &e ){
+				std::cout << "error in accept" << std::endl;
+			}
+			
 		}
 		set_non_blocking(connection);
 		make_client(connection, addr, _servers[i]);
@@ -139,7 +149,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
-		
+
 		throw select_server::select_error_ex();
 		//perror("Malloc error");
 		//exit(1);

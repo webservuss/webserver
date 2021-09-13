@@ -2,6 +2,12 @@
 #define simple_socket_hpp
 
 #include <netinet/in.h>
+#include <iostream>
+#include <vector>
+#include <netinet/in.h>
+#include <sys/time.h>
+//#include "../Sockets/listen_n_bind.hpp"
+//#include "parser_conf.hpp"
 
 namespace HTTP {
     class simple_socket
@@ -16,6 +22,10 @@ namespace HTTP {
             int                 _port;
             u_long              _interface;
         public:
+		    class	socket_error_ex : public std::exception {
+		    public:
+		    virtual const char*	what() const throw();
+		    };
             /* constructors */
             simple_socket(int domain, int service, int protocol, int port, u_long interface);
             /*copy constructor */

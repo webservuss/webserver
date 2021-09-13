@@ -2,6 +2,13 @@
 #define listen_n_bind_hpp
 
 #include "simple_socket.hpp"
+#include <iostream>
+#include <vector>
+#include <netinet/in.h>
+#include <sys/time.h>
+#include "../Sockets/simple_socket.hpp"
+#include "../utils/colors.hpp"
+
 
 namespace HTTP 
 {

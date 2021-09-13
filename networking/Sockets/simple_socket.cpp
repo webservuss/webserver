@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include "simple_socket.hpp"
 #include "../utils/http_funct.hpp"
+#include "../utils/colors.hpp"
 
 /* default constructor??*/
 // HTTP::simple_socket::simple_socket()
@@ -12,6 +13,14 @@
     define address structure, establish socket and test,
     enable rebinding while a previous connection is still in TIME_WAIT state, 
     allow re-use of local address and set non blocking */
+
+
+const char  *HTTP::simple_socket::socket_error_ex::what() const  throw()
+{
+    std::cout <<BLUE <<  "ERROR in simple socket " << RESET << std::endl;
+	return ("Error in simple_socket");
+}
+
 HTTP::simple_socket::simple_socket(int domain, int service, int protocol, int port, u_long interface)
     : _domain(domain), _service(service), _protocol(protocol), _port(port), _interface(interface)
 {
@@ -49,10 +58,17 @@ HTTP::simple_socket::~simple_socket() {}
 /* test socket or connection has been properly established */
 void    HTTP::simple_socket::test_connection(int item_to_test)
 {
-    if (item_to_test < 0)
+    if (item_to_test < 1)
     {
-        perror("Failed to connect..");
-        exit(EXIT_FAILURE);        
+        std::cerr << YELLOW << "TEST ITEM" << RESET << std::endl;
+        //try{
+            std::cerr << BLUE << "failed to connect " << RESET << std::endl;
+            throw simple_socket::socket_error_ex();
+        //}
+        // catch(std::exception &e ){
+        //         //std::cerr << BLUE << "failed to connect " << RESET << std::endl;
+        // }
+    
     }
 }
 

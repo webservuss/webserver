@@ -1,4 +1,6 @@
+
 #include "listen_n_bind.hpp"
+
 
 /* default constructor??*/
 // HTTP::listen_n_bind::listen_n_bind()
@@ -8,7 +10,13 @@ HTTP::listen_n_bind::listen_n_bind(int domain, int service, int protocol, int po
         : simple_socket(domain, service, protocol, port, interface)
 {
     connect_to_network(get_sock(), get_address());
-    test_connection(_binding);
+    try{
+        test_connection(_binding);
+    }
+        catch(std::exception &e ){
+        std::cerr << e.what() << std::endl;
+        std::cerr << BLUE << "failed to connect " << RESET << std::endl;
+    }
     _backlog = bklg;
     start_listening();
     test_connection(_listening);
