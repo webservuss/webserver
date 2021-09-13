@@ -68,7 +68,6 @@ void    HTTP::simple_socket::test_connection(int item_to_test)
         // catch(std::exception &e ){
         //         //std::cerr << BLUE << "failed to connect " << RESET << std::endl;
         // }
-    
     }
 }
 

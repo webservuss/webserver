@@ -14,12 +14,17 @@ HTTP::listen_n_bind::listen_n_bind(int domain, int service, int protocol, int po
         test_connection(_binding);
     }
         catch(std::exception &e ){
-        std::cerr << e.what() << std::endl;
-        std::cerr << BLUE << "failed to connect " << RESET << std::endl;
+        return ;
     }
     _backlog = bklg;
     start_listening();
-    test_connection(_listening);
+    try{
+        test_connection(_listening);
+    }
+    catch(std::exception &e ){
+        std::cerr << e.what() << std::endl;
+       return ;
+    
 }
 
 /* copy constructor */
