@@ -127,7 +127,7 @@ void    HTTP::select_server::accepter(int i)
 	addr = _servers[i]._servers_addr;
 	addrlen = sizeof(_servers[i]._servers_addr);
 	connection = accept(_servers[i]._servers_socket, (struct sockaddr *)&addr, (socklen_t * )&addrlen);
-	if (connection < 6)
+	if (connection < 0)
 		{
 			
 		//	try{

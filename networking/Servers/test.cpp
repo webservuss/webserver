@@ -23,23 +23,23 @@ int main(int argc, char **argv)
 
 // this is not ness anymore 
 
-// std::vector<std::string>config()
-// {
-//     const char * record_dir_path = "configs";
-//     std::vector<std::string> files;
-//     struct dirent *entry;
-// 	DIR *dir = opendir(record_dir_path);
+std::vector<std::string>config()
+{
+    const char * record_dir_path = "configs";
+    std::vector<std::string> files;
+    struct dirent *entry;
+	DIR *dir = opendir(record_dir_path);
 
-// 	if (dir == NULL) 
-// 	{
-// 	  return files;
-// 	}
-// 	while ((entry = readdir(dir)) != NULL) 
-// 	{
-//         std::cout << "open>?"<< std::endl;
-// 		files.push_back(entry->d_name);
-// 	}
-// 	closedir(dir);
+	if (dir == NULL) 
+	{
+	  return files;
+	}
+	while ((entry = readdir(dir)) != NULL) 
+	{
+        std::cout << "open>?"<< std::endl;
+		files.push_back(entry->d_name);
+	}
+	closedir(dir);
 	
-// 	return(files);
-// }
+	return(files);
+}
