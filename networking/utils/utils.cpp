@@ -12,6 +12,8 @@ void	error_exit(const std::string &error_msg, int code)
 	exit(code);
 }
 
+
+
 // https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string/39359311
 /*
  * Splits a string by a delimiter, for instance a space (' ')

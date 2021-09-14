@@ -23,8 +23,8 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 	_path = (char *)malloc(sizeof(char) * path.length() + 1);
 	if (!_path)
 	{
-	    std::string err =  "Malloc error "; 
-    	error_exit(err, 1);
+		perror("Malloc error");
+		exit(1);
 	}
 	strcpy(_path, path.c_str());
 	//set_cgi_env();
@@ -113,8 +113,8 @@ void HTTP::CGI::set_cgi_env()
 	std::cout << __FILE__ << __LINE__ << std::endl;
 	_env = (char **)malloc(sizeof(char *) * (cgi_vars.size() + 1));
 	if (!_env) {
-		std::string err =  "Malloc error "; 
-    	error_exit(err, 1);
+		perror("Malloc error");
+		exit(1);
 	}
 	std::map<std::string, std::string>::iterator it;
 	int i = 0;
@@ -130,8 +130,8 @@ void HTTP::CGI::set_cgi_env()
 		std::string tmp = it->first + "=" + it->second;
 		_env[i] = (char *)malloc(sizeof(char *) * tmp.length() + 1);
 		if (!_env[i]) {
-	    	std::string err =  "Malloc error "; 
-    		error_exit(err, 1);
+			perror("Malloc error");
+			exit(1);
 		}
 		strcpy(_env[i], tmp.c_str());
 		i++;
@@ -143,12 +143,10 @@ void HTTP::CGI::set_cgi_env()
 
 void HTTP::CGI::set_cgi_body()
 {
-//<<<<<<< HEAD
-//	// std::string cgi_location = "/usr/bin/php";
-//	std::string cgi_location = "/usr/local/bin/php-cgi";
-//=======
+	// // std::string cgi_location = "/usr/bin/php";
+	// std::string cgi_location = "/usr/local/bin/php-cgi";
+
 	std::string cgi_location = "/usr/bin/php-cgi";
-//>>>>>>> ourmergingsucks
 
 	char *argv[] = {(char *)cgi_location.c_str(), _path, NULL };
 	char *env[] = {(char *)"SERVER_PORT=1000", (char *)"environment", NULL};
@@ -163,8 +161,7 @@ void HTTP::CGI::set_cgi_body()
 		close(p[0]);
 		close(p[1]);
 		if (execve(argv[0], argv, env) == -1) {
-				std::string err =  "could not execeve"; 
-    			error_exit(err, 1);
+			perror("Could not execve");
 		}
 	}
 	else {

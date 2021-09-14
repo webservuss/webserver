@@ -16,28 +16,30 @@ int main(int argc, char **argv)
         std::string err = "choos a config file in the config file folder : ";
 		error_exit(err, 10);
     }
-	HTTP::parse_conf ex(pathname.c_str(), argv);
+    HTTP::parse_conf ex(pathname.c_str(), argv);
     std::vector<HTTP::t_server> parser_servers = ex.get_server();
     HTTP::select_server t(ex.get_ports(), parser_servers) ;
 }
 
-std::vector<std::string>config()
-{
-    const char * record_dir_path = "configs";
-    std::vector<std::string> files;
-    struct dirent *entry;
-	DIR *dir = opendir(record_dir_path);
+// this is not ness anymore 
 
-	if (dir == NULL) 
-	{
-	  return files;
-	}
-	while ((entry = readdir(dir)) != NULL) 
-	{
-        std::cout << "open>?"<< std::endl;
-		files.push_back(entry->d_name);
-	}
-	closedir(dir);
+// std::vector<std::string>config()
+// {
+//     const char * record_dir_path = "configs";
+//     std::vector<std::string> files;
+//     struct dirent *entry;
+// 	DIR *dir = opendir(record_dir_path);
+
+// 	if (dir == NULL) 
+// 	{
+// 	  return files;
+// 	}
+// 	while ((entry = readdir(dir)) != NULL) 
+// 	{
+//         std::cout << "open>?"<< std::endl;
+// 		files.push_back(entry->d_name);
+// 	}
+// 	closedir(dir);
 	
-	return(files);
-}
+// 	return(files);
+// }
