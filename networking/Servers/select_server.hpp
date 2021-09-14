@@ -17,6 +17,7 @@ namespace HTTP
 		int                 _c_sock;
 		struct timeval      _last_active;
 		bool                _active;
+		bool 				_close_connection;
 		std::string         _header;
 
 		/* variables needed for POST method */
@@ -46,6 +47,7 @@ namespace HTTP
 		std::vector<t_server_select>    _servers;
 		std::vector<t_server>           _parser_servers;
 		// std::string                     _totalheader;
+
 
 
 

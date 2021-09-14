@@ -33,8 +33,6 @@ const char  *HTTP::select_server::select_error_ex::what() const  throw()
 	std::cout <<BLUE <<  "ERROR in select server " << RESET << std::endl;
 	error_exit("error in select_server", 1);
 	return ("Error in select_server");
-
-
 }
 
 
@@ -155,6 +153,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
     char 			*buffer;
 	struct timeval	now;
     std::cout << "in rd client " << std::endl;
+    std::cout << GREEN << "i and j:  " << i << j << std::endl;
 
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
@@ -174,11 +173,15 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	    // FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		exit(EXIT_FAILURE);
 	}
+
+	std::string stringbuff2 = std::string(buffer);
+	std::cout << YELLOW << "SB: " << stringbuff2 << RESET << std::endl;
 	// std::cout << "val read" << valread << std::endl;
 	/* TODO check valread == 0 here; FD_SET as well? */
 	if (valread == 0)
 	{	
-		// _servers[i]._clients[j]._active = false;
+		//_servers[i]._clients[j]._active = false;
+		std::cout << "valread" << std::endl;
 		return (0);
 	}
 	// {
@@ -194,6 +197,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	_servers[i]._clients[j]._last_active = now;
 	_servers[i]._clients[j]._header = "";
 	/* Check if we are expecting a body */
+	std::cout << RED << "exp body: " << _servers[i]._clients[j]._expect_body << RESET << std::endl;
 	if (_servers[i]._clients[j]._expect_body)
 	{
 		//_servers[i]._clients[j]._total_body_length += valread;
@@ -208,12 +212,14 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	}
 	// parse buffer into request
 	std::string stringbuff = std::string(buffer);
+	std::cout << YELLOW << "SB: " << stringbuff << RESET << std::endl;
 	t_req_n_config							r_n_c;
 	re_HTTP									requestinfo (stringbuff.substr(0, stringbuff.find("\r\n\r\n") + 2));
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
 	respond m (r_n_c, _servers[i]._clients[j], buffer, valread);
+
 
 
 //	/* Check if POST and(!) contains a body	*/
@@ -234,6 +240,18 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	// std::cout << YELLOW << _servers[i]._clients[j]._header << RESET << std::endl;
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
+
+    std::cout << " req: " << reqmap["Connection"] << std::endl;
+    std::cout << " req: |" << reqmap["Connection:"] << "|" << std::endl;
+    std::cout << " req: " << reqmap["Connection: "] << std::endl;
+
+
+
+	if (reqmap["Connection:"] == " close")
+	{
+		_servers[i]._clients[j]._close_connection = true;
+	}
+
 	std::cout << "out rd client " << std::endl;
 	return valread;
 }
@@ -245,13 +263,18 @@ void HTTP::select_server::send_response(int i, int j)
 	//update clients last active
 	// int sendval = 
 	std::cout << "GOING TO SEND THE HEADER" << _servers[i]._clients[j]._header.c_str() << std::endl;
-	// int sendval = 
-	send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
+	// int sendval =
+	// TODO seems we are sending 0 bytes?
+	if (_servers[i]._clients[j]._header.size())
+		send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
 	// if (sendval == 0)
 		// _servers[i]._clients[j]._active = false;
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-	_servers[i]._clients[j]._active = false;
+	if (_servers[i]._clients[j]._close_connection)
+	{
+		_servers[i]._clients[j]._active = false;
+	}
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
     std::cout << "out snd" << std::endl;
 }
@@ -408,4 +431,5 @@ void		HTTP::select_server::make_client(int client_socket, sockaddr_in addr, t_se
 	newclient._active = true;
 	newclient._client_addr = addr;
 	server._clients.push_back(newclient);
+	newclient._close_connection = false;
 }

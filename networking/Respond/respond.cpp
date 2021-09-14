@@ -113,7 +113,6 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 //	std::cout << stat("www/html_pageploads/", &stat_buffer) << std::endl;
 //	mkdir("/Users/rvan-sch/webservuss_7sep/www/html_pages/uploads/test/test2", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 //	exit(1);
-	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
 	client._content_length = ft_stoi(_map_req["Content-Length:"]);
 
 
@@ -127,7 +126,9 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 
 	// TODO: client body size valid?
 	if (find_client_body_size() < (uint64_t)client._content_length)
+	{
 		_status_code = 413;
+	}
 
 
 	if (_status_code == 413) {
@@ -137,10 +138,12 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 		client._header = "HTTP/1.1 413 Request Entity Too Large\r\nConnection: keep-alive\r\nContent-Length: " + ft_numtos(payload.length() + 2) + "\r\n\r\n" + payload + "\r\n";
 
 		client._expect_body = false;
+		client._close_connection = true;
 		return;
 	}
 
 
+	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
 	if (!(_map_req.count("Expect:")))
 	{
 		std::string tmp(buffer);

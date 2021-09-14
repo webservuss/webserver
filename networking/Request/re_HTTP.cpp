@@ -31,7 +31,7 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
         if(line.size() != 0)
         {
             key = (line.substr(0, line.find(" ")));
-            value = (line.substr(line.find(" "), line.find('\r')));
+            value = (line.substr(line.find(" "), line.find('\r') - line.find(" ")));
             _map_header.insert(std::pair<std::string, std::string>(key, value));
         }
         j++;
