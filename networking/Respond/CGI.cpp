@@ -75,7 +75,7 @@ static std::string reworkGetRequestMethod(std::map<std::string, std::string> req
 	static std::string getCGIPath(std::string &cgi_path)
 {
 	if (cgi_path.empty())
-		return ("/usr/bin/php-cgi");
+		return ("/Users/rvan-sch/.brew/opt/php@7.2/bin/php-cgi");
 	else
 		return cgi_path;
 }
@@ -153,7 +153,11 @@ void HTTP::CGI::set_cgi_env()
 void HTTP::CGI::set_cgi_body()
 {
 
-	std::string cgi_location = "/usr/bin/php-cgi";
+	char *buf;
+	buf = (char *)malloc(256 * sizeof(char *));
+	buf = getcwd(buf, 256);
+
+	std::string cgi_location = std::string(buf) + "/bin/php-cgi_macos";
 
 	char *argv[] = {(char *)cgi_location.c_str(), _path, NULL };
 	char *env[] = {(char *)"SERVER_PORT=1000", (char *)"environment", NULL};
@@ -169,6 +173,7 @@ void HTTP::CGI::set_cgi_body()
 		close(p[1]);
 
 		if (execve(argv[0], argv, env) == -1) {
+			std::cout << argv[0] << std::endl;
 			perror("Could not execve");
 
 			// TODO: return HTTP Code 500 - Internal Server Error
