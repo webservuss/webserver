@@ -26,6 +26,7 @@ namespace HTTP{
         std::string _stat_cha;
         std::map<std::string, std::string> _totalrespond;
         std::map <std::string, std::string> _map_req;
+        std::map<int, std::string> _status_errors;
 
     public:
         /* constructors & destructors */
@@ -47,7 +48,6 @@ namespace HTTP{
 		/* static method */
 		static void 		post_response(t_client_select &client, const int &total_body_length, std::string &body);
 
-
 		/* setters */
         void                set_content_type(const std::string &contentype);
         void                set_status_code(int code);
@@ -68,6 +68,8 @@ namespace HTTP{
 
         /* check pathname */
         void                find_total_file_path();
+
+        void                make_error_map();
     };
 }
 

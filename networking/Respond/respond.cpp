@@ -17,6 +17,8 @@
 
 HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char * &buffer, int valread)
 {
+    //make the error map;
+    make_error_map();
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
@@ -258,32 +260,8 @@ void HTTP::respond::post_response(t_client_select &client, const int &total_body
 
 	(void)body;
 	client._header = "HTTP/1.1 204 No Content\r\n\r\n";
-
-
-//	client._header = "HTTP/1.1 200 OK\r\nContent-Type: text/markdown\r\nContent-Length: " + ft_numtos(total_body_length) + "\r\nabc\r\n";
-
-
-
 	(void)total_body_length;
-//	client._header = "HTTP/1.1 200 OK\r\n";
-//	client._header.append("Content-Length: " + ft_numtos(total_body_length) + "\r\n");
-//	client._header.append("Connection: keep-alive\r\n");
-//	client._header.append("Location: /uploads/a.txt\r\n");
-//	client._header.append("Content-Type: text/html; charset=utf-8\r\n");
-//	client._header.append("Host: localhost:8080\r\n");
-//	client._header.append( "Date: " +d + "\r\n");
-//	client._header.append("Server: localhost\r\n");
-//	client._header.append("\r\n");
-//
-//	client._header.append(body + "\r\n");
-////	client._header.append("\r\n");
-//	char a[2];
-//	a[0]='a';
-//	a[1]=0;
-//	std::string b(a);
-//	client._header.append(b+"\r\n");
-//	client._header.append("\r\n");
-//
+
 }
 
 
@@ -299,22 +277,34 @@ void HTTP::respond::deletemethod()
 
 void HTTP::respond::set_no_config(std::string root)
 {
-    std::cout << "no config ?" << std::endl;
+    
     if(root != "error_page.html;" )
     {   
-        std::cout << YELLOW << "THER IS NO CONFIG" << R << std::endl;
         _statusline.append(_stat_cha);
         _body.append(_stat_cha);
         _body = "<h1>status code is not present in config file</h1>\0";
-        std::cout << _body  << "BODY"<< std::endl;
         set_content_len(_body);
     }
     return ;
 }
 
+void    HTTP::respond::make_error_map()
+{
+    _status_errors[404] = "<html><h1>404: You can't do that!</h1></html>";
+    _status_errors[403] = "<html><h1>403: You can't do that!</h1></html>";
+    _status_errors[405] = "<html><h1>405: Try another method!</h1></html>";
+    _status_errors[301] = "<html><h1>405::Bad Request The request could not be understood by the \
+    server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.</h1></html>";
+    _status_errors[413] = "<html><h1> 400 : Request Entity Too Large</h1></html>";
+
+}
+
 
 void HTTP::respond::set_status_line()
 {
+    // std::vector<std::string> errorbody "<html><h1>404: You can't do that!</h1></html>", "Red", "Orange" 
+
+    
     std::string tmp = ft_numtos(_status_code);
     _stat_cha = tmp.c_str();
     std::string total_body;
@@ -322,19 +312,15 @@ void HTTP::respond::set_status_line()
     std::ifstream file("html_pages/auto_error.html");
     _statusline = "HTTP/1.1 ";
     std::string _stat_cha_s = _stat_cha;
-    _stat_cha_s.append(";");
-    std::cout <<GREEN << "status code: " << _status_code << RESET<< std::endl;
+    _stat_cha_s.append(";");;
     if ( _pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
-    {
          set_no_config(root);
-         std::cout << "out of config" << std::endl;
-    }
-
     if (_status_code == 404)
     {
          _statusline.append("404 Not Found");
-        _body = "<html><h1>404: You can't do that!</h1></html>";
+        _body = _status_errors[404];  
     }
+   
     else if (_status_code == 200)
     {
         _statusline.append("200 OK");
@@ -343,29 +329,26 @@ void HTTP::respond::set_status_line()
     else if (_status_code == 403)
     {
         _statusline.append("403 Forbidden");
-        _body = "<html><h1>403: You can't do that!</h1></html>";
+        _body = _status_errors[403]; 
     }
     else if (_status_code == 405)
     {
         _statusline.append("405 Method not Allowed");
-        _body = "<html><h1>405: Try another method!</h1></html>";
+        _body = _status_errors[405]; 
     }
     else if (_status_code == 204)
-    {
         _statusline.append("204 No Content");
-        // _body = "<html><h1>204: no content</h1></html>";
-    }
     else if (_status_code == 301)
         _statusline.append("301 Moved Permanently");
     else if(_status_code == 301)
     {
-        _statusline.append("4 ");
-        _body = "<html><h1> 4 :Bad Request The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request without modifications. </h1></html>";
+        _statusline.append("301");
+        _body = _status_errors[301];
     }
     else if(_status_code == 413)
     {
         _statusline.append("413 ");
-        _body = "<html><h1> 400 : Request Entity Too Large</h1></html>";
+        _body = _status_errors[413];
     }
     if(file.is_open())
         {
@@ -396,7 +379,6 @@ void HTTP::respond::set_date()
     gettimeofday(&tv, NULL);
     t = tv.tv_sec;
     info = localtime(&t);
-    //_date = strftime(buffer, sizeof buffer, "%a, %d %B %Y %H::%M::%S %Z", info);
 	strftime(buffer, 36, "%a, %d %h %Y %H:%M:%S GMT", info);
     _date = buffer;
     _totalrespond.insert(std::pair<std::string, std::string>("Date", _date));
@@ -440,9 +422,6 @@ void HTTP::respond::set_host(std::string host)
 
     host = host.substr(1, host.size() - 1);
     host_cmp = host.substr(0, host.find(':'));
-    // TODO get rid of this
-//    if (host_cmp != _pars_server._host)
-//        return (set_status_code(400));
     _host = host;
     _totalrespond.insert(std::pair<std::string, std::string>("Host", _host));
 }
@@ -583,11 +562,6 @@ void HTTP::respond::set_body()
 		file.close();
 	}
     set_content_len(_body);
-   //if(status_code = 204 )
-    // if (_contentlen == "0" && _status_code == 0)
-    // {
-    //     _status_code = 204;
-    // }
     if (_status_code == 0)
         _status_code = 200;
 
