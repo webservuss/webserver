@@ -40,7 +40,7 @@ namespace HTTP{
         /* methods */
         void                getmethod();
         void                postmethod(t_client_select &client, char * &buffer, int valread);
-        void                deletemethod();
+        void                deletemethod(t_client_select &client);
 		//void                cgi_php(); // TODO not implemented, do we need it?
 
 		uint64_t find_client_body_size();

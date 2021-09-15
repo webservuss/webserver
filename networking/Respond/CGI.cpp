@@ -167,10 +167,11 @@ void HTTP::CGI::set_cgi_body()
 		dup2(p[1], 1);
 		close(p[0]);
 		close(p[1]);
-		// maybe check if php file is valid 
+
 		if (execve(argv[0], argv, env) == -1) {
 			perror("Could not execve");
-			// maybe exit 
+
+			// TODO: return HTTP Code 500 - Internal Server Error
 		}
 	}
 	else {
@@ -188,7 +189,7 @@ void HTTP::CGI::set_cgi_body()
 		std::cout << std::endl;
 		std::cout << tmp << std::endl;
 		int start = tmp.find("<html>");
-		tmp = tmp.substr(start, tmp.length());
+		tmp = tmp.substr(start, tmp.length()); //TODO: tmp.length - start for 2nd argument.
 		_cgi_body = tmp;
 		free(buffer);
 	}

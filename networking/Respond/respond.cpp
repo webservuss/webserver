@@ -30,7 +30,7 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
      else if (_map_req["METHOD"].compare("POST") == 0)
          postmethod(client, buffer, valread);
      else if (_map_req["METHOD"].compare("DELETE") == 0)
-         deletemethod();
+         deletemethod(client);
     else
         set_status_code(405);
     std::cout << "out respond" << std::endl;
@@ -215,8 +215,16 @@ void HTTP::respond::post_response(t_client_select &client, const int &total_body
 
 }
 
-void HTTP::respond::deletemethod()
+void HTTP::respond::deletemethod(t_client_select &client)
 {
+	find_total_file_path();
+	std::cout << "deletemethod" << std::endl;
+	if (_status_code == 405) {
+		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
+		client._expect_body = false;
+		return;
+	}
+	//exit(1);
     // _postheader = _totalheader;
     // int ret  = remove(file.c_str());
     // if( ret != 0)
