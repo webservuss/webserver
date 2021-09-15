@@ -118,7 +118,7 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 	client._content_length = ft_stoi(_map_req["Content-Length:"]);
 
 
-	// TODO: request method invalid? */
+	/* If Request Method is not allowed on page, return 405 */
 	find_total_file_path();
 	if (_status_code == 405) {
 		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
@@ -126,26 +126,20 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 		return;
 	}
 
-	// TODO: client body size valid?
+	/* If Content-Length is larger then allowed in the config, return 413 */
 	if (find_client_body_size() < (uint64_t)client._content_length)
 	{
 		_status_code = 413;
-	}
-
-
-	if (_status_code == 413) {
-		//client._header = "HTTP/1.1 413 Request Entity Too Large\r\nConnection: keep-alive\r\nContent-Length: 334\r\n\r\n<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Plebbin reeee</title></head><body style='background-color: #f72d49; padding: 50px 10vw 0 10vw; color: #3f3f3f;'><h1>Error: 413</h1><p style='size: 15px;'>Request Entity Too Large</p></body></html>\r\n";
 		std::string payload = "Max upload-size: " + ft_numtos(find_client_body_size());
-
 		client._header = "HTTP/1.1 413 Request Entity Too Large\r\nConnection: keep-alive\r\nContent-Length: " + ft_numtos(payload.length() + 2) + "\r\n\r\n" + payload + "\r\n";
-
 		client._expect_body = false;
 		client._close_connection = true;
 		return;
 	}
 
-
+	/* Create file */
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
+	/* Check if POST contains body, if not send 100 Continue */
 	if (!(_map_req.count("Expect:")))
 	{
 		std::string tmp(buffer);
@@ -157,37 +151,32 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 		client._post_done = true;
 
 		(void)valread;
-
-
 		client._header = "HTTP/1.1 204 No Content\r\n\r\n";
-		//HTTP::respond::post_response(client, client._content_length, body);
-		//return 0;
 		return ;
 	}
 	else
 	{
 		out_file.close();
-		/* send a brief response to the client */
 		client._header = "HTTP/1.1 100 Continue\r\n\r\n";
 		client._total_body_length = 0;
 		client._expect_body = true;
 		client._post_done= false;
-		//return 1;
 		return;
 	}
 }
 
+/*
+ * Retrieve max client body size from config file
+ *
+ * Workings:
+ * location /uploads/
+ * 		client_body_size 1000
+ *
+ * 	location /uploads/new
+ * 		client_body_size inherited from /uploads/ unless stated otherwise
+ */
 uint64_t HTTP::respond::find_client_body_size()
 {
-	/*
-	 * location /uploads/
-	 * 		client_body_size 1000
-	 *
-	 * 	location /uploads/new
-	 * 		client_body_size inherited from /uploads/ unless stated otherwise
-	 */
-
-
 	std::string path;
 	size_t found_slash = _map_req["URI"].rfind('/');
 	if (found_slash == std::string::npos) {
@@ -198,7 +187,6 @@ uint64_t HTTP::respond::find_client_body_size()
 		std::string tmp = _map_req["URI"].substr(0, found_slash+1);
 		path = "/" + tmp;
 	}
-
 
 	while (true)
 	{
@@ -219,52 +207,13 @@ uint64_t HTTP::respond::find_client_body_size()
 	}
 }
 
-/*
-void HTTP::respond::post_handle_request(t_client_select &client, char * &buffer, int valread)
-{
-	(void)valread;
-	// TODO directory has to be taken from config file? Also: ofstream does not create a directory
-	client._filename = "www/html_pages/uploads/" + .r_n_c._req_map["URI"]; // relative path of the server executable (don't start with a '/' !)
-	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
-	client._content_length = ft_stoi(r_n_c._req_map["Content-Length:"]);
-	// TODO: request method valid?
-
-	// TODO: client body size valid?
-
-	if (!(r_n_c._req_map.count("Expect:")))
-	{
-		int position_of_body = stringbuff.find("\r\n\r\n") + 4;
-		out_file.write(&buffer[position_of_body], client._content_length);
-		out_file.close();
-		client._expect_body = false;
-		client._post_done = true;
-		std::string body(&buffer[position_of_body]);
-
-		HTTP::respond::post_response(client, client._content_length, body);
-		return 0;
-	}
-	else
-	{
-		out_file.close();
-		// send a brief response to the client
-		client._header = "HTTP/1.1 100 Continue\r\n\r\n";
-		client._expect_body = true;
-		client._post_done= false;
-		return 1;
-	}
-}
-*/
-
 void HTTP::respond::post_response(t_client_select &client, const int &total_body_length, std::string &body)
 {
-
 	(void)body;
 	client._header = "HTTP/1.1 204 No Content\r\n\r\n";
 	(void)total_body_length;
 
 }
-
-
 
 void HTTP::respond::deletemethod()
 {
@@ -272,12 +221,10 @@ void HTTP::respond::deletemethod()
     // int ret  = remove(file.c_str());
     // if( ret != 0)
     // set statuscode notfound
-
 }
 
 void HTTP::respond::set_no_config(std::string root)
 {
-    
     if(root != "error_page.html;" )
     {   
         _statusline.append(_stat_cha);
@@ -299,12 +246,8 @@ void    HTTP::respond::make_error_map()
 
 }
 
-
 void HTTP::respond::set_status_line()
 {
-    // std::vector<std::string> errorbody "<html><h1>404: You can't do that!</h1></html>", "Red", "Orange" 
-
-    
     std::string tmp = ft_numtos(_status_code);
     _stat_cha = tmp.c_str();
     std::string total_body;
@@ -320,8 +263,7 @@ void HTTP::respond::set_status_line()
          _statusline.append("404 Not Found");
         _body = _status_errors[404];  
     }
-   
-    else if (_status_code == 200)
+   else if (_status_code == 200)
     {
         _statusline.append("200 OK");
         return;
@@ -359,8 +301,6 @@ void HTTP::respond::set_status_line()
     file.close();
     set_content_type("text/html");
     set_content_len(_body);
-   
-
 }
 
 void HTTP::respond::set_content_type(const std::string &contentype)
@@ -441,7 +381,6 @@ void HTTP::respond::set_content_len(std::string body)
     ss << size;
     ss >> _contentlen;
     _totalrespond.insert(std::pair<std::string, std::string>("Content-Length", _contentlen));
-    
 }
 
 void HTTP::respond::set_total_response()
@@ -472,7 +411,7 @@ void HTTP::respond::find_total_file_path()
     int found;
 
     found = -1;
-    _relativepath = _map_req["URI"].c_str();
+    _relativepath = _map_req["URI"];
     if (_relativepath[_relativepath.size() - 1] != '/')
         _relativepath = _relativepath.append("/");
     key = "/";
