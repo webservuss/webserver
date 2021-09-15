@@ -167,8 +167,10 @@ void HTTP::CGI::set_cgi_body()
 		dup2(p[1], 1);
 		close(p[0]);
 		close(p[1]);
+		// maybe check if php file is valid 
 		if (execve(argv[0], argv, env) == -1) {
 			perror("Could not execve");
+			// maybe exit 
 		}
 	}
 	else {

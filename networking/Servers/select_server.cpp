@@ -29,9 +29,6 @@
 
 const char  *HTTP::select_server::select_error_ex::what() const  throw()
 {
-
-	std::cout <<BLUE <<  "ERROR in select server " << RESET << std::endl;
-	error_exit("error in select_server", 1);
 	return ("Error in select_server");
 }
 
@@ -92,24 +89,12 @@ int HTTP::select_server::selecter()
 	int 			readsocks;
     struct timeval  timeout;
 	
-    // std::cout << "in selecter " << std::endl;
 	std::cout << std::endl;
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
 	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
 	if( readsocks < 0)
-	{
-		// {	
-		// 		std::string = c_str.throw select_error_ex());
-		
-			throw select_error_ex();
-		//}
-			//catch (std::exception &e ){
-			// 	std::cerr << e.what() << std::endl;
-			// }
-		
-	}
-    // std::cout << "out selecter" << std::endl;
+		throw select_error_ex();
 	return (readsocks);
 }
 
@@ -126,22 +111,12 @@ void    HTTP::select_server::accepter(int i)
 	addrlen = sizeof(_servers[i]._servers_addr);
 	connection = accept(_servers[i]._servers_socket, (struct sockaddr *)&addr, (socklen_t * )&addrlen);
 	if (connection < 0)
-		{
-			
-		//	try{
-			//	std::cout << YELLOW "error in accept" << RESET <<  std::endl;
-				throw select_server::select_error_ex();
-			//}
-			// catch(std::exception &e ){
-			// 	std::cout << "error in accept" << std::endl;
-			// }
-			
-		}
-		set_non_blocking(connection);
-		make_client(connection, addr, _servers[i]);
-        std::cout << "NEW CLIENT: " << connection << std::endl;
-		FD_SET(connection,&_read_backup);
-        std::cout << "out accepter" << std::endl;
+			throw select_server::select_error_ex();
+	set_non_blocking(connection);
+	make_client(connection, addr, _servers[i]);
+    std::cout << "NEW CLIENT: " << connection << std::endl;
+	FD_SET(connection,&_read_backup);
+    std::cout << "out accepter" << std::endl;
 }
 
 /* Run through our sockets and check to see if anything happened with them, if so 'service' them. */
@@ -157,8 +132,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
-
-		//throw select_server::select_error_ex();
 		std::string err =  "Malloc error "; 
     	error_exit(err, 1);
 	}
@@ -171,7 +144,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 		// close(_servers[i]._clients[j]._c_sock);
 		// _servers[i]._clients.erase(_servers[i]._clients.begin() + j);
 	    // FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
-		exit(EXIT_FAILURE);
+		throw select_error_ex();
+	
 	}
 
 	std::string stringbuff2 = std::string(buffer);
@@ -324,7 +298,13 @@ void    HTTP::select_server::launch()
         _write_fds = _write_backup;
         std::cout << "...................WAITING////" << std::endl;
 		std::cout << "b4 selecter" << std::endl;
-        selecter();
+		try{
+			selecter();
+		}
+            catch(std::exception &e ){
+       	 	std::cerr << e.what() << std::endl;
+        	error_exit("error in select_Server", 1);
+		}
 		std::cout << "after selecter" << std::endl;
 	    for (unsigned long i = 0; i < _servers.size(); i++) 
         {
@@ -333,7 +313,13 @@ void    HTTP::select_server::launch()
 	    		// std::cout << MAGENTA << _servers[0]._clients.size() << RESET << std::endl;
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
             	// std::cout << "ACCEPTER" << std::endl;
-                accepter(i);
+				try{
+					accepter(i);
+				}
+				catch(std::exception &e ){
+        			std::cerr << e.what() << std::endl;
+        			error_exit("error in accepter", 1);
+				}
             }
             for (unsigned long j = 0; j < _servers[i]._clients.size(); j++)
 			{
@@ -350,7 +336,14 @@ void    HTTP::select_server::launch()
                 if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_read_fds)) {
 					// std::cout << "FD_ISSET, &_read_fds" << std::endl;
 					// std::cout << "i and j: " << i << " " << j << std::endl;
-                    read_from_client(i, j);
+					try{
+						read_from_client(i, j);
+					}
+					    catch(std::exception &e ){
+        					std::cerr << e.what() << std::endl;
+        					error_exit("connection lost", 1);
+						}
+                    
 					if (_servers[i]._clients[j]._active == false)
 					{
 						std::cout << "IN ERASE CLIENT FROM READ" << std::endl;

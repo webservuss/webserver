@@ -14,6 +14,7 @@ HTTP::listen_n_bind::listen_n_bind(int domain, int service, int protocol, int po
         test_connection(_binding);
     }
         catch(std::exception &e ){
+            std::cerr << e.what() << std::endl;
             error_exit("connection fails", 1);
     }
     _backlog = bklg;
@@ -23,7 +24,7 @@ HTTP::listen_n_bind::listen_n_bind(int domain, int service, int protocol, int po
     }
     catch(std::exception &e ){
         std::cerr << e.what() << std::endl;
-        std::cerr << BLUE << "failed to listen  " << RESET << std::endl;
+        error_exit("connection fails", 1);
     }
     
 }
