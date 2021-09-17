@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -139,7 +138,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	/* read from client */
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, &buffer[0], BUFFER_SIZE, 0)) < 0)
 	{
-		std::cout << "\nConnection lost: FD=" << _servers[i]._clients[j]._c_sock << " Slot" << i  << "error " << strerror(errno)<< std::endl;
+		std::cout << "\nConnection lost: FD=" << _servers[i]._clients[j]._c_sock << " Slot" << i  << std::endl;
 		erase_client(i, j);
 		// close(_servers[i]._clients[j]._c_sock);
 		// _servers[i]._clients.erase(_servers[i]._clients.begin() + j);
@@ -153,7 +152,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	// std::cout << "val read" << valread << std::endl;
 	/* TODO check valread == 0 here; FD_SET as well? */
 	if (valread == 0)
-	{	
+	{
 		//_servers[i]._clients[j]._active = false;
 		std::cout << "valread" << std::endl;
 		return (0);

@@ -358,9 +358,9 @@ void ::HTTP::respond::set_modified()
 
 void HTTP::respond::set_connection(std::string connection)
 {
-	std::cout << "here[" << connection <<"]"<< std::endl;
-	if (connection == "")
+	if (connection.empty())
 		return;
+	std::cout << "here[" << connection <<"]"<< std::endl;
 	_connection = connection;
 	_connection = _connection.substr(1, _connection.size() - 1);
 	_totalrespond.insert(std::pair<std::string, std::string>("Connection", _connection));

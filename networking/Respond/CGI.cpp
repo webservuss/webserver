@@ -23,6 +23,7 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 	_path = (char *)malloc(sizeof(char) * path.length() + 1);
 	if (!_path)
 	{
+		std::cout << "here???" << std::endl;
 		//perror("Malloc error");
 		//exit(1);
 		std::string err =  "Malloc error "; 
@@ -75,7 +76,7 @@ static std::string reworkGetRequestMethod(std::map<std::string, std::string> req
 	static std::string getCGIPath(std::string &cgi_path)
 {
 	if (cgi_path.empty())
-		return ("/Users/rvan-sch/.brew/opt/php@7.2/bin/php-cgi");
+		return ("/Users/avan-dam/Documents/webserver/bin/php-cgi_macos");
 	else
 		return cgi_path;
 }
@@ -171,7 +172,7 @@ void HTTP::CGI::set_cgi_body()
 		dup2(p[1], 1);
 		close(p[0]);
 		close(p[1]);
-
+		
 		if (execve(argv[0], argv, env) == -1) {
 			std::cout << argv[0] << std::endl;
 			perror("Could not execve");
