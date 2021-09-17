@@ -17,13 +17,19 @@ namespace HTTP
 		// TODO: map_req?
 		CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path);
 		~CGI();
+		class	cgi_error : public std::exception {
+		public:
+			virtual const char*	what() const throw();
+		};
 
 		void set_cgi_body();
 		void set_cgi_env();
 		const std::string &get_cgi_body() const;
+		int get_status_code() const;
 
 	private:
 		std::string _cgi_body;
+		int 		_status_code;
 		t_server _server;
 		std::map <std::string, std::string> _request;
 		char *_path;

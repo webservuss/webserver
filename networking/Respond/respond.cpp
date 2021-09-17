@@ -500,6 +500,7 @@ void HTTP::respond::set_body()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
 		_body = cgi.get_cgi_body();
+		_status_code = cgi.get_status_code();
 	}
 	else
 	{

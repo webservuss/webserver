@@ -172,13 +172,14 @@ void HTTP::CGI::set_cgi_body()
 		dup2(p[1], 1);
 		close(p[0]);
 		close(p[1]);
-		
-		if (execve(argv[0], argv, env) == -1) {
-			std::cout << argv[0] << std::endl;
-			perror("Could not execve");
 
+
+		if (execve(argv[0], argv, env) == -1) {
+			std::cout << "?????????" << std::endl;
+			_status_code = 500;
 			// TODO: return HTTP Code 500 - Internal Server Error
 		}
+
 	}
 	else {
 		wait(NULL);
@@ -197,6 +198,7 @@ void HTTP::CGI::set_cgi_body()
 		int start = tmp.find("<html>");
 		tmp = tmp.substr(start, tmp.length()); //TODO: tmp.length - start for 2nd argument.
 		_cgi_body = tmp;
+		_status_code = 200;
 		free(buffer);
 	}
 
@@ -205,4 +207,9 @@ void HTTP::CGI::set_cgi_body()
 const std::string &HTTP::CGI::get_cgi_body() const
 {
 	return _cgi_body;
+}
+
+int  HTTP::CGI::get_status_code() const
+{
+	return _status_code;
 }
