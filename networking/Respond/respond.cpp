@@ -23,10 +23,12 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
 
     if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
         set_status_code(405);
+    // this needs to be different 
     else if (_map_req["METHOD"].compare("GET") == 0)
         getmethod();
      else if (_map_req["METHOD"].compare("POST") == 0)
          postmethod(client, buffer, valread);
+        // this needs to be different 
      else if (_map_req["METHOD"].compare("DELETE") == 0)
          deletemethod();
     else
