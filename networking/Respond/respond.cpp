@@ -17,9 +17,13 @@
 
 HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char * &buffer, int valread)
 {
+  
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
+    std::cout << "_map_req[METHOD][" << _map_req["METHOD"]  << "]"<< std::endl;
+    std::cout << "_map_req[METHOD]" << _map_req["METHOD: "] << std::endl;
+    exit(1);
 
     if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
         set_status_code(405);

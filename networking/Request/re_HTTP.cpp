@@ -1,5 +1,6 @@
 #include "re_HTTP.hpp"
 #include <sstream>
+#include "../utils/colors.hpp"
 
 std::string methods[3] = {
         "GET",
@@ -83,17 +84,22 @@ int HTTP::re_HTTP::set_request_line(std::string &requestline)
     found = -1;
     for(int i = 0; i < 3; i++)
     {
-        found = requestline.find(methods[i]);
-        if(found != -1)
-        {
-            _method = requestline.substr(found, methods[i].size());
-            std::string tmp = requestline.substr(_method.size() + 1, requestline.size()- methods[i].size());
+      // found = requestline.find(methods[i]);
+       //if(found != -1)
+       // {
+             std::cout << YELLOW << _method << RESET << std::cout;
+           int sizer = requestline.find(" "); 
+           //int sizerr = requestline.size() - sizer;
+           //_method = requestline.substr(found, methods[i].size());
+           _method = requestline.substr(0, sizer);
+          
+            std::string tmp = requestline.substr(_method.size() + 1, requestline.size()- _method.size());
             _uri = tmp.substr(0, tmp.find(' '));
             _uri = _uri.substr(1, _uri.size() - 1);
             _protocol = tmp.substr(_uri.size() + 2, tmp.size() - _uri.size());
             break;
-        }
-    }
+        //}
+   }
     _map_header.insert(std::pair<std::string, std::string>( "METHOD", _method));
     _map_header.insert(std::pair<std::string, std::string>( "URI", _uri) );
     _map_header.insert(std::pair<std::string, std::string>( "PROTOCOL", _protocol));
