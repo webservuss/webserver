@@ -484,8 +484,10 @@ void HTTP::respond::set_body()
 			std::ifstream file("www/html_pages/downloads/index.php");
 			if (file.is_open())
 			{
-				_totalpath = "www/html_pages/downloads/index.php"; // this 
-				HTTP::CGI cgi(_map_req, _pars_server, _totalpath); // need to change $path to correct so CGI executes on the correct one
+				std::cout << "_totalpath" << _totalpath << std::endl;
+				std::cout << "_path" << _path << std::endl;
+				// _totalpath = "www/html_pages/downloads/index.php"; // this 
+				HTTP::CGI cgi(_map_req, _pars_server, "www/html_pages/downloads/index.php"); // need to change $path to correct so CGI executes on the correct one
 				_body = cgi.get_cgi_body();
 				set_content_len(_body);
 				_status_code = 200;

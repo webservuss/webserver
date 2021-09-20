@@ -31,7 +31,7 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 	}
 
 	strcpy(_path, path.c_str());
-	//set_cgi_env();
+	// set_cgi_env();
 	set_cgi_body();
 }
 
