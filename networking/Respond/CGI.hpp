@@ -15,7 +15,7 @@ namespace HTTP
 	{
 	public:
 		// TODO: map_req?
-		CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path);
+		CGI(std::map <std::string, std::string> &request, const t_server &server, const std::string &path);
 		~CGI();
 
 		void set_cgi_body();
@@ -26,7 +26,7 @@ namespace HTTP
 		std::string _cgi_body;
 		t_server _server;
 		std::map <std::string, std::string> _request;
-		char *_path;
+		std::string _path;
 		char **_env;
 	};
 }

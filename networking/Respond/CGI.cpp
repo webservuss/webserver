@@ -9,28 +9,29 @@
 #include <string.h>
 #include <unistd.h>
 #include "CGI.hpp"
-#include "sys/wait.h"
+#include <sys/wait.h>
 #include "../utils/colors.hpp"
+#include <sys/socket.h>
 
 
 
-HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path)
+HTTP::CGI::CGI(std::map <std::string, std::string> &request, const t_server &server, const std::string &path)
 {
+	std::cout << RED << "*----------" << RESET << std::endl;
+	std::cout << server._server_name << std::endl;
+	std::cout << server._port << std::endl;
+	std::cout << server._host << std::endl;
+	std::cout << server._auto_index << std::endl;
+	std::cout << server._root << std::endl;
+	std::cout << server._index << std::endl;
+	std::cout << RED << "*----------" << RESET << std::endl;
 
 	_request = request;
 	_server = server;
-	std::cout << RED << __LINE__ << __FILE__ << " >>> " << path.length() << std::endl;
-	_path = (char *)malloc(sizeof(char) * path.length() + 1);
-	if (!_path)
-	{
-		std::cout << "here???" << std::endl;
-		//perror("Malloc error");
-		//exit(1);
-		std::string err =  "Malloc error "; 
-    	error_exit(err, 1);
-	}
+	_path = path;
 
-	strcpy(_path, path.c_str());
+	std::cout << _path << std::endl;
+
 	// set_cgi_env();
 	set_cgi_body();
 }
@@ -100,8 +101,8 @@ void HTTP::CGI::set_cgi_env()
 	cgi_vars["SERVER_PORT"] =		_server._port;		// TCP port (decimal).
 	/* TODO request method is not  */
 	cgi_vars["REQUEST_METHOD"] =	reworkGetRequestMethod(_request);	// name of HTTP method (see above).
-	cgi_vars["PATH_INFO"] =			getFullPath(_path);	// path suffix, if appended to URL after program name and a slash.
-	cgi_vars["PATH_TRANSLATED"] =	getFullPath(_path);	// corresponding full path as supposed by server, if PATH_INFO is present.
+	cgi_vars["PATH_INFO"] =			getFullPath(_path.c_str());	// path suffix, if appended to URL after program name and a slash.
+//	cgi_vars["PATH_TRANSLATED"] =	getFullPath(_path);	// corresponding full path as supposed by server, if PATH_INFO is present.
 	// TODO help? I am now picking the first location block for the cgi path :(
 	cgi_vars["SCRIPT_NAME"] =		getCGIPath(_server._location_map[0]._cgi);				// relative path to the program, like /cgi-bin/script.cgi.
 //	cgi_vars["QUERY_STRING"] =		getQueryString(_request);				// the part of URL after ? character. The query string may be composed of *name=value pairs separated with ampersands (such as var1=val1&var2=val2...) when used to submit form data transferred via GET method as defined by HTML application/x-www-form-urlencoded.
@@ -160,7 +161,7 @@ void HTTP::CGI::set_cgi_body()
 
 	std::string cgi_location = std::string(buf) + "/bin/php-cgi_macos";
 
-	char *argv[] = {(char *)cgi_location.c_str(), _path, NULL };
+	char *argv[] = {(char *)cgi_location.c_str(), (char *)_path.c_str(), NULL };
 	char *env[] = {(char *)"SERVER_PORT=1000", (char *)"environment", NULL};
 	pid_t pid;
 	char *buffer;
@@ -182,13 +183,17 @@ void HTTP::CGI::set_cgi_body()
 	}
 	else {
 		wait(NULL);
-		buffer = (char *)malloc(sizeof(char *) * 4096 * 4096);
+//		buffer = (char *)malloc(sizeof(char *) * 4096 * 4096);
+		buffer = new char[4096 * 4096];
 		close(p[1]);
 		int bytes_read = read(p[0], buffer, 4096 *4096);
-		std::cout << "BR: " << bytes_read << std::endl;
+//		close(p[0]); // TODO check if needed 20sep
+
+		std::cout << YELLOW << "BR: " << bytes_read << "p[0]: " << p[0] << std::endl;
 		for (int i = 0; i < bytes_read; ++i) {
 			std::cout << buffer[i];
 		}
+		std::cout << RESET << std::endl;
 		buffer[bytes_read] = 0;
 		std::string tmp = std::string(buffer);
 
