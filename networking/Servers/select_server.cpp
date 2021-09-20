@@ -211,6 +211,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	//_servers[i]._clients[j]._header = "HTTP/1.1 204 No Content\r\n\r\n";
 	// add client to write backups so next loop correct thing will be written
 	// std::cout << YELLOW << _servers[i]._clients[j]._header << RESET << std::endl;
+    FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
 
@@ -234,14 +235,14 @@ void HTTP::select_server::send_response(int i, int j)
 	struct timeval now;
 
 	//update clients last active
-	// int sendval = 
+	int sendval = 0;
 	std::cout << "GOING TO SEND THE HEADER" << _servers[i]._clients[j]._header.c_str() << std::endl;
 	// int sendval =
 	// TODO seems we are sending 0 bytes?
 	if (_servers[i]._clients[j]._header.size())
-		send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
-	// if (sendval == 0)
-		// _servers[i]._clients[j]._active = false;
+		sendval = send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
+	if (sendval == 0)
+		_servers[i]._clients[j]._active = false;
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
 	if (_servers[i]._clients[j]._close_connection)

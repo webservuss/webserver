@@ -33,7 +33,6 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
 		deletemethod(client);
 	else
 		set_status_code(405);
-	std::cout << "out respond" << std::endl;
 }
 
 HTTP::respond::~respond()
@@ -360,7 +359,6 @@ void HTTP::respond::set_connection(std::string connection)
 {
 	if (connection.empty())
 		return;
-	std::cout << "here[" << connection <<"]"<< std::endl;
 	_connection = connection;
 	_connection = _connection.substr(1, _connection.size() - 1);
 	_totalrespond.insert(std::pair<std::string, std::string>("Connection", _connection));
@@ -433,7 +431,6 @@ void HTTP::respond::find_total_file_path()
 			break;
 		if (key[key.size() - 1] == '/')
 			key = key.substr(0, key.size() - 1);
-
 	}
 	if (_pars_server._location_map[key]._redir != "")
 	{
@@ -458,7 +455,10 @@ void HTTP::respond::find_total_file_path()
 			return (set_status_code(405));
 		if (_relativepath == "" || _relativepath == "/")
 			_relativepath = _pars_server._location_map[key]._index;
-		_totalpath = _pars_server._location_map[key]._root.append(_relativepath);
+		if (_pars_server._location_map[key]._root.empty())
+				_totalpath = _pars_server._location_map["/"]._root.append(_relativepath);
+		else
+			_totalpath = _pars_server._location_map[key]._root.append(_relativepath);
 	}
 	return;
 }
@@ -484,8 +484,8 @@ void HTTP::respond::set_body()
 			std::ifstream file("www/html_pages/downloads/index.php");
 			if (file.is_open())
 			{
-				_totalpath = "www/html_pages/downloads/index.php";
-				HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
+				_totalpath = "www/html_pages/downloads/index.php"; // this 
+				HTTP::CGI cgi(_map_req, _pars_server, _totalpath); // need to change $path to correct so CGI executes on the correct one
 				_body = cgi.get_cgi_body();
 				set_content_len(_body);
 				_status_code = 200;
