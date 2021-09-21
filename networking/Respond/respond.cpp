@@ -264,6 +264,7 @@ void HTTP::respond::make_error_map()
 	_status_errors[301] = "<html><h1>405::Bad Request The request could not be understood by the \
     server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.</h1></html>";
 	_status_errors[413] = "<html><h1> 400 : Request Entity Too Large</h1></html>";
+	_status_errors[500] = "<html><h1>500 : Internal Server Error</h1><div class=\"tenor-gif-embed\" data-postid=\"22864502\" data-share-method=\"host\" data-aspect-ratio=\"1\" data-width=\"25%\"><a href=\"https://tenor.com/view/sorry-tony-hayward-south-park-s14e11-coon2rise-of-captain-hindsight-gif-22864502\">Sorry Tony Hayward GIF</a>from <a href=\"https://tenor.com/search/sorry-gifs\">Sorry GIFs</a></div> <script type=\"text/javascript\" async src=\"https://tenor.com/embed.js\"></script></html>";
 
 }
 
@@ -305,14 +306,20 @@ void HTTP::respond::set_status_line()
 		_statusline.append("301 Moved Permanently");
 	else if(_status_code == 301)
 	{
-		_statusline.append("301");
+		_statusline.append("301 ");
 		_body = _status_errors[301];
 	}
 	else if(_status_code == 413)
 	{
 		_statusline.append("413 ");
 		_body = _status_errors[413];
-    }
+	}
+	else if(_status_code == 500)
+	{
+		_statusline.append("505 Internal Server Error");
+		_body = _status_errors[500];
+
+	}
 	if(file.is_open())
 	{
 		std::cout << "file open " << std::endl;
@@ -512,7 +519,12 @@ void HTTP::respond::set_body()
 	if (_totalpath.find(".php") != std::string::npos)// _body will be filled by php_cgi()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
-		_body = cgi.get_cgi_body();
+		_status_code = cgi.get_status_code();
+		if (_status_code != 500) {
+			_body = cgi.get_cgi_body();
+		}
+		else
+			return (set_status_code(500));
 	}
 	else
 	{

@@ -19,14 +19,35 @@ namespace HTTP
 		~CGI();
 
 		void set_cgi_body();
+		int get_status_code();
 		void set_cgi_env();
 		const std::string &get_cgi_body() const;
 
+		void print_all_cgi_vars();
+
 	private:
+		int _status_code;
+
 		std::string _cgi_body;
 		t_server _server;
 		std::map <std::string, std::string> _request;
-		char *_path;
+
+		void set_script_filename();
+		void set_path_info();
+		void set_request_method();
+		void set_redirect_status();
+		void set_port();
+		void set_server_software();
+		void set_cgi_location();
+		std::string _port;
+		std::string _path;
+		std::string _request_method;
+		std::string _redirect_status;
+		std::string _path_info;
+		std::string _server_software;
+		std::string _script_filename;
+		std::string _cgi_location;
+
 		char **_env;
 	};
 }
