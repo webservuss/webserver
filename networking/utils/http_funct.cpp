@@ -36,20 +36,15 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 int HTTP::post_handle_request2(t_client_select &client, t_req_n_config r_n_c, std::string stringbuff, char * &buffer, int valread)
 {
 	(void)valread;
-	// TODO directory has to be taken from config file? Also: ofstream does not create a directory
-	client._filename = "www/html_pages/uploads/" + r_n_c._req_map["URI"]; // relative path of the server executable (don't start with a '/' !)
+	
+	client._filename = "www/html_pages/uploads/" + r_n_c._req_map["URI"]; 
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
 	client._content_length = ft_stoi(r_n_c._req_map["Content-Length:"]);
-	// TODO: request method valid?
-	// TODO: client body size valid?
-
 	if (!(r_n_c._req_map.count("Expect:")))
 	{
 		int position_of_body = stringbuff.find("\r\n\r\n") + 4;
 		out_file.write(&buffer[position_of_body], client._content_length);
 		out_file.close();
-//		client._expect_body = false;
-//		client._post_done = true;
 		std::string body(&buffer[position_of_body]);
 
 		HTTP::respond::post_response(client, client._content_length, body);
@@ -61,7 +56,6 @@ int HTTP::post_handle_request2(t_client_select &client, t_req_n_config r_n_c, st
 		/* send a brief response to the client */
 		client._header = "HTTP/1.1 100 Continue\r\n\r\n";
 		client._expect_body = true;
-//		client._post_done= false;
 		return 1;
 	}
 }

@@ -7,8 +7,7 @@
 #include "../utils/colors.hpp"
 
 int ft_stoi(std::string s);
-// void db(std::string s);
-// void dbe(std::string s);
+
 std::vector<std::string> split(const std::string &s, char delim);
 
 void	error_exit(const std::string &errMsg, int code);

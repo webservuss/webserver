@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     HTTP::select_server t(ex.get_ports(), parser_servers) ;
 }
 
-// this is not ness anymore 
+
 
 std::vector<std::string>config()
 {

@@ -38,7 +38,7 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
     }
 }
 
-// CAN SOMEONE CHECK COPY CONSTRUCTOR AND ASSIGNMENT OPPERATOR
+
 /*copy constructor */
 HTTP::re_HTTP::re_HTTP(const re_HTTP& x)
 { // TEST THIS // change
@@ -51,7 +51,7 @@ HTTP::re_HTTP::re_HTTP(const re_HTTP& x)
 
 /*assignment operator */
 HTTP::re_HTTP& HTTP::re_HTTP::operator=(const re_HTTP& x)
-{ // TEST THIS
+{ 
     _headers = x._headers;
     _method = x._method;
     _uri = x._uri;
@@ -101,7 +101,5 @@ int HTTP::re_HTTP::set_request_line(std::string &requestline)
 
 HTTP::re_HTTP::~re_HTTP()
 {
-    // std::cout << "destructor" << std::endl;
-    // for (std::map<std::string, std::string>::iterator itft = _map_header.begin(); itft!=_map_header.end(); ++itft)
-    //     std::cout << itft->first << " => " << itft->second << '\n';
+    
 }
