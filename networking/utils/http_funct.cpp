@@ -7,11 +7,10 @@
 
 /* set non-blocking: to set a specific flag and leave the other flags as-is,
 then you must F_GETFL the old flags, | the new flag in, and then F_SETFL the result
- as two separate system calls; */
+as two separate system calls; */
 void                HTTP::set_non_blocking(int sock)
 {
 //    int opts;
-
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) < 0)
 		exit(1);
 	else
@@ -42,7 +41,6 @@ int HTTP::post_handle_request2(t_client_select &client, t_req_n_config r_n_c, st
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
 	client._content_length = ft_stoi(r_n_c._req_map["Content-Length:"]);
 	// TODO: request method valid?
-
 	// TODO: client body size valid?
 
 	if (!(r_n_c._req_map.count("Expect:")))

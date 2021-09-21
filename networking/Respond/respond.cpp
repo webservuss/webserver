@@ -22,7 +22,10 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
-
+    std::cout << "_map_req[METHOD][" << _map_req["METHOD"]  << "]"<< std::endl;
+    std::cout << "_map_req[METHOD]" << _map_req["METHOD: "] << std::endl;
+   
+    // make sure the whole header is made 
     if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
         set_status_code(405);
     else if (_map_req["METHOD"].compare("GET") == 0)
@@ -31,8 +34,15 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
          postmethod(client, buffer, valread);
      else if (_map_req["METHOD"].compare("DELETE") == 0)
          deletemethod();
+
+    // make sure the whole header is made 
     else
+    {
+        std::cout << YELLOW << "POO" << RESET << std::endl;
+        getmethod();
         set_status_code(405);
+    }
+    exit(1);
     std::cout << "out respond" << std::endl;
 }
 
@@ -89,9 +99,7 @@ void HTTP::respond::getmethod()
     find_total_file_path();
     set_date();
     set_modified();
-    std::cout << "in get method" << std::endl;
     set_connection(_map_req["Connection:"]);
-    std::cout << "2in get method" << std::endl;
     set_host(_map_req["Host:"]);
     set_language(_map_req["Accept-Language:"]);
     set_server_name();
