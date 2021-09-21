@@ -150,7 +150,7 @@ void HTTP::CGI::set_cgi_body()
 				_status_code = 500;
 			else
 			{
-				_status_code = 333;
+				_status_code = 200;
 				buffer[bytes_read] = 0;
 				std::string tmp = std::string(buffer);
 				int start = tmp.find("\r\n\r\n") + 4;
