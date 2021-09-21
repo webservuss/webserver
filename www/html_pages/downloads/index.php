@@ -152,7 +152,7 @@ function count_dir_files( $dir)
 	return iterator_count($fi);
 }
 
-function get_directory_size($path)
+function get_directory_size($_path)
 {
     $bytestotal = 0;
     $path = realpath($path);
@@ -167,6 +167,20 @@ function get_directory_size($path)
     return display_size($bytestotal);
 }
 
+// function get_directory_size($_SERVER['PATH_INFO'])
+// {
+//     $bytestotal = 0;
+//     $_SERVER['PATH_INFO'] = realpath($_SERVER['PATH_INFO']);
+//     if($_SERVER['PATH_INFO']!==false && $path!='' && file_exists($_SERVER['PATH_INFO']))
+//     {
+//         foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($_SERVER['PATH_INFO'], FilesystemIterator::SKIP_DOTS)) as $object)
+//         {
+//             $bytestotal += $object->getSize();
+//         }
+//     }
+
+//     return display_size($bytestotal);
+// }
 
 // SHOW THE MEDIA BLOCK
 function display_block( $file )

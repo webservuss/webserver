@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -133,14 +132,16 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
 		std::string err =  "Malloc error "; 
+		free(buffer);
     	error_exit(err, 1);
 	}
 	bzero(buffer, BUFFER_SIZE + 1);
 	/* read from client */
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, &buffer[0], BUFFER_SIZE, 0)) < 0)
 	{
-		std::cout << "\nConnection lost: FD=" << _servers[i]._clients[j]._c_sock << " Slot" << i  << "error " << strerror(errno)<< std::endl;
+		//std::cout << "\nConnection lost: FD=" << _servers[i]._clients[j]._c_sock << " Slot" << i  << std::endl;
 		erase_client(i, j);
+		free(buffer);
 		// close(_servers[i]._clients[j]._c_sock);
 		// _servers[i]._clients.erase(_servers[i]._clients.begin() + j);
 	    // FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
@@ -153,8 +154,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	// std::cout << "val read" << valread << std::endl;
 	/* TODO check valread == 0 here; FD_SET as well? */
 	if (valread == 0)
-	{	
+	{
 		//_servers[i]._clients[j]._active = false;
+		free(buffer);
 		std::cout << "valread" << std::endl;
 		return (0);
 	}
@@ -197,21 +199,23 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 
 //	/* Check if POST and(!) contains a body	*/
-	if (stringbuff.substr(0, 4) == "POST")
-	{
+	// if (stringbuff.substr(0, 4) == "POST")
+	// {
 
-			//m.post_handle_request(_servers[i]._clients[j], r_n_c, stringbuff, buffer, valread);
-			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-			// std::cout << _servers[i]._clients[j]._post_done << std::endl;
-			free(buffer);
-			return valread;
-	}
+	// 		//m.post_handle_request(_servers[i]._clients[j], r_n_c, stringbuff, buffer, valread);
+	// 		FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+	// 		// std::cout << _servers[i]._clients[j]._post_done << std::endl;
+	// 		free(buffer);
+	// 		return valread;
+	// }
 	if (stringbuff.substr(0, 3) == "GET")
 		_servers[i]._clients[j]._header = m.getTotalheader();
 	std::cout << BLUE << "TOTAL HEADER IS " << m.getTotalheader() << RESET << std::endl;
 	//_servers[i]._clients[j]._header = "HTTP/1.1 204 No Content\r\n\r\n";
 	// add client to write backups so next loop correct thing will be written
 	// std::cout << YELLOW << _servers[i]._clients[j]._header << RESET << std::endl;
+    if (stringbuff.substr(0, 4) != "POST")
+		FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
 
@@ -234,21 +238,18 @@ void HTTP::select_server::send_response(int i, int j)
 {
 	struct timeval now;
 
-	//update clients last active
-	// int sendval = 
+	int sendval = 0;
 	std::cout << "GOING TO SEND THE HEADER" << _servers[i]._clients[j]._header.c_str() << std::endl;
-	// int sendval =
-	// TODO seems we are sending 0 bytes?
 	if (_servers[i]._clients[j]._header.size())
-		send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
-	// if (sendval == 0)
-		// _servers[i]._clients[j]._active = false;
+		sendval = send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
+	if (sendval < 0)
+		throw select_error_ex();
+	if (sendval == 0)
+		_servers[i]._clients[j]._active = false;
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
 	if (_servers[i]._clients[j]._close_connection)
-	{
 		_servers[i]._clients[j]._active = false;
-	}
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
     std::cout << "out snd" << std::endl;
 }
@@ -352,8 +353,13 @@ void    HTTP::select_server::launch()
 					}
 				}
                 if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_write_fds)) {
-					// std::cout << "FD_ISSET, &_write_fds" << std::endl;
-                    send_response(i, j);
+					try{
+						send_response(i, j);
+					}
+					    catch(std::exception &e ){
+        					std::cerr << e.what() << std::endl;
+        					error_exit("connection lost", 1);
+						}
 					if (_servers[i]._clients[j]._active == false)
 					{
 						std::cout << "IN ERASE CLIENT FROM SEND" << std::endl;

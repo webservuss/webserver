@@ -23,6 +23,7 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 	_path = (char *)malloc(sizeof(char) * path.length() + 1);
 	if (!_path)
 	{
+		std::cout << "here???" << std::endl;
 		//perror("Malloc error");
 		//exit(1);
 		std::string err =  "Malloc error "; 
@@ -30,7 +31,7 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 	}
 
 	strcpy(_path, path.c_str());
-	//set_cgi_env();
+	// set_cgi_env();
 	set_cgi_body();
 }
 
@@ -75,7 +76,7 @@ static std::string reworkGetRequestMethod(std::map<std::string, std::string> req
 	static std::string getCGIPath(std::string &cgi_path)
 {
 	if (cgi_path.empty())
-		return ("/usr/bin/php-cgi");
+		return ("/Users/avan-dam/Documents/webserver/bin/php-cgi_macos");
 	else
 		return cgi_path;
 }
@@ -153,7 +154,11 @@ void HTTP::CGI::set_cgi_env()
 void HTTP::CGI::set_cgi_body()
 {
 
-	std::string cgi_location = "/usr/bin/php-cgi";
+	char *buf;
+	buf = (char *)malloc(256 * sizeof(char *));
+	buf = getcwd(buf, 256);
+
+	std::string cgi_location = std::string(buf) + "/bin/php-cgi_macos";
 
 	char *argv[] = {(char *)cgi_location.c_str(), _path, NULL };
 	char *env[] = {(char *)"SERVER_PORT=1000", (char *)"environment", NULL};
@@ -167,10 +172,12 @@ void HTTP::CGI::set_cgi_body()
 		dup2(p[1], 1);
 		close(p[0]);
 		close(p[1]);
-		// maybe check if php file is valid 
+		
 		if (execve(argv[0], argv, env) == -1) {
+			std::cout << argv[0] << std::endl;
 			perror("Could not execve");
-			// maybe exit 
+
+			// TODO: return HTTP Code 500 - Internal Server Error
 		}
 	}
 	else {
@@ -188,7 +195,7 @@ void HTTP::CGI::set_cgi_body()
 		std::cout << std::endl;
 		std::cout << tmp << std::endl;
 		int start = tmp.find("<html>");
-		tmp = tmp.substr(start, tmp.length());
+		tmp = tmp.substr(start, tmp.length()); //TODO: tmp.length - start for 2nd argument.
 		_cgi_body = tmp;
 		free(buffer);
 	}
