@@ -106,12 +106,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	struct timeval	now;
 
 	buffer = new char [BUFFER_SIZE + 1];
-	// buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
-	if (!buffer) {
-		std::string err =  "Malloc error "; 
-		delete [] buffer;
-    	error_exit(err, 1);
-	}
 	bzero(buffer, BUFFER_SIZE + 1);
 	/* read from client */
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, &buffer[0], BUFFER_SIZE, 0)) < 0)
@@ -156,7 +150,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 		FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 	}
 	FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-		delete [] buffer;
+	delete [] buffer;
 	if (reqmap["Connection:"] == " close")
 		_servers[i]._clients[j]._close_connection = true;
 	return valread;
@@ -209,10 +203,9 @@ void    HTTP::select_server::launch()
     std::cout << GREEN << "server starting..." << RESET << std::endl;
     while(true)
     {
-		
-        _read_fds = _read_backup;
-        _write_fds = _write_backup;
-       
+		_read_fds = _read_backup;
+		_write_fds = _write_backup;
+
 		try{
 			selecter();
 		}
@@ -240,7 +233,7 @@ void    HTTP::select_server::launch()
 				if (_servers[i]._clients[j]._active == false)
 				{
 					j = erase_client(i, j);
-						break;
+					break;
 				}
                 if (FD_ISSET(_servers[i]._clients[j]._c_sock, &_read_fds)) {
 					try{
@@ -253,7 +246,6 @@ void    HTTP::select_server::launch()
                     
 					if (_servers[i]._clients[j]._active == false)
 					{
-						
 						j = erase_client(i, j);
 						break;
 					}
@@ -268,14 +260,13 @@ void    HTTP::select_server::launch()
 						}
 					if (_servers[i]._clients[j]._active == false)
 					{
-						
 						j = erase_client(i, j);
-					
 						break;	
 					}
 					FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
 					if (_servers[i]._clients[j]._active == false)
-					{	j = erase_client(i, j);
+					{
+						j = erase_client(i, j);
 						break;
 					}
 
@@ -287,7 +278,6 @@ void    HTTP::select_server::launch()
 
 void HTTP::select_server::check_client_active(t_client_select &client)
 {
-
 	struct timeval start = client._last_active;
 	struct timeval end;
 
