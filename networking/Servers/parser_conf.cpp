@@ -57,7 +57,6 @@ HTTP::parse_conf::parse_conf(const char *path, char **argv)
     file.close(); // put in destructor
 }
 
-// CAN SOMEONE CHECK COPY CONSTRUCTOR AND ASSIGNMENT OPPERATOR
 /*copy constructor */
 HTTP::parse_conf::parse_conf(const parse_conf& x)
 { 
