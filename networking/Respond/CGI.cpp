@@ -77,15 +77,10 @@ void HTTP::CGI::set_auto_index_path()
 	getcwd(buf, 512);
 	std::string server_root = _placeholder;
 	_auto_index_path = "AUTO_INDEX=" + std::string(buf) + "/" + server_root + _request["URI"];
-	std::cout << "plholder: " << _placeholder << std::endl;
-
 }
 
 HTTP::CGI::~CGI()
-{
-	// check for leaks: https://stackoverflow.com/questions/67124700/why-is-address-sanitizer-not-detecting-this-simple-memory-leak
-
-}
+{}
 
 void HTTP::CGI::set_cgi_body()
 {
