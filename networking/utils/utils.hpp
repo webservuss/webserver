@@ -1,8 +1,6 @@
 #ifndef utils_hpp
 #define utils_hpp
 
-
-
 #include <sstream>
 #include "../utils/colors.hpp"
 

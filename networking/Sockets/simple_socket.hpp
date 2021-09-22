@@ -6,8 +6,6 @@
 #include <vector>
 #include <netinet/in.h>
 #include <sys/time.h>
-//#include "../Sockets/listen_n_bind.hpp"
-//#include "parser_conf.hpp"
 
 namespace HTTP {
     class simple_socket

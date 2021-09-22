@@ -1,13 +1,8 @@
-
 #include <string.h>
 #include <stdio.h>
 #include <cstdlib>
 #include "simple_socket.hpp"
 #include "../utils/http_funct.hpp"
-#include "../utils/colors.hpp"
-
-/* default constructor??*/
-// HTTP::simple_socket::simple_socket()
 
 /* constructor setting up simple socket
     define address structure, establish socket and test,
@@ -51,7 +46,6 @@ HTTP::simple_socket& HTTP::simple_socket::operator=(const simple_socket& x)
 
 /* destructor */
 HTTP::simple_socket::~simple_socket() {}
-
 
 /* test socket or connection has been properly established */
 void    HTTP::simple_socket::test_connection(int item_to_test)

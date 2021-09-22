@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-
-
 static int check_argument_count(int argc)
 {
     if(argc == 1)

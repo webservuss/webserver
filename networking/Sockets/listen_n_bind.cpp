@@ -1,6 +1,4 @@
-
 #include "listen_n_bind.hpp"
-
 
 /* create simple socket, bind, check, listen, check */
 HTTP::listen_n_bind::listen_n_bind(int domain, int service, int protocol, int port, u_long interface, int bklg) 
@@ -49,7 +47,6 @@ HTTP::listen_n_bind& HTTP::listen_n_bind::operator=(const listen_n_bind& x)
 
 /* destructor */
 HTTP::listen_n_bind::~listen_n_bind() {}
-
 
 /* call bind */
 void    HTTP::listen_n_bind::connect_to_network(int sock, struct sockaddr_in address)
