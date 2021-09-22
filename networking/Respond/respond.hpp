@@ -60,7 +60,7 @@ namespace HTTP{
         void                set_connection(const std::string connection);
         void                set_status_line();
         void                set_total_response();
-        void                set_no_config(std::string root);
+        void                set_no_config();
         void                set_server_name();
 
         /* getters */

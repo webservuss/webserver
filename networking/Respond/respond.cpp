@@ -17,6 +17,7 @@
 
 HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char *&buffer, int valread)
 {
+
     make_error_map();
     _status_code = 0;
     _map_req = req_n_conf._req_map;
@@ -216,15 +217,13 @@ void HTTP::respond::deletemethod(t_client_select &client)
 	}
 }
 
-void HTTP::respond::set_no_config(std::string root)
+void HTTP::respond::set_no_config()
 {
-	if (root != "error_page.html;")
-	{
 		_statusline.append(_stat_cha);
 		_body.append(_stat_cha);
 		_body = "<h1>status code is not present in config file</h1>\0";
 		set_content_len(_body);
-	}
+	
 	return;
 }
 
@@ -245,13 +244,17 @@ void HTTP::respond::set_status_line()
 	std::string tmp = ft_numtos(_status_code);
 	_stat_cha = tmp.c_str();
 	std::string total_body;
-	std::string root = _pars_server._error_page[1];
+	   std::string root;
+	if (_pars_server._error_page.size() > 1)
+		 root = _pars_server._error_page[1];
+	else
+		root = "error_page.html";
 	std::ifstream file("html_pages/auto_error.html");
 	_statusline = "HTTP/1.1 ";
 	std::string _stat_cha_s = _stat_cha;
 	_stat_cha_s.append(";");;
-	if ( _pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
-	set_no_config(root);
+	if (_pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
+		set_no_config();
 	if (_status_code == 404)
 	{
 	 	_statusline.append("404 Not Found");

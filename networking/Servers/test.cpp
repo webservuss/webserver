@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     }
     HTTP::parse_conf ex(pathname.c_str(), argv);
     std::vector<HTTP::t_server> parser_servers = ex.get_server();
-    HTTP::select_server t(ex.get_ports(), parser_servers) ;
+    HTTP::select_server t(ex.get_ports(), parser_servers);
 }
 
 
@@ -31,9 +31,7 @@ std::vector<std::string>config()
 	DIR *dir = opendir(record_dir_path);
 
 	if (dir == NULL) 
-	{
 	  return files;
-	}
 	while ((entry = readdir(dir)) != NULL) 
 		files.push_back(entry->d_name);
 	closedir(dir);

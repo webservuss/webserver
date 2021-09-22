@@ -110,8 +110,9 @@ int    HTTP::select_server::read_from_client(int i, int j)
     int				valread;
     char 			*buffer;
 	struct timeval	now;
-   
-	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
+
+	buffer = new char [BUFFER_SIZE + 1];
+	// buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
 		std::string err =  "Malloc error "; 
 		free(buffer);
@@ -183,14 +184,11 @@ void HTTP::select_server::send_response(int i, int j)
 		erase_client(i, j);
 		throw select_error_ex();
 	}
-	if (sendval == 0)
+	if (sendval == 0 || _servers[i]._clients[j]._close_connection)
 		_servers[i]._clients[j]._active = false;
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
-	if (_servers[i]._clients[j]._close_connection)
-		_servers[i]._clients[j]._active = false;
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
-    
 }
 
 int              HTTP::select_server::erase_client(int i, int j)
@@ -218,6 +216,7 @@ void    HTTP::select_server::launch()
 				_highsock = _servers[listnum]._servers_socket;
 		}
 	}
+    std::cout << GREEN << "server starting..." << RESET << std::endl;
     while(true)
     {
 		
