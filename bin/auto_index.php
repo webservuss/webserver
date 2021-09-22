@@ -37,19 +37,8 @@
 ?>
 
 <?PHP
-  // list files in the current directory
-//   $dirlist = getFileList(".");
-//   $dirlist = getFileList("./");
-
-  // a subdirectory of the current directory called images
-  //$dirlist = getFileList("images");
-  //$dirlist = getFileList("images/");
-  //$dirlist = getFileList("./images");
-  //$dirlist = getFileList("./images/");
-
   // using an absolute path
  $dirlist = getFileList("{$_SERVER['AUTO_INDEX']}");
- // $dirlist = getFileList("{$_SERVER['DOCUMENT_ROOT']}/images/");
 ?>
 
 <?PHP
