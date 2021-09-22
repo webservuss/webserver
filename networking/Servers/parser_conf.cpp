@@ -94,7 +94,7 @@ void HTTP::parse_conf::set_values_server(std::string s, t_server &server, char *
 		server._index = value;
 	if (key == "autoindex")
 	{
-		std::cout << " >> " << value << std::endl;
+		
 		if (value == "on")
 			server._auto_index = 1;
 		else if (value == "off")

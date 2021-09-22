@@ -2,9 +2,6 @@
 #include "listen_n_bind.hpp"
 
 
-/* default constructor??*/
-// HTTP::listen_n_bind::listen_n_bind()
-
 /* create simple socket, bind, check, listen, check */
 HTTP::listen_n_bind::listen_n_bind(int domain, int service, int protocol, int port, u_long interface, int bklg) 
         : simple_socket(domain, service, protocol, port, interface)

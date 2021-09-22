@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     HTTP::select_server t(ex.get_ports(), parser_servers) ;
 }
 
-// this is not ness anymore 
+
 
 std::vector<std::string>config()
 {
@@ -35,11 +35,7 @@ std::vector<std::string>config()
 	  return files;
 	}
 	while ((entry = readdir(dir)) != NULL) 
-	{
-        std::cout << "open>?"<< std::endl;
 		files.push_back(entry->d_name);
-	}
 	closedir(dir);
-	
 	return(files);
 }

@@ -57,7 +57,6 @@ namespace HTTP
 			virtual const char*	what() const throw();
 		};
 		/* constructor */
-		// select_server();
 		// constructor for multiple ports */
 		select_server(std::vector<int> ports, std::vector<t_server> parser_servers);
 		/*copy constructor */
@@ -72,8 +71,7 @@ namespace HTTP
 		void            send_response(int i, int j);
 		void    		launch();
 		/* getter */
-		listen_n_bind * get_socket(); // TODO function not implemented. Also: do we need a instance of class listen_n_bind anyway here?
-		/* set values in struct */
+		listen_n_bind * get_socket(); 
 		void            set_value_server_select_server(int servers_socket, sockaddr_in servers_addr, int port, t_server_select &server);
 		void	        make_client(int client_socket, sockaddr_in addr, t_server_select &server);
 		void            check_client_active(t_client_select &client);

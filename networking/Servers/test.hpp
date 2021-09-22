@@ -16,9 +16,6 @@
 namespace HTTP {
 
     std::vector<std::string> config();
-
-    
-
 }
 
 #endif

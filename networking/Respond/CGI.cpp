@@ -1,7 +1,3 @@
-//
-// Created by ruben on 12-08-21.
-//
-
 #include <limits.h>
 #include <fstream>
 #include <sstream>
@@ -39,9 +35,6 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 	set_redirect_status();
 	set_server_software();
 	set_cgi_location();
-
-	//print_all_cgi_vars(); // TODO use this for making a correct auto index php file
-
 	set_cgi_body();
 }
 
@@ -57,7 +50,6 @@ void HTTP::CGI::set_request_method()
 
 void HTTP::CGI::set_path_info()
 {
-	//_path_info = "PATH_INFO=/" + _request["URI"];
 	_path_info = "PATH_INFO=/" + _path;
 }
 
@@ -65,8 +57,6 @@ void HTTP::CGI::set_script_filename()
 {
 	char buf[256];
 	getcwd(buf, 256);
-
-	//_script_filename ="SCRIPT_FILENAME=" + std::string(buf) + "/www/html_pages/" + _request["URI"];
 	_script_filename ="SCRIPT_FILENAME=" + std::string(buf) + "/" + _path;
 }
 

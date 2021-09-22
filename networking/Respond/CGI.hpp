@@ -14,7 +14,7 @@ namespace HTTP
 	class CGI
 	{
 	public:
-		// TODO: map_req?
+		
 		CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path);
 		~CGI();
 
@@ -52,4 +52,4 @@ namespace HTTP
 	};
 }
 
-#endif //INC_12AUG_CGI_HPP
+#endif
