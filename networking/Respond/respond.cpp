@@ -214,7 +214,6 @@ void HTTP::respond::deletemethod(t_client_select &client)
 	(void)client;
 	find_total_file_path();
 	_body = "";
-
 	if (_status_code != 405)
 	{
 		char filename[_totalpath.size() + 1];
