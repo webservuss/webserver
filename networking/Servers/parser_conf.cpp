@@ -87,7 +87,11 @@ void HTTP::parse_conf::set_values_server(std::string s, t_server &server, char *
 	if (key == "host")
 		server._host = value;
 	if (key == "error_page")
-		server._error_page = split(s.substr(s.find(' ') + 1, s.size() -  s.find(' ')), ' ');
+	{
+		server._error_page = split(s.substr(s.find(' ') + 1, s.size() -  s.find(' ') - 2), ' ');
+		if (server._error_page[1][server._error_page[1].size() - 1] == ';')
+			server._error_page[1] = server._error_page[1].substr(0, server._error_page[1].size() - 1);
+	}
 	if (key == "root")
 		server._root = value;
 	if (key == "index")

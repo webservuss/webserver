@@ -24,6 +24,7 @@ namespace HTTP{
         std::string _relativepath;
         std::string _totalheader;
         std::string _stat_cha;
+        std::string _root;
         std::map<std::string, std::string> _totalrespond;
         std::map <std::string, std::string> _map_req;
         std::map<int, std::string> _status_errors;
@@ -41,7 +42,6 @@ namespace HTTP{
         void                getmethod();
         void                postmethod(t_client_select &client, char * &buffer, int valread);
         void                deletemethod(t_client_select &client);
-		
 
 		uint64_t find_client_body_size();
 		void 				post_handle_request(t_client_select &client, char * &buffer, int valread);
@@ -70,6 +70,7 @@ namespace HTTP{
         void                find_total_file_path();
 
         void                make_error_map();
+    	void                reset_body_error();
     };
 }
 

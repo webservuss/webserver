@@ -90,6 +90,7 @@ HTTP::respond &HTTP::respond::operator=(const respond &x)
 void HTTP::respond::getmethod()
 {
 	std::string findKey;
+	_body = "";
 	find_total_file_path();
 	set_date();
 	set_modified();
@@ -99,6 +100,7 @@ void HTTP::respond::getmethod()
 	set_server_name();
 	set_body();
 	set_status_line();
+	set_content_len(_body);
 	set_total_response();
 }
 
@@ -222,7 +224,7 @@ void HTTP::respond::set_no_config()
 		_statusline.append(_stat_cha);
 		_body.append(_stat_cha);
 		_body = "<h1>status code is not present in config file</h1>\0";
-		set_content_len(_body);
+		// set_content_len(_body);
 	
 	return;
 }
@@ -239,6 +241,32 @@ void HTTP::respond::make_error_map()
 
 }
 
+void	HTTP::respond::reset_body_error()
+{
+	if (_status_code == 200 || _status_code == 204)
+		return;
+	if (_pars_server._error_page.size() > 1)
+	{
+		std::string char_status_code = ft_numtos(_status_code);
+		if (_pars_server._error_page[0] == char_status_code)
+		{	
+				std::string rel_err_pg = _pars_server._error_page[1];
+				std::string err_pg = _root.append(_pars_server._error_page[1]);
+				std::ifstream file(err_pg);
+				if (file.is_open())
+				{	
+					_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+					file.close();
+				}
+				else
+				{
+					_status_code = 403;
+	    			_body = _status_errors[403];
+				}
+		}
+	}
+}
+
 void HTTP::respond::set_status_line()
 {
 	std::string tmp = ft_numtos(_status_code);
@@ -250,48 +278,57 @@ void HTTP::respond::set_status_line()
 	else
 		root = "error_page.html";
 	std::ifstream file("html_pages/auto_error.html");
-	_statusline = "HTTP/1.1 ";
 	std::string _stat_cha_s = _stat_cha;
 	_stat_cha_s.append(";");;
 	if (_pars_server._error_page[0] == _stat_cha || _pars_server._error_page[0] == _stat_cha_s )
 		set_no_config();
 	if (_status_code == 404)
 	{
-	 	_statusline.append("404 Not Found");
-	 	_body = _status_errors[404];
+		_statusline = "HTTP/1.1 404 Not Found";
+		// if (_pars_server._error_page.size() > 1)
+		// {
+		// 	if (_pars_server._error_page[0] == "404")
+		// 	{	
+		// 		std::ifstream file(_pars_server._error_page[1]);
+		// 		if (file.is_open())
+		// 			_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		// 		else
+		// 			_status_code = 403;
+		// 		file.close();
+		// 	}
+		// 	else
+		// 		_body = _status_errors[404];
+		// }
+		// else
+			_body = _status_errors[404];
 	}
 	else if (_status_code == 200)
     {
-   		_statusline.append("200 OK");
+   		_statusline = "HTTP/1.1 200 OK";
    		return;
     }
 	else if (_status_code == 403)
 	{
-	    _statusline.append("403 Forbidden");
+	    _statusline = "HTTP/1.1 403 Forbidden";
 	    _body = _status_errors[403];
 	}
 	else if (_status_code == 405)
 	{
-		_statusline.append("405 Method not Allowed");
+		_statusline = "HTTP/1.1 405 Method not Allowed";
 		_body = _status_errors[405];
 	}
 	else if (_status_code == 204)
-		_statusline.append("204 No Content");
+		_statusline = "HTTP/1.1 204 No Content";
 	else if (_status_code == 301)
-		_statusline.append("301 Moved Permanently");
-	else if(_status_code == 301)
-	{
-		_statusline.append("301 ");
-		_body = _status_errors[301];
-	}
+		_statusline = "HTTP/1.1 301 Moved Permanently";
 	else if(_status_code == 413)
 	{
-		_statusline.append("413 ");
+		_statusline.append("HTTP/1.1 413 Payload Too Large");
 		_body = _status_errors[413];
 	}
 	else if(_status_code == 500)
 	{
-		_statusline.append("505 Internal Server Error");
+		_statusline.append("HTTP/1.1 505 Internal Server Error");
 		_body = _status_errors[500];
 
 	}
@@ -299,10 +336,11 @@ void HTTP::respond::set_status_line()
 	{
 		total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		_body = total_body;
+		file.close();
 	}
-	file.close();
+	reset_body_error();
 	set_content_type("text/html");
-	set_content_len(_body);
+	// set_content_len(_body);
 }
 
 void HTTP::respond::set_content_type(const std::string &contentype)
@@ -402,6 +440,7 @@ void HTTP::respond::set_total_response()
 	_totalheader.append("\r\n");
 	_totalheader.append(_body);
 	_totalheader.append("\r\n");
+	std::cout << "totalheader[" << _totalheader << "]"<< std::endl; 
 }
 
 void HTTP::respond::find_total_file_path()
@@ -444,13 +483,19 @@ void HTTP::respond::find_total_file_path()
 				found = 1;
 		}
 		if (found == -1)
-			return (set_status_code(405));
+			_status_code = 405;
 		if (_relativepath == "" || _relativepath == "/")
 			_relativepath = _pars_server._location_map[key]._index;
 		if (_pars_server._location_map[key]._root.empty())
-				_totalpath = _pars_server._location_map["/"]._root.append(_relativepath);
+		{	
+			_root = _pars_server._location_map["/"]._root;
+			_totalpath = _pars_server._location_map["/"]._root.append(_relativepath);
+		}
 		else
+		{	
+			_root = _pars_server._location_map[key]._root;
 			_totalpath = _pars_server._location_map[key]._root.append(_relativepath);
+		}
 	}
 	return;
 }
@@ -478,7 +523,7 @@ void HTTP::respond::set_body()
 			{
 				HTTP::CGI cgi(_map_req, _pars_server, "www/html_pages/downloads/index.php");
 				_body = cgi.get_cgi_body();
-				set_content_len(_body);
+				// set_content_len(_body);
 				_status_code = 200;
 				file.close();
 				return;
@@ -506,7 +551,7 @@ void HTTP::respond::set_body()
 			return (set_status_code(403));
 		file.close();
 	}
-	set_content_len(_body);
+	// set_content_len(_body);
 	if (_status_code == 0)
 		_status_code = 200;
 
