@@ -13,6 +13,8 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define DEFAULT_CLIENT_BODY_SIZE 1024*1024
 
@@ -103,9 +105,19 @@ void HTTP::respond::getmethod()
 
 void HTTP::respond::postmethod(t_client_select &client, char * &buffer)
 {
-	client._filename = "www/html_pages/uploads/" + _map_req["URI"];
-	client._content_length = ft_stoi(_map_req["Content-Length:"]);
+	struct stat stats;
+	std::string	directory;
+
 	find_total_file_path();
+	directory = _totalpath.substr(0, _totalpath.rfind('/'));
+	if (stat(directory.c_str(), &stats) == -1)
+	{	
+		_status_code = 404;
+		client._header = _status_errors[404];
+		return;
+	}
+	client._filename = _totalpath;
+	client._content_length = ft_stoi(_map_req["Content-Length:"]);
 	if (_status_code == 405) 
 	{
 		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
@@ -504,7 +516,6 @@ void HTTP::respond::set_body()
 			{
 				HTTP::CGI cgi(_map_req, _pars_server, "bin/auto_index.php", _root);
 				_body = cgi.get_cgi_body();
-				// set_content_len(_body);
 				_status_code = 200;
 				file.close();
 				return;
@@ -517,7 +528,6 @@ void HTTP::respond::set_body()
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath, _root);
 		_status_code = cgi.get_status_code();
-		std::cout << "status_code: " << _status_code << std::endl;
 		if (_status_code != 500) {
 			_body = cgi.get_cgi_body();
 		}
@@ -533,7 +543,6 @@ void HTTP::respond::set_body()
 			return (set_status_code(403));
 		file.close();
 	}
-	//set_content_len(_body); removed by amber
 	if (_status_code == 0)
 		_status_code = 200;
 }
