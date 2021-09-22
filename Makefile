@@ -2,7 +2,7 @@ NAME =		test
 
 CC =		clang++
 
-SRCS =		networking/Servers/test.cpp \
+SRCS =		networking/Servers/main.cpp \
 			networking/Sockets/simple_socket.cpp \
 			networking/Sockets/listen_n_bind.cpp \
 			networking/utils/http_funct.cpp \
@@ -15,7 +15,7 @@ SRCS =		networking/Servers/test.cpp \
 
 OFILES =	$(SRCS:.cpp=.o)
 
-FLAGS = -std=c++98 -g -Wall -Werror -Wextra
+FLAGS = -std=c++98 -Wall -Werror -Wextra
 
 all:		$(NAME)
 
