@@ -237,6 +237,7 @@ void HTTP::respond::deletemethod(t_client_select &client)
 	set_status_line();
 	set_content_len(_body);
 	set_date();
+	set_host(_map_req["Host:"]);
 	set_server_name();
 	std::cout << "before totalresponse" << std::endl;
 	set_total_response();
