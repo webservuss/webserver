@@ -159,7 +159,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 
 
-	if (stringbuff.substr(0, 3) == "GET")
+	// if (stringbuff.substr(0, 3) == "GET")
+	if (stringbuff.substr(0, 4) != "POST")
 		_servers[i]._clients[j]._header = m.getTotalheader();
     if (stringbuff.substr(0, 4) != "POST")
 		FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);

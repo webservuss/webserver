@@ -34,8 +34,13 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
          deletemethod(client);
     else
     {
-        getmethod();
+
+        //getmethod();
+		std::cout << YELLOW << "else, no valid method" << RESET << std::endl;
         set_status_code(405);
+		// _totalheader = "HTTP/1.1 405 Method not Allowed\r\n\r\n";
+		getmethod();
+		std::cout << GREEN <<"now end totalheader is:["  << _totalheader << RESET << std::endl;
     }
 }
 
@@ -221,11 +226,9 @@ void HTTP::respond::deletemethod(t_client_select &client)
 
 void HTTP::respond::set_no_config()
 {
-		_statusline.append(_stat_cha);
-		_body.append(_stat_cha);
-		_body = "<h1>status code is not present in config file</h1>\0";
-		// set_content_len(_body);
-	
+	_statusline.append(_stat_cha);
+	_body.append(_stat_cha);
+	_body = "<h1>status code is not present in config file</h1>\0";	
 	return;
 }
 
@@ -285,22 +288,7 @@ void HTTP::respond::set_status_line()
 	if (_status_code == 404)
 	{
 		_statusline = "HTTP/1.1 404 Not Found";
-		// if (_pars_server._error_page.size() > 1)
-		// {
-		// 	if (_pars_server._error_page[0] == "404")
-		// 	{	
-		// 		std::ifstream file(_pars_server._error_page[1]);
-		// 		if (file.is_open())
-		// 			_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		// 		else
-		// 			_status_code = 403;
-		// 		file.close();
-		// 	}
-		// 	else
-		// 		_body = _status_errors[404];
-		// }
-		// else
-			_body = _status_errors[404];
+		_body = _status_errors[404];
 	}
 	else if (_status_code == 200)
     {
@@ -314,6 +302,7 @@ void HTTP::respond::set_status_line()
 	}
 	else if (_status_code == 405)
 	{
+		std::cout << YELLOW << "  WE WANT YOU IN HERE NOT ALLOWED" << RESET << std::endl;
 		_statusline = "HTTP/1.1 405 Method not Allowed";
 		_body = _status_errors[405];
 	}
@@ -340,7 +329,6 @@ void HTTP::respond::set_status_line()
 	}
 	reset_body_error();
 	set_content_type("text/html");
-	// set_content_len(_body);
 }
 
 void HTTP::respond::set_content_type(const std::string &contentype)
@@ -483,7 +471,9 @@ void HTTP::respond::find_total_file_path()
 				found = 1;
 		}
 		if (found == -1)
-			_status_code = 405;
+		{	_status_code = 405;
+			std::cout << "STATUS CODE 405" << std::endl;
+		}
 		if (_relativepath == "" || _relativepath == "/")
 			_relativepath = _pars_server._location_map[key]._index;
 		if (_pars_server._location_map[key]._root.empty())
@@ -551,10 +541,8 @@ void HTTP::respond::set_body()
 			return (set_status_code(403));
 		file.close();
 	}
-	// set_content_len(_body);
 	if (_status_code == 0)
 		_status_code = 200;
-
 }
 
 const std::string &HTTP::respond::getTotalheader() const
