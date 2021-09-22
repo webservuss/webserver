@@ -35,13 +35,8 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
          deletemethod(client);
     else
     {
-
-        //getmethod();
-		std::cout << YELLOW << "else, no valid method" << RESET << std::endl;
         set_status_code(405);
-		// _totalheader = "HTTP/1.1 405 Method not Allowed\r\n\r\n";
 		getmethod();
-		std::cout << GREEN <<"now end totalheader is:["  << _totalheader << RESET << std::endl;
     }
 }
 
@@ -235,7 +230,7 @@ void HTTP::respond::deletemethod(t_client_select &client)
 		else
 		{
 			_status_code = 204;
-			client._header = "HTTP/1.1 204 No Content\r\n\r\n";
+			_totalheader = "HTTP/1.1 204 No Content\r\n\r\n";
 			return;
 		}
 	}
@@ -244,10 +239,7 @@ void HTTP::respond::deletemethod(t_client_select &client)
 	set_date();
 	set_host(_map_req["Host:"]);
 	set_server_name();
-	std::cout << "before totalresponse" << std::endl;
 	set_total_response();
-	std::cout << "after totalresponse" << std::endl;
-
 }
 
 void HTTP::respond::set_no_config()
@@ -328,7 +320,6 @@ void HTTP::respond::set_status_line()
 	}
 	else if (_status_code == 405)
 	{
-		std::cout << YELLOW << "  WE WANT YOU IN HERE NOT ALLOWED" << RESET << std::endl;
 		_statusline = "HTTP/1.1 405 Method not Allowed";
 		_body = _status_errors[405];
 	}
@@ -454,7 +445,6 @@ void HTTP::respond::set_total_response()
 	_totalheader.append("\r\n");
 	_totalheader.append(_body);
 	_totalheader.append("\r\n");
-	std::cout << "totalheader[" << _totalheader << "]"<< std::endl; 
 }
 
 void HTTP::respond::find_total_file_path()
@@ -497,9 +487,7 @@ void HTTP::respond::find_total_file_path()
 				found = 1;
 		}
 		if (found == -1)
-		{	_status_code = 405;
-			std::cout << "STATUS CODE 405" << std::endl;
-		}
+			_status_code = 405;
 		if (_relativepath == "" || _relativepath == "/")
 			_relativepath = _pars_server._location_map[key]._index;
 		if (_pars_server._location_map[key]._root.empty())
