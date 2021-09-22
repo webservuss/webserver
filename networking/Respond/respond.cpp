@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <sys/time.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "respond.hpp"
 #include "../utils/colors.hpp"
 #include "../utils/utils.hpp"
@@ -215,13 +216,38 @@ void HTTP::respond::post_response(t_client_select &client, const int &total_body
 
 void HTTP::respond::deletemethod(t_client_select &client)
 {
+	(void)client;
 	find_total_file_path();
-	if (_status_code == 405)
+	_body = "";
+
+	if (_status_code != 405)
 	{
-		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
-		client._expect_body = false;
-		return;
+		char filename[_totalpath.size() + 1];
+		strcpy(filename,_totalpath.c_str());
+
+		// remove the file, -1 on failure, 0 on success
+		int result = remove(filename);
+
+		if (result == -1)
+		{
+			_status_code = 404;
+		}
+		else
+		{
+			_status_code = 204;
+			client._header = "HTTP/1.1 204 No Content\r\n\r\n";
+			return;
+		}
 	}
+	set_status_line();
+	set_content_len(_body);
+	set_date();
+	set_host(_map_req["Host:"]);
+	set_server_name();
+	std::cout << "before totalresponse" << std::endl;
+	set_total_response();
+	std::cout << "after totalresponse" << std::endl;
+
 }
 
 void HTTP::respond::set_no_config()
