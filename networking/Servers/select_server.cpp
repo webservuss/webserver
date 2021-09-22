@@ -75,7 +75,6 @@ int HTTP::select_server::selecter()
 	int 			readsocks;
     struct timeval  timeout;
 	
-	std::cout << std::endl;
 	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
 	readsocks = select(FD_SETSIZE, &_read_fds, &_write_fds, (fd_set *) 0, &timeout);
@@ -91,7 +90,6 @@ void    HTTP::select_server::accepter(int i)
 	int					    connection;
 	sockaddr_in				addr;
 	int 					addrlen;
-    std::cout << "in accepter" << std::endl;
 
 	addr = _servers[i]._servers_addr;
 	addrlen = sizeof(_servers[i]._servers_addr);
@@ -100,9 +98,8 @@ void    HTTP::select_server::accepter(int i)
 			throw select_server::select_error_ex();
 	set_non_blocking(connection);
 	make_client(connection, addr, _servers[i]);
-    std::cout << "NEW CLIENT: " << connection << std::endl;
 	FD_SET(connection,&_read_backup);
-    std::cout << "out accepter" << std::endl;
+    
 }
 
 /* Run through our sockets and check to see if anything happened with them, if so 'service' them. */
@@ -113,9 +110,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
     int				valread;
     char 			*buffer;
 	struct timeval	now;
-    std::cout << "in rd client " << std::endl;
-    std::cout << GREEN << "i and j:  " << i << j << std::endl;
-
+   
 	buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
 		std::string err =  "Malloc error "; 
@@ -134,13 +129,11 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	}
 
 	std::string stringbuff2 = std::string(buffer);
-	std::cout << YELLOW << "SB: " << stringbuff2 << RESET << std::endl;
 
 	if (valread == 0)
 	{
 		
 		free(buffer);
-		std::cout << "valread" << std::endl;
 		return (0);
 	}
 	
@@ -148,7 +141,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	_servers[i]._clients[j]._last_active = now;
 	_servers[i]._clients[j]._header = "";
 	/* Check if we are expecting a body */
-	std::cout << RED << "exp body: " << _servers[i]._clients[j]._expect_body << RESET << std::endl;
 	if (_servers[i]._clients[j]._expect_body)
 	{
 		if (HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread))
@@ -162,7 +154,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	}
 	// parse buffer into request
 	std::string stringbuff = std::string(buffer);
-	std::cout << YELLOW << "SB: " << stringbuff << RESET << std::endl;
 	t_req_n_config							r_n_c;
 	re_HTTP									requestinfo (stringbuff.substr(0, stringbuff.find("\r\n\r\n") + 2));
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
@@ -175,24 +166,14 @@ int    HTTP::select_server::read_from_client(int i, int j)
 
 	if (stringbuff.substr(0, 3) == "GET")
 		_servers[i]._clients[j]._header = m.getTotalheader();
-	std::cout << BLUE << "TOTAL HEADER IS " << m.getTotalheader() << RESET << std::endl;
     if (stringbuff.substr(0, 4) != "POST")
 		FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
     FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
-
-    std::cout << " req: " << reqmap["Connection"] << std::endl;
-    std::cout << " req: |" << reqmap["Connection:"] << "|" << std::endl;
-    std::cout << " req: " << reqmap["Connection: "] << std::endl;
-
-
-
 	if (reqmap["Connection:"] == " close")
 	{
 		_servers[i]._clients[j]._close_connection = true;
 	}
-
-	std::cout << "out rd client " << std::endl;
 	return valread;
 }
 
@@ -201,7 +182,6 @@ void HTTP::select_server::send_response(int i, int j)
 	struct timeval now;
 
 	int sendval = 0;
-	std::cout << "GOING TO SEND THE HEADER" << _servers[i]._clients[j]._header.c_str() << std::endl;
 	if (_servers[i]._clients[j]._header.size())
 		sendval = send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
 	if (sendval < 0)
@@ -213,7 +193,7 @@ void HTTP::select_server::send_response(int i, int j)
 	if (_servers[i]._clients[j]._close_connection)
 		_servers[i]._clients[j]._active = false;
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
-    std::cout << "out snd" << std::endl;
+    
 }
 
 int              HTTP::select_server::erase_client(int i, int j)
@@ -223,7 +203,6 @@ int              HTTP::select_server::erase_client(int i, int j)
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_fds);
 	FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
 
-	std::cout << RED << j << " " << _servers[i]._clients.size() << "value: " << _servers[i]._clients[j]._c_sock << std::endl;
 	close(_servers[i]._clients[j]._c_sock);
 	_servers[i]._clients.erase(_servers[i]._clients.begin() + j);
 	return (0);
@@ -244,11 +223,10 @@ void    HTTP::select_server::launch()
 	}
     while(true)
     {
-		std::cout << "start whole loop" << std::endl;
+		
         _read_fds = _read_backup;
         _write_fds = _write_backup;
-        std::cout << "...................WAITING////" << std::endl;
-		std::cout << "b4 selecter" << std::endl;
+       
 		try{
 			selecter();
 		}
@@ -256,10 +234,10 @@ void    HTTP::select_server::launch()
        	 	std::cerr << e.what() << std::endl;
         	error_exit("error in select_Server", 1);
 		}
-		std::cout << "after selecter" << std::endl;
+		
 	    for (unsigned long i = 0; i < _servers.size(); i++) 
         {
-		std::cout << "start smaller loop" << std::endl;
+		
 	    	
             if (FD_ISSET(_servers[i]._servers_socket, &_read_fds)) {
 				try{
@@ -289,7 +267,7 @@ void    HTTP::select_server::launch()
                     
 					if (_servers[i]._clients[j]._active == false)
 					{
-						std::cout << "IN ERASE CLIENT FROM READ" << std::endl;
+						
 						j = erase_client(i, j);
 						break;
 					}
@@ -304,9 +282,9 @@ void    HTTP::select_server::launch()
 						}
 					if (_servers[i]._clients[j]._active == false)
 					{
-						std::cout << "IN ERASE CLIENT FROM SEND" << std::endl;
+						
 						j = erase_client(i, j);
-						std::cout << "out ERASE CLIENT FROM SEND" << std::endl;
+					
 						break;	
 					}
 					FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
@@ -314,7 +292,7 @@ void    HTTP::select_server::launch()
 					{	j = erase_client(i, j);
 						break;
 					}
-std::cout << "end whole loop" << std::endl;
+
                 }
             }
 		}

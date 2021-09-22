@@ -19,13 +19,9 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 
 	_request = request;
 	_server = server;
-	std::cout << RED << __LINE__ << __FILE__ << " >>> " << path.length() << std::endl;
 	_path = (char *)malloc(sizeof(char) * path.length() + 1);
 	if (!_path)
 	{
-		std::cout << "here???" << std::endl;
-		//perror("Malloc error");
-		//exit(1);
 		std::string err =  "Malloc error "; 
     	error_exit(err, 1);
 	}
@@ -174,7 +170,7 @@ void HTTP::CGI::set_cgi_body()
 		close(p[1]);
 		
 		if (execve(argv[0], argv, env) == -1) {
-			std::cout << argv[0] << std::endl;
+
 			perror("Could not execve");
 
 			// TODO: return HTTP Code 500 - Internal Server Error
@@ -185,15 +181,12 @@ void HTTP::CGI::set_cgi_body()
 		buffer = (char *)malloc(sizeof(char *) * 4096 * 4096);
 		close(p[1]);
 		int bytes_read = read(p[0], buffer, 4096 *4096);
-		std::cout << "BR: " << bytes_read << std::endl;
 		for (int i = 0; i < bytes_read; ++i) {
 			std::cout << buffer[i];
 		}
 		buffer[bytes_read] = 0;
 		std::string tmp = std::string(buffer);
 
-		std::cout << std::endl;
-		std::cout << tmp << std::endl;
 		int start = tmp.find("<html>");
 		tmp = tmp.substr(start, tmp.length()); //TODO: tmp.length - start for 2nd argument.
 		_cgi_body = tmp;

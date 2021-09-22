@@ -17,15 +17,12 @@
 
 HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char *&buffer, int valread)
 {
-    //make the error map;
     make_error_map();
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
-    // std::cout << "_map_req[METHOD][" << _map_req["METHOD"]  << "]"<< std::endl;
-    // std::cout << "_map_req[METHOD]" << _map_req["METHOD: "] << std::endl;
+
    
-    // make sure the whole header is made 
     if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
         set_status_code(405);
     else if (_map_req["METHOD"].compare("GET") == 0)
@@ -34,16 +31,11 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
          postmethod(client, buffer, valread);
      else if (_map_req["METHOD"].compare("DELETE") == 0)
          deletemethod(client);
-
-    // make sure the whole header is made 
     else
     {
-        std::cout << YELLOW << "POO" << RESET << std::endl;
         getmethod();
         set_status_code(405);
     }
-    //exit(1);
-    std::cout << "out respond" << std::endl;
 }
 
 HTTP::respond::~respond()
@@ -100,9 +92,7 @@ void HTTP::respond::getmethod()
 	find_total_file_path();
 	set_date();
 	set_modified();
-	std::cout << "in get method" << std::endl;
 	set_connection(_map_req["Connection:"]);
-	std::cout << "2in get method" << std::endl;
 	set_host(_map_req["Host:"]);
 	set_language(_map_req["Accept-Language:"]);
 	set_server_name();
@@ -111,25 +101,14 @@ void HTTP::respond::getmethod()
 	set_total_response();
 }
 
-//static void make_directory(std::string dir)
-//{
-//
-//}
+
 
 void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valread)
 {
-
-	// TODO: is this enough?
 	client._filename = "www/html_pages/uploads/" + _map_req["URI"];
-//	struct stat stat_buffer;
 
-//	std::cout << stat("www/html_pageploads/", &stat_buffer) << std::endl;
-//	mkdir("/Users/rvan-sch/webservuss_7sep/www/html_pages/uploads/test/test2", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-//	exit(1);
 	client._content_length = ft_stoi(_map_req["Content-Length:"]);
 
-
-	/* If Request Method is not allowed on page, return 405 */
 	find_total_file_path();
 	if (_status_code == 405) {
 		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
@@ -155,7 +134,6 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 	{
 		std::string tmp(buffer);
 		int position_of_body = tmp.find("\r\n\r\n") + 4;
-		// TODO: check if length of body is comp with Content-Length
 		out_file.write(&buffer[position_of_body], client._content_length);
 		out_file.close();
 		client._expect_body = false;
@@ -230,18 +208,12 @@ void HTTP::respond::post_response(t_client_select &client, const int &total_body
 void HTTP::respond::deletemethod(t_client_select &client)
 {
 	find_total_file_path();
-	std::cout << "deletemethod" << std::endl;
 	if (_status_code == 405)
 	{
 		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
 		client._expect_body = false;
 		return;
 	}
-	//exit(1);
-	// _postheader = _totalheader;
-	// int ret  = remove(file.c_str());
-	// if( ret != 0)
-	// set statuscode notfound
 }
 
 void HTTP::respond::set_no_config(std::string root)
@@ -315,7 +287,6 @@ void HTTP::respond::set_status_line()
     }
 	if(file.is_open())
 	{
-		std::cout << "file open " << std::endl;
 		total_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		_body = total_body;
 	}
@@ -495,10 +466,7 @@ void HTTP::respond::set_body()
 			std::ifstream file("www/html_pages/downloads/index.php");
 			if (file.is_open())
 			{
-				std::cout << "_totalpath" << _totalpath << std::endl;
-				std::cout << "_path" << _path << std::endl;
-				// _totalpath = "www/html_pages/downloads/index.php"; // this 
-				HTTP::CGI cgi(_map_req, _pars_server, "www/html_pages/downloads/index.php"); // need to change $path to correct so CGI executes on the correct one
+				HTTP::CGI cgi(_map_req, _pars_server, "www/html_pages/downloads/index.php");
 				_body = cgi.get_cgi_body();
 				set_content_len(_body);
 				_status_code = 200;
@@ -508,8 +476,8 @@ void HTTP::respond::set_body()
 		}
 	}
 	if (stat(_path, &sb) == -1)
-		return (set_status_code(404)); // file doesnt exist
-	if (_totalpath.find(".php") != std::string::npos)// _body will be filled by php_cgi()
+		return (set_status_code(404)); 
+	if (_totalpath.find(".php") != std::string::npos)
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
 		_body = cgi.get_cgi_body();

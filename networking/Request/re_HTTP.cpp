@@ -84,7 +84,6 @@ int HTTP::re_HTTP::set_request_line(std::string &requestline)
     {
         std::string templine = requestline.substr(0,requestline.find(" "));
         _method = templine;
-        std::cout << _method << "method" << std::endl;
         std::string tmp = requestline.substr(_method.size() + 1, requestline.size()- methods[i].size());
         _uri = tmp.substr(0, tmp.find(' '));
         _uri = _uri.substr(1, _uri.size() - 1);

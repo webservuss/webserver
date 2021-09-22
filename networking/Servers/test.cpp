@@ -35,11 +35,7 @@ std::vector<std::string>config()
 	  return files;
 	}
 	while ((entry = readdir(dir)) != NULL) 
-	{
-        std::cout << "open>?"<< std::endl;
 		files.push_back(entry->d_name);
-	}
 	closedir(dir);
-	
 	return(files);
 }

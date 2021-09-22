@@ -14,7 +14,6 @@
     enable rebinding while a previous connection is still in TIME_WAIT state, 
     allow re-use of local address and set non blocking */
 
-
 const char  *HTTP::simple_socket::socket_error_ex::what() const  throw()
 {
 	return ("Error in simple_socket");
