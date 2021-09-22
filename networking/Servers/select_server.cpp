@@ -123,20 +123,14 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	{
 		erase_client(i, j);
 		free(buffer);
-	
 		throw select_error_ex();
-	
 	}
-
 	std::string stringbuff2 = std::string(buffer);
-
 	if (valread == 0)
 	{
-		
 		free(buffer);
 		return (0);
 	}
-	
 	gettimeofday(&now, NULL);
 	_servers[i]._clients[j]._last_active = now;
 	_servers[i]._clients[j]._header = "";
@@ -185,7 +179,10 @@ void HTTP::select_server::send_response(int i, int j)
 	if (_servers[i]._clients[j]._header.size())
 		sendval = send(_servers[i]._clients[j]._c_sock , _servers[i]._clients[j]._header.c_str(), _servers[i]._clients[j]._header.size() , 0 );
 	if (sendval < 0)
+	{	
+		erase_client(i, j);
 		throw select_error_ex();
+	}
 	if (sendval == 0)
 		_servers[i]._clients[j]._active = false;
 	gettimeofday(&now, NULL);
