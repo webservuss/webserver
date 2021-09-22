@@ -15,7 +15,7 @@ namespace HTTP
 	{
 	public:
 		
-		CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path);
+		CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path, const std::string &root);
 		~CGI();
 
 		void set_cgi_body();
@@ -39,6 +39,7 @@ namespace HTTP
 		void set_port();
 		void set_server_software();
 		void set_cgi_location();
+		void set_auto_index_path();
 		std::string _port;
 		std::string _path;
 		std::string _request_method;
@@ -47,6 +48,8 @@ namespace HTTP
 		std::string _server_software;
 		std::string _script_filename;
 		std::string _cgi_location;
+		std::string _auto_index_path;
+		std::string _placeholder;
 
 		char **_env;
 	};

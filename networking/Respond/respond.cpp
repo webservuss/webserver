@@ -521,10 +521,10 @@ void HTTP::respond::set_body()
 	{
 		if (opendir(_path) != NULL)
 		{
-			std::ifstream file("www/html_pages/downloads/index.php");
+			std::ifstream file("bin/auto_index.php");
 			if (file.is_open())
 			{
-				HTTP::CGI cgi(_map_req, _pars_server, "www/html_pages/downloads/index.php");
+				HTTP::CGI cgi(_map_req, _pars_server, "bin/auto_index.php", _root);
 				_body = cgi.get_cgi_body();
 				// set_content_len(_body);
 				_status_code = 200;
@@ -537,8 +537,9 @@ void HTTP::respond::set_body()
 		return (set_status_code(404)); 
 	if (_totalpath.find(".php") != std::string::npos)
 	{
-		HTTP::CGI cgi(_map_req, _pars_server, _totalpath);
+		HTTP::CGI cgi(_map_req, _pars_server, _totalpath, _root);
 		_status_code = cgi.get_status_code();
+		std::cout << "status_code: " << _status_code << std::endl;
 		if (_status_code != 500) {
 			_body = cgi.get_cgi_body();
 		}
@@ -554,6 +555,7 @@ void HTTP::respond::set_body()
 			return (set_status_code(403));
 		file.close();
 	}
+	//set_content_len(_body); removed by amber
 	if (_status_code == 0)
 		_status_code = 200;
 }

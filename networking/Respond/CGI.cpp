@@ -21,12 +21,13 @@ void HTTP::CGI::print_all_cgi_vars()
  << "\n_cgi_location; " << _cgi_location << "\n++++++++++++" << RESET << std::endl;
 }
 
-HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path)
+HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path, const std::string &root)
 {
 	_status_code = 0;
 	_request = request;
 	_server = server;
 	_path = path;
+	_placeholder = root;
 
 	set_port();
 	set_path_info();
@@ -35,6 +36,7 @@ HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server serve
 	set_redirect_status();
 	set_server_software();
 	set_cgi_location();
+	set_auto_index_path();
 	set_cgi_body();
 }
 
@@ -82,6 +84,16 @@ void HTTP::CGI::set_cgi_location()
 	_cgi_location = std::string(buf) + "/bin/php-cgi_macos";
 }
 
+void HTTP::CGI::set_auto_index_path()
+{
+	char buf[512];
+	getcwd(buf, 512);
+	std::string server_root = _placeholder;
+	_auto_index_path = "AUTO_INDEX=" + std::string(buf) + "/" + server_root + _request["URI"];
+	std::cout << "plholder: " << _placeholder << std::endl;
+
+}
+
 HTTP::CGI::~CGI()
 {
 	// check for leaks: https://stackoverflow.com/questions/67124700/why-is-address-sanitizer-not-detecting-this-simple-memory-leak
@@ -100,6 +112,7 @@ void HTTP::CGI::set_cgi_body()
 					(char *)_path_info.c_str(),
 					(char *)_server_software.c_str(),
 					(char *)_request_method.c_str(),
+					(char *)_auto_index_path.c_str(),
 					NULL};
 
 	pid_t pid;
@@ -140,7 +153,7 @@ void HTTP::CGI::set_cgi_body()
 				_status_code = 500;
 			else
 			{
-				_status_code = 333;
+				_status_code = 200;
 				buffer[bytes_read] = 0;
 				std::string tmp = std::string(buffer);
 				int start = tmp.find("\r\n\r\n") + 4;
