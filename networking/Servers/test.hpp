@@ -13,8 +13,8 @@
 #include "parser_conf.hpp"
 
 
-namespace HTTP {
-
+namespace HTTP 
+{
     std::vector<std::string> config();
 }
 

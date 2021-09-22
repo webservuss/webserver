@@ -31,7 +31,7 @@ namespace HTTP{
 
     public:
         /* constructors & destructors */
-        respond(t_req_n_config req_n_conf, t_client_select &client, char * &buffer, int valread);
+        respond(t_req_n_config req_n_conf, t_client_select &client, char * &buffer);
         respond(const respond& x);
         ~respond();
 
@@ -40,13 +40,13 @@ namespace HTTP{
 
         /* methods */
         void                getmethod();
-        void                postmethod(t_client_select &client, char * &buffer, int valread);
+        void                postmethod(t_client_select &client, char * &buffer);
         void                deletemethod(t_client_select &client);
 
 		uint64_t find_client_body_size();
 		void 				post_handle_request(t_client_select &client, char * &buffer, int valread);
 		/* static method */
-		static void 		post_response(t_client_select &client, const int &total_body_length, std::string &body);
+		static void 		post_response(t_client_select &client);
 
 		/* setters */
         void                set_content_type(const std::string &contentype);
@@ -69,7 +69,7 @@ namespace HTTP{
         /* check pathname */
         void                find_total_file_path();
 
-        void                make_error_map();
+        void                make_error_codes_map();
     	void                reset_body_error();
     };
 }

@@ -41,7 +41,7 @@ HTTP::re_HTTP::re_HTTP(std::string dataparser)
 
 /*copy constructor */
 HTTP::re_HTTP::re_HTTP(const re_HTTP& x)
-{ // TEST THIS // change
+{
     _headers = x._headers;
     _method = x._method;
     _uri = x._uri;
@@ -61,8 +61,8 @@ HTTP::re_HTTP& HTTP::re_HTTP::operator=(const re_HTTP& x)
 }
 
 
-void HTTP::re_HTTP::set_headers(std::string header) {
-
+void HTTP::re_HTTP::set_headers(std::string header) 
+{
     int i;
 
     i = 0;
@@ -78,8 +78,6 @@ void HTTP::re_HTTP::set_headers(std::string header) {
 
 int HTTP::re_HTTP::set_request_line(std::string &requestline) 
 {
-    
-    
     for(int i = 0; i < 3; i++)
     {
         std::string templine = requestline.substr(0,requestline.find(" "));
@@ -91,14 +89,10 @@ int HTTP::re_HTTP::set_request_line(std::string &requestline)
         break;
         
     }
-
     _map_header.insert(std::pair<std::string, std::string>( "METHOD", _method));
     _map_header.insert(std::pair<std::string, std::string>( "URI", _uri) );
     _map_header.insert(std::pair<std::string, std::string>( "PROTOCOL", _protocol));
     return (1);
 }
 
-HTTP::re_HTTP::~re_HTTP()
-{
-    
-}
+HTTP::re_HTTP::~re_HTTP()   {}

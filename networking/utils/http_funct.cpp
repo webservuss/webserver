@@ -47,7 +47,7 @@ int HTTP::post_handle_request2(t_client_select &client, t_req_n_config r_n_c, st
 		out_file.close();
 		std::string body(&buffer[position_of_body]);
 
-		HTTP::respond::post_response(client, client._content_length, body);
+		HTTP::respond::post_response(client);
 		return 0;
 	}
 	else

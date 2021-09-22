@@ -3,16 +3,11 @@
 #include <sstream>
 #include "../utils/colors.hpp"
 
-
-
-
 void	error_exit(const std::string &error_msg, int code)
 {
 	std::cerr << YELLOW <<  "error: " << error_msg << RESET <<  std::endl;
 	exit(code);
 }
-
-
 
 // https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string/39359311
 /*

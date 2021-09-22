@@ -16,21 +16,19 @@
 
 #define DEFAULT_CLIENT_BODY_SIZE 1024*1024
 
-HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char *&buffer, int valread)
+HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char *&buffer)
 {
-
-    make_error_map();
+    make_error_codes_map();
     _status_code = 0;
     _map_req = req_n_conf._req_map;
     _pars_server = req_n_conf._parser_server;
 
-   
     if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
         set_status_code(405);
     else if (_map_req["METHOD"].compare("GET") == 0)
         getmethod();
      else if (_map_req["METHOD"].compare("POST") == 0)
-         postmethod(client, buffer, valread);
+         postmethod(client, buffer);
      else if (_map_req["METHOD"].compare("DELETE") == 0)
          deletemethod(client);
     else
@@ -39,11 +37,10 @@ HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char 
 		getmethod();
     }
 }
+/* destructor */
+HTTP::respond::~respond() {}
 
-HTTP::respond::~respond()
-{}
-
-
+/* copy constructor */
 HTTP::respond::respond(const respond &x)
 {
 	_statusline = x._statusline;
@@ -62,7 +59,6 @@ HTTP::respond::respond(const respond &x)
 	_totalheader = x._totalheader;
 	_totalrespond = x._totalrespond;
 	_map_req = x._map_req;
-
 }
 
 /*assignment operator */
@@ -84,7 +80,6 @@ HTTP::respond &HTTP::respond::operator=(const respond &x)
 	_totalheader = x._totalheader;
 	_totalrespond = x._totalrespond;
 	_map_req = x._map_req;
-
 	return *this;
 }
 
@@ -106,20 +101,17 @@ void HTTP::respond::getmethod()
 }
 
 
-
-void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valread)
+void HTTP::respond::postmethod(t_client_select &client, char * &buffer)
 {
 	client._filename = "www/html_pages/uploads/" + _map_req["URI"];
-
 	client._content_length = ft_stoi(_map_req["Content-Length:"]);
-
 	find_total_file_path();
-	if (_status_code == 405) {
+	if (_status_code == 405) 
+	{
 		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
 		client._expect_body = false;
 		return;
 	}
-
 	/* If Content-Length is larger then allowed in the config, return 413 */
 	if (find_client_body_size() < (uint64_t)client._content_length)
 	{
@@ -130,7 +122,6 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 		client._close_connection = true;
 		return;
 	}
-
 	/* Create file */
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
 	/* Check if POST contains body, if not send 100 Continue */
@@ -142,8 +133,6 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
 		out_file.close();
 		client._expect_body = false;
 		client._post_done = true;
-
-		(void)valread;
 		client._header = "HTTP/1.1 204 No Content\r\n\r\n";
 		return ;
 	}
@@ -170,18 +159,17 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer, int valr
  */
 uint64_t HTTP::respond::find_client_body_size()
 {
-	std::string path;
-	size_t found_slash = _map_req["URI"].rfind('/');
+	std::string	path;
+	size_t 		found_slash;
+	
+	found_slash = _map_req["URI"].rfind('/');
 	if (found_slash == std::string::npos)
-	{
 		path = "/";
-	}
 	else
 	{
 		std::string tmp = _map_req["URI"].substr(0, found_slash + 1);
 		path = "/" + tmp;
 	}
-
 	while (true)
 	{
 		if (_pars_server._location_map.count(path) &&
@@ -195,18 +183,13 @@ uint64_t HTTP::respond::find_client_body_size()
 			path = path.substr(0, path.rfind('/') + 1);
 		}
 		else
-		{
 			return (DEFAULT_CLIENT_BODY_SIZE);
-		}
 	}
 }
 
-void HTTP::respond::post_response(t_client_select &client, const int &total_body_length, std::string &body)
+void HTTP::respond::post_response(t_client_select &client)
 {
-	(void)body;
 	client._header = "HTTP/1.1 204 No Content\r\n\r\n";
-	(void)total_body_length;
-
 }
 
 void HTTP::respond::deletemethod(t_client_select &client)
@@ -218,14 +201,10 @@ void HTTP::respond::deletemethod(t_client_select &client)
 	{
 		char filename[_totalpath.size() + 1];
 		strcpy(filename,_totalpath.c_str());
-
-		// remove the file, -1 on failure, 0 on success
+		/* remove returns -1 on failure */ 
 		int result = remove(filename);
-
 		if (result == -1)
-		{
 			_status_code = 404;
-		}
 		else
 		{
 			_status_code = 204;
@@ -249,7 +228,7 @@ void HTTP::respond::set_no_config()
 	return;
 }
 
-void HTTP::respond::make_error_map()
+void HTTP::respond::make_error_codes_map()
 {
 	_status_errors[404] = "<html><h1>404: You can't do that!</h1></html>";
 	_status_errors[403] = "<html><h1>403: You can't do that!</h1></html>";
@@ -258,7 +237,6 @@ void HTTP::respond::make_error_map()
     server due to malformed syntax. The client SHOULD NOT repeat the request without modifications.</h1></html>";
 	_status_errors[413] = "<html><h1> 400 : Request Entity Too Large</h1></html>";
 	_status_errors[500] = "<html><h1>500 : Internal Server Error</h1><div class=\"tenor-gif-embed\" data-postid=\"22864502\" data-share-method=\"host\" data-aspect-ratio=\"1\" data-width=\"25%\"><a href=\"https://tenor.com/view/sorry-tony-hayward-south-park-s14e11-coon2rise-of-captain-hindsight-gif-22864502\">Sorry Tony Hayward GIF</a>from <a href=\"https://tenor.com/search/sorry-gifs\">Sorry GIFs</a></div> <script type=\"text/javascript\" async src=\"https://tenor.com/embed.js\"></script></html>";
-
 }
 
 void	HTTP::respond::reset_body_error()
@@ -270,19 +248,19 @@ void	HTTP::respond::reset_body_error()
 		std::string char_status_code = ft_numtos(_status_code);
 		if (_pars_server._error_page[0] == char_status_code)
 		{	
-				std::string rel_err_pg = _pars_server._error_page[1];
-				std::string err_pg = _root.append(_pars_server._error_page[1]);
-				std::ifstream file(err_pg);
-				if (file.is_open())
-				{	
-					_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-					file.close();
-				}
-				else
-				{
-					_status_code = 403;
-	    			_body = _status_errors[403];
-				}
+			std::string rel_err_pg = _pars_server._error_page[1];
+			std::string err_pg = _root.append(_pars_server._error_page[1]);
+			std::ifstream file(err_pg);
+			if (file.is_open())
+			{	
+				_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+				file.close();
+			}
+			else
+			{
+				_status_code = 403;
+	    		_body = _status_errors[403];
+			}
 		}
 	}
 }

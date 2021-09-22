@@ -13,12 +13,6 @@
 
 #define BUFFER_SIZE (104 * 104) // 1Mb
 
-const char  *HTTP::select_server::select_error_ex::what() const  throw()
-{
-	return ("Error in select_server");
-}
-
-
 HTTP:: select_server::select_server(std::vector<int> ports, std::vector<t_server> parser_servers)
 {
 	_parser_servers = parser_servers;
@@ -115,7 +109,7 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	// buffer = (char *)malloc(sizeof(char *) * BUFFER_SIZE + 1);
 	if (!buffer) {
 		std::string err =  "Malloc error "; 
-		free(buffer);
+		delete [] buffer;
     	error_exit(err, 1);
 	}
 	bzero(buffer, BUFFER_SIZE + 1);
@@ -123,13 +117,13 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	if ((valread = recv(_servers[i]._clients[j]._c_sock, &buffer[0], BUFFER_SIZE, 0)) < 0)
 	{
 		erase_client(i, j);
-		free(buffer);
+		delete [] buffer;
 		throw select_error_ex();
 	}
 	std::string stringbuff2 = std::string(buffer);
 	if (valread == 0)
 	{
-		free(buffer);
+		delete [] buffer;
 		return (0);
 	}
 	gettimeofday(&now, NULL);
@@ -141,32 +135,30 @@ int    HTTP::select_server::read_from_client(int i, int j)
 		if (HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread))
 		{
 			std::string body = "";
-			HTTP::respond::post_response(_servers[i]._clients[j], _servers[i]._clients[j]._total_body_length, body);
+			HTTP::respond::post_response(_servers[i]._clients[j]);
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		}
-		free(buffer);
+		delete [] buffer;
 		return valread;
 	}
-	// parse buffer into request
+	/* parse buffer into request */ 
 	std::string stringbuff = std::string(buffer);
 	t_req_n_config							r_n_c;
 	re_HTTP									requestinfo (stringbuff.substr(0, stringbuff.find("\r\n\r\n") + 2));
 	std::map <std::string, std::string > 	reqmap = requestinfo._map_header;
 	r_n_c._req_map = reqmap;
 	r_n_c._parser_server = _parser_servers[i];
-	respond m (r_n_c, _servers[i]._clients[j], buffer, valread);
-
+	/*create response */
+	respond m (r_n_c, _servers[i]._clients[j], buffer);
 	if (stringbuff.substr(0, 4) != "POST")
 	{
 		_servers[i]._clients[j]._header = m.getTotalheader();
 		FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 	}
 	FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
-    free(buffer);
+		delete [] buffer;
 	if (reqmap["Connection:"] == " close")
-	{
 		_servers[i]._clients[j]._close_connection = true;
-	}
 	return valread;
 }
 
@@ -311,13 +303,12 @@ void            HTTP::select_server::set_value_server_select_server(int servers_
 	server._servers_addr = servers_addr;
 	server._servers_socket = servers_socket;
 	server._port = port;
-
 }
 
 void		HTTP::select_server::make_client(int client_socket, sockaddr_in addr, t_server_select &server)
 {
 	t_client_select newclient;
-	struct timeval now;
+	struct timeval 	now;
 
 	gettimeofday(&now, NULL);
 	newclient._c_sock = client_socket;
@@ -326,4 +317,10 @@ void		HTTP::select_server::make_client(int client_socket, sockaddr_in addr, t_se
 	newclient._client_addr = addr;
 	server._clients.push_back(newclient);
 	newclient._close_connection = false;
+}
+
+/* error throw */
+const char  *HTTP::select_server::select_error_ex::what() const  throw()
+{
+	return ("Error in select_server");
 }

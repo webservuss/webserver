@@ -8,19 +8,6 @@
 #include "sys/wait.h"
 #include "../utils/colors.hpp"
 
-void HTTP::CGI::print_all_cgi_vars()
-{
-	std::cout << RED << "++++++++++++++++++++"
-	<< "\n_port; " << _port
-    << "\n_path; " << _path
- << "\n_request_method; " << _request_method
- << "\n_redirect_status; " << _redirect_status
- << "\n_path_info; " << _path_info
- << "\n_server_software; " << _server_software
- << "\n_script_filename; " << _script_filename
- << "\n_cgi_location; " << _cgi_location << "\n++++++++++++" << RESET << std::endl;
-}
-
 HTTP::CGI::CGI(std::map <std::string, std::string> request, const t_server server, const std::string &path, const std::string &root)
 {
 	_status_code = 0;
@@ -115,40 +102,35 @@ void HTTP::CGI::set_cgi_body()
 					(char *)_auto_index_path.c_str(),
 					NULL};
 
-	pid_t pid;
-	int p[2];
+	pid_t			pid;
+	int 			p[2];
 
 	pipe(p);
 	pid = fork();
 	int status = -1;
-	if (pid == 0) {
+	if (pid == 0) 
+	{
 		dup2(p[1], 1);
 		close(p[0]);
 		close(p[1]);
 		if (execve(argv[0], argv, env) == -1)
-		{
 			exit(1);
-		}
 		exit(0);
 	}
 	else {
-
 		wait(&status);
-
 		if (status)
 		{
 			close(p[0]);
 			close(p[1]);
 			_status_code = 500;
 		}
-
 		else
 		{
 			char *buffer = new char[4096 * 4096];
 			close(p[1]);
 			int bytes_read = read(p[0], buffer, 4096 *4096);
 			close(p[0]);
-
 			if (bytes_read < 0)
 				_status_code = 500;
 			else
@@ -160,7 +142,6 @@ void HTTP::CGI::set_cgi_body()
 				tmp = tmp.substr(start, tmp.length() - start);
 				_cgi_body = tmp;
 			}
-
 			delete [] buffer;
 		}
 	}
@@ -169,4 +150,18 @@ void HTTP::CGI::set_cgi_body()
 const std::string &HTTP::CGI::get_cgi_body() const
 {
 	return _cgi_body;
+}
+
+/* to test */
+void HTTP::CGI::print_all_cgi_vars()
+{
+	std::cout << RED << "++++++++++++++++++++"
+	<< "\n_port; " << _port
+    << "\n_path; " << _path
+	<< "\n_request_method; " << _request_method
+	<< "\n_redirect_status; " << _redirect_status
+	<< "\n_path_info; " << _path_info
+	<< "\n_server_software; " << _server_software
+	<< "\n_script_filename; " << _script_filename
+	<< "\n_cgi_location; " << _cgi_location << "\n++++++++++++" << RESET << std::endl;
 }

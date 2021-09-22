@@ -32,26 +32,26 @@ namespace HTTP {
 
 	class parse_conf
 	{
-	private:
-		std::vector<t_server>	_server;
+		private:
+			std::vector<t_server>	_server;
 
-		/* setters */
-		void set_values_server(std::string s, t_server &server, char **argv);
-		void set_values_location(std::string s, t_location &location);
+			/* setters */
+			void set_values_server(std::string s, t_server &server, char **argv);
+			void set_values_location(std::string s, t_location &location);
 
-	public:
-		/* constructors and destructors */
-		parse_conf(const char *path, char **argv);
-		parse_conf(const parse_conf& x);
-		~parse_conf();
+		public:
+			/* constructors and destructors */
+			parse_conf(const char *path, char **argv);
+			parse_conf(const parse_conf& x);
+			~parse_conf();
 
-		/*assignment operators */
-        parse_conf& operator=(const parse_conf& x);
+			/*assignment operators */
+       		parse_conf& operator=(const parse_conf& x);
 
-		/* GETTERS */
-		int							get_server_port(const t_server &server);
-		const std::vector<t_server>	&get_server() const;
-		std::vector<int>			get_ports();
-};
+			/* GETTERS */
+			int							get_server_port(const t_server &server);
+			const std::vector<t_server>	&get_server() const;
+			std::vector<int>			get_ports();
+	};
 }
 #endif //__PARSER_CONF_HPP__

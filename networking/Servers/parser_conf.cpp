@@ -12,8 +12,8 @@ HTTP::parse_conf::parse_conf(const char *path, char **argv)
 	std::string 	s1;
 	int 			i;
     std::ifstream	file;
-    file.open(path);
-
+    
+	file.open(path);
 	is_acc = false;
 	server_count = 0;
     if(!file || !file.is_open())
@@ -61,12 +61,13 @@ HTTP::parse_conf::parse_conf(const char *path, char **argv)
 /*copy constructor */
 HTTP::parse_conf::parse_conf(const parse_conf& x)
 { 
-
     _server = x._server;
 }
 
+/*destuctor */
 HTTP::parse_conf::~parse_conf() {}
 
+/* assignment operator */
 HTTP::parse_conf& HTTP::parse_conf::operator=(const parse_conf& x)
 {
     _server = x._server;
@@ -98,7 +99,6 @@ void HTTP::parse_conf::set_values_server(std::string s, t_server &server, char *
 		server._index = value;
 	if (key == "autoindex")
 	{
-		
 		if (value == "on")
 			server._auto_index = 1;
 		else if (value == "off")
