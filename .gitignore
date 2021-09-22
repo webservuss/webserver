@@ -3,3 +3,5 @@ cmake-build-debug
 CMakeLists.txt
 .idea
 test
+test.dSYM
+.DS_Store
