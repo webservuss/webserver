@@ -156,15 +156,12 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	r_n_c._parser_server = _parser_servers[i];
 	respond m (r_n_c, _servers[i]._clients[j], buffer, valread);
 
-
-
-
-	// if (stringbuff.substr(0, 3) == "GET")
 	if (stringbuff.substr(0, 4) != "POST")
+	{
 		_servers[i]._clients[j]._header = m.getTotalheader();
-    if (stringbuff.substr(0, 4) != "POST")
 		FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
-    FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
+	}
+	FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
     free(buffer);
 	if (reqmap["Connection:"] == " close")
 	{
