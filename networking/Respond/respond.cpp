@@ -168,6 +168,9 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer)
 			tmp_first_line = tmp_first_line.substr(0, tmp_first_line.find("\r\n"));
 			client._content_length = hex2int((char *)tmp_first_line.c_str());
 
+			std::cout << MAGENTA << tmp_body.size() - client._content_length << std::endl;
+			std::cout << "|" << tmp_body.substr(client._content_length) << "|" << std::endl;
+
 			/* write to file and return */
 			out_file.write(tmp_body.c_str(), client._content_length);
 			out_file.close();

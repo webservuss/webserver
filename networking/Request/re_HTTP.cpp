@@ -68,7 +68,7 @@ void HTTP::re_HTTP::set_headers(std::string header)
     i = 0;
     if (header == "")
         return;
-    while (header[i] != '\r')
+    while (header[i] != '\r') // TODO Doesn't seem safe
         i++;
     _totalBody = header.substr(i, header.size() - i);
     _method = "";
