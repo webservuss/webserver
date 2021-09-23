@@ -189,40 +189,22 @@ void HTTP::select_server::send_response(int i, int j)
 {
 	struct timeval now;
 
-	unsigned long sendval_tot = 0;
 	int sendval = 0;
 	std::cout << YELLOW << __LINE__ << "I and J: "<< i << j << " _servers[i]._clients[j]._header.size(): " << _servers[i]._clients[j]._header.size() << RESET << std::endl;
 	std::string buf(_servers[i]._clients[j]._header);
 	if (_servers[i]._clients[j]._header.size())
 	{
-		if (buf.size() >= 1024) {
-			sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[0], 1024, 0);
-			_servers[i]._clients[j]._header = _servers[i]._clients[j]._header.substr(sendval, _servers[i]._clients[j]._header.size() - sendval);
+		sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[0], buf.size(), 0);
+		if (sendval < 0)
+		{
+			erase_client(i, j);
+			throw select_error_ex();
 		}
-		else {
-			sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[0], buf.size(), 0);
-			_servers[i]._clients[j]._header = "";
+		if (sendval > 0)
+		{
+			_servers[i]._clients[j]._header = buf.substr(sendval, buf.size() - sendval);
 		}
-		//std::cout << GREEN << "BEFORE: " << _servers[i]._clients[j]._header << std::endl;
-		//std::cout << BLUE << "AFTER: " <<_servers[i]._clients[j]._header << std::endl;
-
-		if (sendval <= 0) {
-			/* PROBLEM */
-			std::cout << RED << __LINE__ << " sendval == " << sendval << ", sendval_tot: " << sendval_tot << ", left: " << buf.size() - sendval_tot << RESET << std::endl;
-			//exit(1);
-		}
-		else
-			sendval_tot += sendval;
-
-
 	}
-	if (sendval < 0)
-	{
-		std::cout << __LINE__ << " sendval == " << sendval << ", sendval_tot: " << sendval_tot << std::endl;
-		erase_client(i, j);
-		throw select_error_ex();
-	}
-	std::cout << "sendval: " << sendval << std::endl;
 	if (sendval == 0 || (_servers[i]._clients[j]._close_connection))
 		_servers[i]._clients[j]._active = false;
 	gettimeofday(&now, NULL);
