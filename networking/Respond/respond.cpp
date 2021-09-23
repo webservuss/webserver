@@ -536,7 +536,7 @@ void HTTP::respond::set_body()
 	}
 	else
 	{
-		std::ifstream file(_path);
+		std::ifstream file(_path, std::ios::in | std::ios_base::binary);
 		if (file.is_open()) {
 			// TODO: see if this is causing an error with BIG files. it seems to stop halway or so for pumpkin.jpeg
 			_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
