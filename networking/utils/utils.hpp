@@ -5,6 +5,7 @@
 #include "../utils/colors.hpp"
 
 int ft_stoi(std::string s);
+uint32_t hex2int(char *hex);
 
 std::vector<std::string> split(const std::string &s, char delim);
 
