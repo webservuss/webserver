@@ -2,6 +2,8 @@
 #define utils_hpp
 
 #include <sstream>
+#include <stdint.h>
+
 #include "../utils/colors.hpp"
 
 int ft_stoi(std::string s);

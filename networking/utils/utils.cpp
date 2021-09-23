@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <cstdlib>
+#include <stdint.h>
 #include "../utils/colors.hpp"
 
 void	error_exit(const std::string &error_msg, int code)

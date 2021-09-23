@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <cstring>
 
 #define DEFAULT_CLIENT_BODY_SIZE 1024*1024
 
@@ -304,7 +305,7 @@ void	HTTP::respond::reset_body_error()
 		{
 			std::string rel_err_pg = _pars_server._error_page[1];
 			std::string err_pg = _root.append(_pars_server._error_page[1]);
-			std::ifstream file(err_pg);
+			std::ifstream file(err_pg.c_str());
 			if (file.is_open())
 			{
 				_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
