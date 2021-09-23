@@ -20,24 +20,24 @@
 
 HTTP::respond::respond(t_req_n_config req_n_conf, t_client_select &client, char *&buffer)
 {
-    make_error_codes_map();
-    _status_code = 0;
-    _map_req = req_n_conf._req_map;
-    _pars_server = req_n_conf._parser_server;
+	make_error_codes_map();
+	_status_code = 0;
+	_map_req = req_n_conf._req_map;
+	_pars_server = req_n_conf._parser_server;
 
-    if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
-        set_status_code(405);
-    else if (_map_req["METHOD"].compare("GET") == 0)
-        getmethod();
-     else if (_map_req["METHOD"].compare("POST") == 0)
-         postmethod(client, buffer);
-     else if (_map_req["METHOD"].compare("DELETE") == 0)
-         deletemethod(client);
-    else
-    {
-        set_status_code(405);
+	if (_map_req["PROTOCOL"].compare("HTTP/1.1") != 0)
+		set_status_code(405);
+	else if (_map_req["METHOD"].compare("GET") == 0)
 		getmethod();
-    }
+	else if (_map_req["METHOD"].compare("POST") == 0)
+		postmethod(client, buffer);
+	else if (_map_req["METHOD"].compare("DELETE") == 0)
+		deletemethod(client);
+	else
+	{
+		set_status_code(405);
+		getmethod();
+	}
 }
 /* destructor */
 HTTP::respond::~respond() {}
@@ -105,43 +105,82 @@ void HTTP::respond::getmethod()
 
 void HTTP::respond::postmethod(t_client_select &client, char * &buffer)
 {
+
+	std::cout << YELLOW << buffer << std::endl;
+
+	/* Does path (directory) exist? */
 	struct stat stats;
 	std::string	directory;
-
 	find_total_file_path();
 	directory = _totalpath.substr(0, _totalpath.rfind('/'));
 	if (stat(directory.c_str(), &stats) == -1)
-	{	
+	{
 		_status_code = 404;
 		client._header = _status_errors[404];
 		return;
 	}
-	client._filename = _totalpath;
-	client._content_length = ft_stoi(_map_req["Content-Length:"]);
-	if (_status_code == 405) 
+
+	/* Method POST Allowed? */
+	if (_status_code == 405)
 	{
 		client._header = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\nContent-Length: 0\r\n\r\n";
 		client._expect_body = false;
 		return;
 	}
-	/* If Content-Length is larger then allowed in the config, return 413 */
-	if (find_client_body_size() < (uint64_t)client._content_length)
+
+	/* Chunked request? */
+	client._chunked = _map_req["Transfer-Encoding:"] == " chunked";
+
+	/* If not chunked get Content-Length and check if it is larger then allowed in the config, return 413
+	 * (Chunked Request doesn't state a Content-Length) */
+	if (!client._chunked)
 	{
-		_status_code = 413;
-		std::string payload = "Max upload-size: " + ft_numtos(find_client_body_size());
-		client._header = "HTTP/1.1 413 Request Entity Too Large\r\nConnection: keep-alive\r\nContent-Length: " + ft_numtos(payload.length() + 2) + "\r\n\r\n" + payload + "\r\n";
-		client._expect_body = false;
-		client._close_connection = true;
-		return;
+		client._content_length = ft_stoi(_map_req["Content-Length:"]);
+		if (find_client_body_size() < (uint64_t)client._content_length)
+		{
+			_status_code = 413;
+			std::string payload = "Max upload-size: " + ft_numtos(find_client_body_size());
+			client._header = "HTTP/1.1 413 Request Entity Too Large\r\nConnection: keep-alive\r\nContent-Length: " + ft_numtos(payload.length() + 2) + "\r\n\r\n" + payload + "\r\n";
+			client._expect_body = false;
+			client._close_connection = true;
+			return;
+		}
 	}
+
 	/* Create file */
+	client._filename = _totalpath;
 	std::ofstream out_file(client._filename.c_str(), std::ios::binary);
+
 	/* Check if POST contains body, if not send 100 Continue */
 	if (!(_map_req.count("Expect:")))
 	{
-		std::string tmp(buffer);
-		int position_of_body = tmp.find("\r\n\r\n") + 4;
-		out_file.write(&buffer[position_of_body], client._content_length);
+		std::string tmp_body(buffer);
+
+		if (client._chunked)
+		{
+			std::string tmp_first_line(buffer);
+			/* get rid of header and empty space (\r\n\r\n) */
+			tmp_first_line = tmp_first_line.substr(tmp_first_line.find("\r\n\r\n") + 4);
+			/* we now can set this as the body. The closing 0 (end of chunked-request) is
+			 * included but we can ignore this since we know the length to write */
+			tmp_body = tmp_first_line.substr(tmp_first_line.find("\r\n") + 2);
+			/* trim the first line to be able to read the bytes we need to write */
+			tmp_first_line = tmp_first_line.substr(0, tmp_first_line.find("\r\n"));
+			client._content_length = hex2int((char *)tmp_first_line.c_str());
+
+			/* write to file and return */
+			out_file.write(tmp_body.c_str(), client._content_length);
+			out_file.close();
+			client._expect_body = false;
+			client._post_done = true;
+			client._header = "HTTP/1.1 204 No Content\r\n\r\n";
+
+			return;
+		}
+
+		tmp_body = tmp_body.substr(tmp_body.find("\r\n\r\n") + 4);
+
+		out_file.write(tmp_body.c_str(), client._content_length);
 		out_file.close();
 		client._expect_body = false;
 		client._post_done = true;
@@ -173,7 +212,7 @@ uint64_t HTTP::respond::find_client_body_size()
 {
 	std::string	path;
 	size_t 		found_slash;
-	
+
 	found_slash = _map_req["URI"].rfind('/');
 	if (found_slash == std::string::npos)
 		path = "/";
@@ -213,7 +252,7 @@ void HTTP::respond::deletemethod(t_client_select &client)
 	{
 		char filename[_totalpath.size() + 1];
 		strcpy(filename,_totalpath.c_str());
-		/* remove returns -1 on failure */ 
+		/* remove returns -1 on failure */
 		int result = remove(filename);
 		if (result == -1)
 			_status_code = 404;
@@ -236,7 +275,7 @@ void HTTP::respond::set_no_config()
 {
 	_statusline.append(_stat_cha);
 	_body.append(_stat_cha);
-	_body = "<h1>status code is not present in config file</h1>\0";	
+	_body = "<h1>status code is not present in config file</h1>\0";
 	return;
 }
 
@@ -259,19 +298,19 @@ void	HTTP::respond::reset_body_error()
 	{
 		std::string char_status_code = ft_numtos(_status_code);
 		if (_pars_server._error_page[0] == char_status_code)
-		{	
+		{
 			std::string rel_err_pg = _pars_server._error_page[1];
 			std::string err_pg = _root.append(_pars_server._error_page[1]);
 			std::ifstream file(err_pg);
 			if (file.is_open())
-			{	
+			{
 				_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 				file.close();
 			}
 			else
 			{
 				_status_code = 403;
-	    		_body = _status_errors[403];
+				_body = _status_errors[403];
 			}
 		}
 	}
@@ -282,9 +321,9 @@ void HTTP::respond::set_status_line()
 	std::string tmp = ft_numtos(_status_code);
 	_stat_cha = tmp.c_str();
 	std::string total_body;
-	   std::string root;
+	std::string root;
 	if (_pars_server._error_page.size() > 1)
-		 root = _pars_server._error_page[1];
+		root = _pars_server._error_page[1];
 	else
 		root = "error_page.html";
 	std::ifstream file("html_pages/auto_error.html");
@@ -298,14 +337,14 @@ void HTTP::respond::set_status_line()
 		_body = _status_errors[404];
 	}
 	else if (_status_code == 200)
-    {
-   		_statusline = "HTTP/1.1 200 OK";
-   		return;
-    }
+	{
+		_statusline = "HTTP/1.1 200 OK";
+		return;
+	}
 	else if (_status_code == 403)
 	{
-	    _statusline = "HTTP/1.1 403 Forbidden";
-	    _body = _status_errors[403];
+		_statusline = "HTTP/1.1 403 Forbidden";
+		_body = _status_errors[403];
 	}
 	else if (_status_code == 405)
 	{
@@ -480,12 +519,12 @@ void HTTP::respond::find_total_file_path()
 		if (_relativepath == "" || _relativepath == "/")
 			_relativepath = _pars_server._location_map[key]._index;
 		if (_pars_server._location_map[key]._root.empty())
-		{	
+		{
 			_root = _pars_server._location_map["/"]._root;
 			_totalpath = _pars_server._location_map["/"]._root.append(_relativepath);
 		}
 		else
-		{	
+		{
 			_root = _pars_server._location_map[key]._root;
 			_totalpath = _pars_server._location_map[key]._root.append(_relativepath);
 		}
@@ -523,7 +562,7 @@ void HTTP::respond::set_body()
 		}
 	}
 	if (stat(_path, &sb) == -1)
-		return (set_status_code(404)); 
+		return (set_status_code(404));
 	if (_totalpath.find(".php") != std::string::npos)
 	{
 		HTTP::CGI cgi(_map_req, _pars_server, _totalpath, _root);
@@ -537,11 +576,8 @@ void HTTP::respond::set_body()
 	else
 	{
 		std::ifstream file(_path, std::ios::in | std::ios_base::binary);
-		if (file.is_open()) {
-			// TODO: see if this is causing an error with BIG files. it seems to stop halway or so for pumpkin.jpeg
+		if (file.is_open())
 			_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-			std::cout << "_path: " << _path << ", _body length: " << _body.length() << std::endl;
-		}
 		else
 			return (set_status_code(403));
 		file.close();

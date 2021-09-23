@@ -21,6 +21,7 @@ namespace HTTP
 		std::string         _header;
 
 		/* variables needed for POST method */
+		bool 				_chunked;
 		bool 				_expect_body;
 		bool 				_post_done;
 		std::string			_filename;
