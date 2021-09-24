@@ -134,6 +134,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		}
 		delete [] buffer;
+		if (_servers[i]._clients[j]._post_done == true)
+			FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		return valread;
 	}
 	/* parse buffer into request */
