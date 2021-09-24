@@ -308,6 +308,8 @@ void		HTTP::select_server::make_client(int client_socket, sockaddr_in addr, t_se
 	server._clients.push_back(newclient);
 	newclient._close_connection = false;
 	newclient._header = "";
+	newclient._expect_body = false;
+	newclient._chunked = false;
 }
 
 /* error throw */

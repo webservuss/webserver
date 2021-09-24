@@ -128,7 +128,7 @@ void HTTP::respond::postmethod(t_client_select &client, char * &buffer)
 
 	/* Chunked request? */
 	client._chunked = _map_req["Transfer-Encoding:"] == " chunked";
-
+	
 	/* If not chunked get Content-Length and check if it is larger then allowed in the config, return 413
 	 * (Chunked Request doesn't state a Content-Length) */
 	if (!client._chunked)

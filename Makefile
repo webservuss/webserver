@@ -15,7 +15,7 @@ SRCS =		networking/Servers/main.cpp \
 
 OFILES =	$(SRCS:.cpp=.o)
 
-FLAGS = -std=c++98 -Wall -Werror -Wextra
+FLAGS = -std=c++98 -Wall -Werror -Wextra -g -fsanitize=address
 #  -g -fsanitize=address
 
 all:		$(NAME)
