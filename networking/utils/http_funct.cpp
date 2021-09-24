@@ -21,24 +21,57 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 	existing_file.open(client._filename.c_str(), std::ios::binary | std::ios::app);
 
 	if (client._chunked)
-	{
-		std::string tmp_first_line(buffer);
+	{	std::string tmp_first_line(buffer);
+		std::string body(buffer);
 		/* get rid of header and empty space (\r\n\r\n) */
-		tmp_first_line = tmp_first_line.substr(tmp_first_line.find("\r\n\r\n") + 4);
+//		tmp_first_line = tmp_first_line.substr(tmp_first_line.find("\r\n\r\n") + 4);
 		/* we now can set this as the body. The closing 0 (end of chunked-request) is
 		 * included but we can ignore this since we know the length to write */
-		std::string tmp_body = tmp_first_line.substr(tmp_first_line.find("\r\n") + 2);
 		/* trim the first line to be able to read the bytes we need to write */
 		tmp_first_line = tmp_first_line.substr(0, tmp_first_line.find("\r\n"));
-		int unchunked_length = hex2int((char *)tmp_first_line.c_str());
+		//unsigned int unchunked_length = hex2int((char *)tmp_first_line.c_str());
+
+
+		unsigned int unchunked_length = hex2int(tmp_first_line);
+
+
+
+		/*
+		 * length \r\n\
+		 * [body]\r\n
+		 * end 0 \r\n
+		 * \r\n
+		 */
+		std::string end(buffer);
+		body = body.substr(body.find("\r\n") + 2, unchunked_length);
+
+
+
+		//end = end.substr(end.find("\r\n") + 2, end.size() - (end.find("\r\n") + 2));
+		end = end.substr(end.find("\r\n") + 2, end.size() - (end.find("\r\n") + 2));
+		end = end.substr(unchunked_length, end.size() - unchunked_length);
+
+		std::cout << ">" << tmp_first_line << " >" << unchunked_length << std::endl;
+
+
+
+		std::cout << YELLOW << "end.size(): " << end.size() << " body.size(): " << body.size() << "valread: " << length << std::endl;
+
 
 		/* write to file and return */
-		existing_file.write(tmp_body.c_str(), unchunked_length);
+		std::cout << BLUE << "bs - ul" << (int)body.size() - unchunked_length << std::endl;
+		std::cout << BLUE << "bs: " << (int)body.size() << " ul: " << unchunked_length << std::endl;
+		//existing_file.write(body.c_str(), unchunked_length);
+		existing_file.write(buffer, length);
+
 		existing_file.close();
 		client._total_body_length += unchunked_length;
 
-		if ((int)tmp_body.size() > unchunked_length)
+
+		if (body.size() > unchunked_length)
 		{
+			std::cout << RED << "bs - ul" << (int)body.size() - unchunked_length << std::endl;
+			std::cout << RED << "bs: " << (int)body.size() << "ul: " << unchunked_length << std::endl;
 			client._expect_body = false;
 			client._post_done = true;
 //			client._header = "HTTP/1.1 204 No Content\r\n\r\n";
