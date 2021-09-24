@@ -12,9 +12,9 @@ namespace HTTP{
             std::string _headers;
             std::string _method;
             std::string  _uri;
-            std::string  _totalBody; // do no think we need this
+            std::string  _totalBody;
             std::string _protocol;
-            // re_HTTP(){}
+            re_HTTP(){}
         public:
             std::map<std::string, std::string> _map_header;
 

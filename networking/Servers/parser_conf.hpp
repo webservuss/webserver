@@ -9,7 +9,6 @@
 namespace HTTP {
 
 	typedef struct s_location {
-		// std::string _method;
 		std::vector<std::string>			_methods;
 		std::string _root;
 		std::string _cgi;

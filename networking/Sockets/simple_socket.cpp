@@ -38,7 +38,6 @@ HTTP::simple_socket::simple_socket(const simple_socket& x)
 /* assignment operator */
 HTTP::simple_socket& HTTP::simple_socket::operator=(const simple_socket& x)
 {
-    // if (sock != x.sock || address != x.address)
     _sock = x._sock;
     _address = x._address;
     return *this;

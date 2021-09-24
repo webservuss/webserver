@@ -1,7 +1,3 @@
-//
-// Created by ruben on 12-08-21.
-//
-
 #ifndef INC_12AUG_CGI_HPP
 #define INC_12AUG_CGI_HPP
 

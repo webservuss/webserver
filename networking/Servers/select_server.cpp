@@ -49,7 +49,7 @@ HTTP::select_server& HTTP::select_server::operator=(const select_server& x)
     return *this;
 }
 
-// /*destructor */
+/*destructor */
 HTTP::select_server::~select_server() {}
 
 	
@@ -101,7 +101,6 @@ void    HTTP::select_server::accepter(int i)
 /* else send correct to browser */
 int    HTTP::select_server::read_from_client(int i, int j)
 {
-	std::cout << __LINE__ << "HERE?" << std::endl;
 	int				valread;
 	char 			*buffer;
 	struct timeval	now;
@@ -118,8 +117,6 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	std::string stringbuff2 = std::string(buffer);
 	if (valread == 0)
 	{
-		std::cout << __LINE__ << "HERE?" << std::endl;
-
 		delete [] buffer;
 		FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		return (0);
@@ -130,12 +127,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	/* Check if we are expecting a body */
 	if (_servers[i]._clients[j]._expect_body)
 	{
-		std::cout << __LINE__ << "HERE?" << std::endl;
-
 		if (HTTP::post_expected_body(_servers[i]._clients[j], buffer, valread))
 		{
-			std::cout << __LINE__ << "HERE?" << std::endl;
-
 			std::string body = "";
 			HTTP::respond::post_response(_servers[i]._clients[j]);
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
@@ -164,33 +157,11 @@ int    HTTP::select_server::read_from_client(int i, int j)
 	return valread;
 }
 
-//sendval = send(_servers[i]._clients[j]._c_sock, &_servers[i]._clients[j]._header.c_str()[sendval_tot], _servers[i]._clients[j]._header.size() - sendval_tot, 0);
-//{
-//while (sendval_tot < _servers[i]._clients[j]._header.size())
-//{
-//if ((buf.size() - sendval_tot) > 1024)
-//sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[sendval_tot], 1024, 0);
-//else
-//sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[sendval_tot], buf.size() - sendval_tot, 0);
-//
-//if (sendval <= 0) {
-///* PROBLEM */
-//std::cout << RED << __LINE__ << " sendval == " << sendval << ", sendval_tot: " << sendval_tot << ", left: " << buf.size() - sendval_tot << RESET << std::endl;
-////exit(1);
-//}
-//else
-//sendval_tot += sendval;
-//}
-//
-//}
-
-
 void HTTP::select_server::send_response(int i, int j)
 {
 	struct timeval now;
 
 	int sendval = 0;
-	std::cout << YELLOW << __LINE__ << "I and J: "<< i << j << " _servers[i]._clients[j]._header.size(): " << _servers[i]._clients[j]._header.size() << RESET << std::endl;
 	std::string buf(_servers[i]._clients[j]._header);
 	if (_servers[i]._clients[j]._header.size())
 	{
@@ -201,9 +172,7 @@ void HTTP::select_server::send_response(int i, int j)
 			throw select_error_ex();
 		}
 		if (sendval > 0)
-		{
 			_servers[i]._clients[j]._header = buf.substr(sendval, buf.size() - sendval);
-		}
 	}
 	if (sendval == 0 || (_servers[i]._clients[j]._close_connection))
 		_servers[i]._clients[j]._active = false;
@@ -230,7 +199,7 @@ void    HTTP::select_server::launch()
 {
     FD_ZERO(&_read_backup);
     FD_ZERO(&_write_backup);
-    // add servers to read_backup
+    /* add servers to read_backup */
 	for (unsigned long listnum = 0; listnum < _servers.size(); listnum++) {
 		if (_servers[listnum]._servers_socket != 0) {
 			FD_SET(_servers[listnum]._servers_socket,&_read_backup);
@@ -301,7 +270,6 @@ void    HTTP::select_server::launch()
 						j = erase_client(i, j);
 						break;	
 					}
-					//FD_CLR(_servers[i]._clients[j]._c_sock, &_write_backup);
                 }
             }
 		}

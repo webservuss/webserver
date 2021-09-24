@@ -54,7 +54,7 @@ HTTP::parse_conf::parse_conf(const char *path, char **argv)
 		if (is_acc)
 			set_values_location(s1, _server[server_count - 1]._location_map[map_key]);
 	}
-    file.close(); // put in destructor
+    file.close();
 }
 
 /*copy constructor */

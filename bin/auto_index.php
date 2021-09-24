@@ -1,18 +1,18 @@
 <?PHP
   function getFileList($dir)
   {
-    // array to hold return value
+    /* array to hold return value */
     $retval = [];
 
-    // add trailing slash if missing
+    /* add trailing slash if missing */
     if(substr($dir, -1) != "/") {
       $dir .= "/";
     }
 
-    // open pointer to directory and read list of files
+    /* open pointer to directory and read list of files */
     $d = @dir($dir) or die("getFileList: Failed opening directory {$dir} for reading");
     while(FALSE !== ($entry = $d->read())) {
-      // skip hidden files
+      /* skip hidden files */
       if($entry{0} == ".") continue;
       if(is_dir("{$dir}{$entry}")) {
         $retval[] = [
@@ -37,12 +37,12 @@
 ?>
 
 <?PHP
-  // using an absolute path
+  /* using an absolute path */
  $dirlist = getFileList("{$_SERVER['AUTO_INDEX']}");
 ?>
 
 <?PHP
-  // output file list in HTML TABLE format
+  /* output file list in HTML TABLE format */
   echo "<table border=\"1\">\n";
   echo "<thead>\n";
   echo "<tr><th>Name</th><th>Type</th><th>Size</th><th>Last Modified</th></tr>\n";

@@ -13,7 +13,7 @@
 namespace HTTP
 {
 	typedef struct          s_client_select {
-		sockaddr_in         _client_addr; // TODO not used
+		sockaddr_in         _client_addr;
 		int                 _c_sock;
 		struct timeval      _last_active;
 		bool                _active;
@@ -47,24 +47,19 @@ namespace HTTP
 		fd_set                          _read_backup;
 		std::vector<t_server_select>    _servers;
 		std::vector<t_server>           _parser_servers;
-		// std::string                     _totalheader;
-
-
-
 
 	public:
 		class	select_error_ex : public std::exception {
 		public:
 			virtual const char*	what() const throw();
 		};
-		/* constructor */
-		// constructor for multiple ports */
+		/* constructor for multiple ports */
 		select_server(std::vector<int> ports, std::vector<t_server> parser_servers);
 		/*copy constructor */
 		select_server(const select_server& x);
-		// /*assignment operator */
+		 /*assignment operator */
 		select_server& operator=(const select_server& x);
-		// /*destructor */
+		/*destructor */
 		~select_server();
 		int     		selecter();
 		void    		accepter(int i);

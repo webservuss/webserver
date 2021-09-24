@@ -17,15 +17,11 @@ void                HTTP::set_non_blocking(int sock)
 
 int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &length)
 {
-
 	std::ofstream existing_file;
 	existing_file.open(client._filename.c_str(), std::ios::binary | std::ios::app);
 
-
-	std::cout << RED << __FILE__ << " " << __LINE__ << "done?" << std::endl;
 	if (client._chunked)
 	{
-		std::cout << RED << __FILE__ << " " << __LINE__ << "done?" << std::endl;
 		std::string tmp_first_line(buffer);
 		/* get rid of header and empty space (\r\n\r\n) */
 		tmp_first_line = tmp_first_line.substr(tmp_first_line.find("\r\n\r\n") + 4);
@@ -41,10 +37,8 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 		existing_file.close();
 		client._total_body_length += unchunked_length;
 
-		std::cout << __FILE__ << "tmp b s: " << tmp_body.size() << ". unch length: " << unchunked_length << std::endl;
 		if ((int)tmp_body.size() > unchunked_length)
 		{
-			std::cout << RED << __FILE__ << " " << __LINE__ << "done?" << std::endl;
 			client._expect_body = false;
 			client._post_done = true;
 //			client._header = "HTTP/1.1 204 No Content\r\n\r\n";
