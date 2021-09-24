@@ -134,8 +134,8 @@ int    HTTP::select_server::read_from_client(int i, int j)
 			FD_SET(_servers[i]._clients[j]._c_sock, &_write_backup);
 		}
 		delete [] buffer;
-		if (_servers[i]._clients[j]._post_done == true)
-			FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
+//		if (_servers[i]._clients[j]._post_done == true)
+//			FD_CLR(_servers[i]._clients[j]._c_sock, &_read_backup);
 		return valread;
 	}
 	/* parse buffer into request */
@@ -167,14 +167,19 @@ void HTTP::select_server::send_response(int i, int j)
 	std::string buf(_servers[i]._clients[j]._header);
 	if (_servers[i]._clients[j]._header.size())
 	{
-		sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[0], buf.size(), 0);
-		if (sendval < 0)
-		{
-			erase_client(i, j);
-			throw select_error_ex();
+		if (buf.size() >= 512*512) {
+			sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[0], 512*512, 0);
+			_servers[i]._clients[j]._header = _servers[i]._clients[j]._header.substr(sendval, _servers[i]._clients[j]._header.size() - sendval);
 		}
-		if (sendval > 0)
-			_servers[i]._clients[j]._header = buf.substr(sendval, buf.size() - sendval);
+		else {
+			sendval = send(_servers[i]._clients[j]._c_sock, &buf.c_str()[0], buf.size(), 0);
+			_servers[i]._clients[j]._header = "";
+		}
+	}
+	if (sendval < 0)
+	{
+		erase_client(i, j);
+		throw select_error_ex();
 	}
 	if (sendval == 0 || (_servers[i]._clients[j]._close_connection))
 		_servers[i]._clients[j]._active = false;

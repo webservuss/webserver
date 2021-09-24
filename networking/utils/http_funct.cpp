@@ -70,30 +70,22 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 		{
 
 			/* get first line to get the length of chunk */
-//			tmp_first_line = buf_str.substr(0, buf_str.find("\r\n"));
 			if (buf_vec.size() == 0)
 				return 0;
 			tmp_first_line = get_first_line_of_vec(buf_vec);
 
 			unsigned int unchunked_length = hex2int(tmp_first_line);
-			std::cout << YELLOW << "first_line: [" << tmp_first_line << "] size of fline: [" << tmp_first_line.size() << "] unchunk_len: [" << unchunked_length << RESET << std::endl;
-
 
 			/* get body */
 			body = get_body_from_vec(buf_vec, unchunked_length, tmp_first_line.size() + 2);
-//			body = buf_str.substr(buf_str.find("\r\n") + 2, unchunked_length);
-			//std::cout << "bsize: " << body.size() << std::endl;
-
 
 			/* check if done and return 1 */
 			if (unchunked_length == 0 && body && body[0] != '0')
 			{
-				std::cout << MAGENTA << "DONE? bfstring:\n" << buf_str << RESET << std::endl;
 				existing_file.close();
 				client._expect_body = false;
 				client._post_done = true;
 				client._chunked = false;
-				//client._header = "HTTP/1.1 204 No Content\r\n\r\n";
 				return 1;
 				break;
 			}
@@ -102,16 +94,9 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 			existing_file.write(body, unchunked_length);
 
 			/* trim body */
-
-			//buf_str = buf_str.substr(buf_str.find("\r\n") + 2 + unchunked_length + 2); // + 2 at the end?
-
-
 			buf_vec.erase(buf_vec.begin(), buf_vec.begin() + tmp_first_line.size() + 2 + unchunked_length + 2);
 
-
 		}
-
-		std::cout << RED << "end of loop" << RESET << std::endl;
 		existing_file.close();
 		return 0;
 
@@ -129,7 +114,4 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 		return 0;
 
 	}
-
-
-
 }
