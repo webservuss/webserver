@@ -1,4 +1,4 @@
-NAME =		test
+NAME =		webserver
 
 CC =		clang++
 
