@@ -15,26 +15,6 @@ void                HTTP::set_non_blocking(int sock)
 		return;
 }
 
-int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &length)
-{
-	std::ofstream existing_file;
-	existing_file.open(client._filename.c_str(), std::ios::binary | std::ios::app);
-
-	if (client._chunked)
-	{	std::string tmp_first_line(buffer);
-		std::string body(buffer);
-		/* get rid of header and empty space (\r\n\r\n) */
-//		tmp_first_line = tmp_first_line.substr(tmp_first_line.find("\r\n\r\n") + 4);
-		/* we now can set this as the body. The closing 0 (end of chunked-request) is
-		 * included but we can ignore this since we know the length to write */
-		/* trim the first line to be able to read the bytes we need to write */
-		tmp_first_line = tmp_first_line.substr(0, tmp_first_line.find("\r\n"));
-		//unsigned int unchunked_length = hex2int((char *)tmp_first_line.c_str());
-
-
-		unsigned int unchunked_length = hex2int(tmp_first_line);
-
-
 
 		/*
 		 * length \r\n\
@@ -42,42 +22,71 @@ int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &lengt
 		 * end 0 \r\n
 		 * \r\n
 		 */
-		std::string end(buffer);
-		body = body.substr(body.find("\r\n") + 2, unchunked_length);
+int HTTP::post_expected_body(t_client_select &client, char * &buffer, int &length)
+{
+	std::ofstream existing_file;
+	existing_file.open(client._filename.c_str(), std::ios::binary | std::ios::app);
 
 
+	if (client._chunked)
+	{
 
-		//end = end.substr(end.find("\r\n") + 2, end.size() - (end.find("\r\n") + 2));
-		end = end.substr(end.find("\r\n") + 2, end.size() - (end.find("\r\n") + 2));
-		end = end.substr(unchunked_length, end.size() - unchunked_length);
-
-		std::cout << ">" << tmp_first_line << " >" << unchunked_length << std::endl;
-
-
-
-		std::cout << YELLOW << "end.size(): " << end.size() << " body.size(): " << body.size() << "valread: " << length << std::endl;
-
-
-		/* write to file and return */
-		std::cout << BLUE << "bs - ul" << (int)body.size() - unchunked_length << std::endl;
-		std::cout << BLUE << "bs: " << (int)body.size() << " ul: " << unchunked_length << std::endl;
-		//existing_file.write(body.c_str(), unchunked_length);
-		existing_file.write(buffer, length);
-
-		existing_file.close();
-		client._total_body_length += unchunked_length;
-
-
-		if (body.size() > unchunked_length)
+		std::string tmp_first_line;
+		std::string buf_str(buffer);
+		std::string body;
+		int x = 0;
+		while (!buf_str.empty())
 		{
-			std::cout << RED << "bs - ul" << (int)body.size() - unchunked_length << std::endl;
-			std::cout << RED << "bs: " << (int)body.size() << "ul: " << unchunked_length << std::endl;
-			client._expect_body = false;
-			client._post_done = true;
-//			client._header = "HTTP/1.1 204 No Content\r\n\r\n";
-			return 1;
+
+			/* get first line to get the length of chunk */
+			tmp_first_line = buf_str.substr(0, buf_str.find("\r\n"));
+			unsigned int unchunked_length = hex2int(tmp_first_line);
+			std::cout << YELLOW << "first_line: " << tmp_first_line << " size of fline: " << tmp_first_line.size() << " unchunk_len: " << unchunked_length << RESET << std::endl;
+
+			/* get body */
+			body = buf_str.substr(buf_str.find("\r\n") + 2, unchunked_length);
+
+			/* check if done and return 1 */
+			if (unchunked_length == 0 && body.empty())
+			{
+//				std::cout << MAGENTA << "DONE? bfstring:\n" << buf_str << RESET << std::endl;
+				existing_file.close();
+				client._expect_body = false;
+				client._post_done = true;
+				//client._header = "HTTP/1.1 204 No Content\r\n\r\n";
+				return 1;
+				break;
+			}
+
+			/* write body to file */
+//			if (x == 0)
+				existing_file.write(body.c_str(), unchunked_length);
+
+			/* trim body */
+			std::cout << RED << buf_str.substr(buf_str.size() -20., 20) << RESET << std::endl;
+			buf_str = buf_str.substr(buf_str.find("\r\n") + 2 + unchunked_length + 2); // + 2 at the end?
+			std::cout << RED << buf_str.substr(0, 20) << RESET << std::endl;
+			std::cout << buf_str.size() << "... length: "<< length << std::endl;
+
+			x++;
+//			if (x == 2)
+//				exit(1);
 		}
+
+		std::cout << RED << "end of loop" << RESET << std::endl;
+		existing_file.close();
 		return 0;
+
+//
+//		if (body.size() > unchunked_length)
+//		{
+//
+//			client._expect_body = false;
+//			client._post_done = true;
+//			client._header = "HTTP/1.1 204 No Content\r\n\r\n";
+//			return 1;
+//		}
+//		return 0;
 	}
 	else
 	{

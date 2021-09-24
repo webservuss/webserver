@@ -11,7 +11,7 @@
 #include "../utils/colors.hpp"
 #include "../Respond/respond.hpp"
 
-#define BUFFER_SIZE (1024 * 1024) // 1Mb
+#define BUFFER_SIZE (4024 * 1024) // 1Mb
 
 HTTP:: select_server::select_server(std::vector<int> ports, std::vector<t_server> parser_servers)
 {
